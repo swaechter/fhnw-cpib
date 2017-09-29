@@ -37,6 +37,6 @@ public class RelOprToken extends Token {
 
     @Override
     public String toString() {
-        return "TODO";
+        return "(" + Terminal.RELOPR + ", " + relopr.toString() + ")";
     }
 }

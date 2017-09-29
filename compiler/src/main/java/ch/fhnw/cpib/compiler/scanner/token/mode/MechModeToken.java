@@ -33,6 +33,6 @@ public class MechModeToken extends Token {
 
     @Override
     public String toString() {
-        return "TODO";
+        return "(" + Terminal.MECHMODE + ", " + mechmode.toString() + ")";
     }
 }

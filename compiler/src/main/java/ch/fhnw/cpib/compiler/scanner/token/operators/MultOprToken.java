@@ -34,6 +34,6 @@ public class MultOprToken extends Token {
 
     @Override
     public String toString() {
-        return "TODO";
+        return "(" + Terminal.MULTOPR + ", " + multopr.toString() + ")";
     }
 }

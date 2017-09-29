@@ -33,6 +33,6 @@ public class ChangeModeToken extends Token {
 
     @Override
     public String toString() {
-        return "TODO";
+        return "(" + Terminal.CHANGEMODE + ", " + changemode.toString() + ")";
     }
 }

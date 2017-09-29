@@ -18,6 +18,6 @@ public class LiteralToken extends Token {
 
     @Override
     public String toString() {
-        return "TODO";
+        return "(" + Terminal.LITERAL + ", " + name.toString() + ")";
     }
 }

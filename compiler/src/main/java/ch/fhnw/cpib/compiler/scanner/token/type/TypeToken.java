@@ -6,7 +6,6 @@ import ch.fhnw.cpib.compiler.scanner.terminal.Terminal;
 public class TypeToken extends Token {
 
     public enum Type {
-
         BOOL("BOOL"),
         INT("INT"),
         INT64("INT64");
@@ -36,6 +35,6 @@ public class TypeToken extends Token {
 
     @Override
     public String toString() {
-        return "TODO";
+        return "(" + Terminal.TYPE + ", " + type.toString() + ")";
     }
 }

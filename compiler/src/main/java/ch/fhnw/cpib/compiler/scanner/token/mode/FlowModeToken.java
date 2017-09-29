@@ -34,6 +34,6 @@ public class FlowModeToken extends Token {
 
     @Override
     public String toString() {
-        return "TODO";
+        return "(" + Terminal.FLOWMODE + ", " + flowmode.toString() + ")";
     }
 }

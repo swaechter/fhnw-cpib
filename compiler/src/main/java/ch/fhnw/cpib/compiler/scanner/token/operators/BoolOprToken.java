@@ -35,6 +35,6 @@ public class BoolOprToken extends Token {
 
     @Override
     public String toString() {
-        return "TODO";
+        return "(" + Terminal.BOOLOPR + ", " + boolopr.toString() + ")";
     }
 }

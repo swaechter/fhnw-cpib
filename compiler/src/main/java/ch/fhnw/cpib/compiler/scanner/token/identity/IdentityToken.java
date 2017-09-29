@@ -18,6 +18,6 @@ public class IdentityToken extends Token {
 
     @Override
     public String toString() {
-        return "TODO";
+        return "(" + Terminal.IDENT + ", " + name.toString() + ")";
     }
 }

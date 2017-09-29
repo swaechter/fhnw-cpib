@@ -33,6 +33,6 @@ public class AddOprToken extends Token {
 
     @Override
     public String toString() {
-        return "TODO";
+        return "(" + Terminal.ADDOPR + ", " + addropr.toString() + ")";
     }
 }
