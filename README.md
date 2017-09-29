@@ -7,7 +7,7 @@ is written in Java.
 
 ## Preparations
 
-    * Install the EditorConfig plugin in IntelliJ IDEA
+* Install the EditorConfig plugin in IntelliJ IDEA
 
 ## Build
 
