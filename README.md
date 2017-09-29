@@ -5,6 +5,10 @@
 This is our IML compiler for the module cpib (Building a compiler) that
 is written in Java.
 
+## Preparations
+
+    * Install the EditorConfig plugin in IntelliJ IDEA
+
 ## Build
 
     git clone https://github.com/swaechter/fhnw-cpib

@@ -2,10 +2,17 @@ package ch.fhnw.cpib.application;
 
 import ch.fhnw.cpib.compiler.Compiler;
 
+import java.io.File;
+
 public class Application {
 
     public static void main(String[] args) {
+        if (args.length != 1) {
+            System.err.println("Usage: compiler <filename>");
+            System.exit(1);
+        }
+
         Compiler compiler = new Compiler();
-        System.out.println("Text from the compiler: " + compiler.getText());
+        compiler.compileFile(new File(args[0]));
     }
 }

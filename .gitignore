@@ -3,4 +3,6 @@ target/
 
 # IDE from JetBrains
 .idea/
-*.iml
+cpib.iml
+application/application.iml
+compiler/compiler.iml
