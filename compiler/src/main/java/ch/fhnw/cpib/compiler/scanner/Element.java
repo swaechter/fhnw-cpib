@@ -21,7 +21,7 @@ public class Element {
     }
 
     public boolean isOperator() {
-        return toString().matches("[!,;:():=<>%/*+-]");
+        return toString().matches("[!,;:()=<>%/*+-]");
     }
 
     @Override
