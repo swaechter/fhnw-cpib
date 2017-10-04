@@ -7,6 +7,7 @@ import ch.fhnw.cpib.compiler.scanner.tokens.Token;
 import ch.fhnw.cpib.compiler.scanner.tokens.TokenList;
 import ch.fhnw.cpib.compiler.scanner.tokens.identifier.IdentifierToken;
 import ch.fhnw.cpib.compiler.scanner.tokens.literal.LiteralToken;
+import ch.fhnw.cpib.compiler.scanner.tokens.sentinel.SentinelToken;
 
 import java.io.File;
 import java.io.IOException;
@@ -112,6 +113,10 @@ public class Scanner {
                 }
             }
         }
+
+        // Add the end token
+        tokenlist.addToken(new SentinelToken(Terminal.SENTINEL));
+
         return tokenlist;
     }
 }

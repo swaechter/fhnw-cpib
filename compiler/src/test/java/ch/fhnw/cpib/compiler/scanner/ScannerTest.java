@@ -142,7 +142,10 @@ public class ScannerTest {
         "RPAREN",
 
         // Line 16: endprogram
-        "ENDPROGRAM"
+        "ENDPROGRAM",
+
+        // End
+        "SENTINEL"
     );
 
     @Test
