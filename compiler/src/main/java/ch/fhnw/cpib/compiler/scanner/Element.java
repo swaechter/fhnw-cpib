@@ -8,16 +8,24 @@ public class Element {
         this.character = character;
     }
 
+    public boolean isSlash() {
+        return character == '/';
+    }
+
+    public boolean isNewline() {
+        return character == '\n';
+    }
+
+    public boolean isSpaceOrTab() {
+        return character == ' ' || character == '\t';
+    }
+
     public boolean isDigit() {
         return Character.isDigit(character);
     }
 
     public boolean isLetter() {
         return Character.isLetter(character);
-    }
-
-    public boolean isSequence() {
-        return toString().matches("[ \\r\\n\\t]");
     }
 
     public boolean isOperator() {

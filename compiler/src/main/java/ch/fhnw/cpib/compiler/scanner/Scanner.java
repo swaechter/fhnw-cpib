@@ -55,7 +55,10 @@ public class Scanner {
             Element element = new Element(content.charAt(i));
             switch (state) {
                 case INITIAL: {
-                    if (element.isDigit()) {
+                    if (element.isSlash()) {
+                        holder.append(element);
+                        state = State.COMMENT;
+                    } else if (element.isDigit()) {
                         holder.append(element);
                         state = State.LITERAL;
                     } else if (element.isLetter()) {
@@ -64,10 +67,30 @@ public class Scanner {
                     } else if (element.isOperator()) {
                         holder.append(element);
                         state = State.OPERATOR;
-                    } else if (element.isSequence()) {
+                    } else if (element.isSpaceOrTab()) {
+                        state = State.INITIAL;
+                    } else if (element.isNewline()) {
                         state = State.INITIAL;
                     } else {
                         throw new ScannerException("Unknown character: " + element);
+                    }
+                    break;
+                }
+                case COMMENT: {
+                    if (holder.length() == 1 && element.isSlash()) {
+                        if (element.isSlash()) {
+                            holder.append(element);
+                        } else {
+                            holder.setLength(0);
+                            state = State.INITIAL;
+                            i--;
+                            i--;
+                        }
+                    } else {
+                        if (element.isNewline()) {
+                            holder.setLength(0);
+                            state = State.INITIAL;
+                        }
                     }
                     break;
                 }
