@@ -13,7 +13,7 @@ public class ScannerTest {
 
     private final List<String> stringtokens = Arrays.asList(
 
-        // Line 1: program intDiv(in  m:int32, in  n:int32,
+        // Line: program intDiv(in  m:int32, in  n:int32,
         "PROGRAM",
         "(IDENT,intDiv)",
         "LPAREN",
@@ -28,7 +28,7 @@ public class ScannerTest {
         "(TYPE,INT)",
         "COMMA",
 
-        // Line 2: out q:int32, out r:int32)
+        // Line: out q:int32, out r:int32)
         "(FLOWMODE,OUT)",
         "(IDENT,q)",
         "COLON",
@@ -40,10 +40,10 @@ public class ScannerTest {
         "(TYPE,INT)",
         "RPAREN",
 
-        // Line 3: global
+        // Line: global
         "GLOBAL",
 
-        // Line 4: proc divide(in copy const m:int32, in copy const n:int32,
+        // Line: proc divide(in copy const m:int32, in copy const n:int32,
         "PROC",
         "(IDENT,divide)",
         "LPAREN",
@@ -62,7 +62,7 @@ public class ScannerTest {
         "(TYPE,INT)",
         "COMMA",
 
-        // Line 5: out ref var   q:int32, out ref var   r:int32)
+        // Line: out ref var   q:int32, out ref var   r:int32)
         "(FLOWMODE,OUT)",
         "(MECHMODE,REF)",
         "(CHANGEMODE,VAR)",
@@ -78,31 +78,39 @@ public class ScannerTest {
         "(TYPE,INT)",
         "RPAREN",
 
-        // Line 6: do
+        // Line: do
         "DO",
 
-        // Line 7: q init := 0;
+        // Line: var p := 2 /2 // Not a comment
+        "(CHANGEMODE,VAR)",
+        "(IDENT,p)",
+        "BECOMES",
+        "(LITERAL,2)",
+        "(MULTOPR,DIVE)",
+        "(LITERAL,2)",
+
+        // Line: q init := 0;
         "(IDENT,q)",
         "INIT",
         "BECOMES",
         "(LITERAL,0)",
         "SEMICOLON",
 
-        // Line 8: r init := m;
+        // Line: r init := m;
         "(IDENT,r)",
         "INIT",
         "BECOMES",
         "(IDENT,m)",
         "SEMICOLON",
 
-        // Line 9: while r >= n do
+        // Line: while r >= n do
         "WHILE",
         "(IDENT,r)",
         "(RELOPR,GE)",
         "(IDENT,n)",
         "DO",
 
-        // Line 10: q := q + 1 ;
+        // Line: q := q + 1 ;
         "(IDENT,q)",
         "BECOMES",
         "(IDENT,q)",
@@ -110,23 +118,23 @@ public class ScannerTest {
         "(LITERAL,1)",
         "SEMICOLON",
 
-        // Line 11: r := r - n
+        // Line: r := r - n
         "(IDENT,r)",
         "BECOMES",
         "(IDENT,r)",
         "(ADDOPR,MINUS)",
         "(IDENT,n)",
 
-        // Line 12: endwhile
+        // Line: endwhile
         "ENDWHILE",
 
-        // Line 13: endproc
+        // Line: endproc
         "ENDPROC",
 
-        // Line 14: do
+        // Line: do
         "DO",
 
-        // Line 15: call divide(m, n, q init, r init)
+        // Line: call divide(m, n, q init, r init)
         "CALL",
         "(IDENT,divide)",
         "LPAREN",
@@ -141,7 +149,7 @@ public class ScannerTest {
         "INIT",
         "RPAREN",
 
-        // Line 16: endprogram
+        // Line: endprogram
         "ENDPROGRAM",
 
         // End

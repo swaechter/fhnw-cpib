@@ -77,17 +77,17 @@ public class Scanner {
                     break;
                 }
                 case COMMENT: {
-                    if (holder.length() == 1 && element.isSlash()) {
+                    if (holder.length() == 1) {
                         if (element.isSlash()) {
                             holder.append(element);
                         } else {
-                            holder.setLength(0);
-                            state = State.INITIAL;
-                            i--;
+                            state = State.OPERATOR;
                             i--;
                         }
                     } else {
-                        if (element.isNewline()) {
+                        if (!element.isNewline()) {
+                            holder.append(element);
+                        } else {
                             holder.setLength(0);
                             state = State.INITIAL;
                         }

@@ -9,6 +9,7 @@ global
   proc divide(in copy const m:int32, in copy const n:int32,
               out ref var   q:int32, out ref var   r:int32)
   do
+    var p := 2 /2 // Not a comment
     q init := 0; // Always zero
     r init := m; // No idea
     while r >= n do // while > for
