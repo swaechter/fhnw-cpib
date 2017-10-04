@@ -18,12 +18,12 @@ public enum Terminal {
     TYPE("TYPE"),
 
     // Symbols
-    COLON("COLON"),
-    COMMA("COMMA"),
-    SEMICOLON("SEMICOLON"),
-    BECOMES("BECOMES"),
-    LPAREN("LPAREN"),
-    RPAREN("RPAREN"),
+    COLON(":"),
+    COMMA(","),
+    SEMICOLON(";"),
+    BECOMES(":="),
+    LPAREN("("),
+    RPAREN(")"),
 
     // Modes
     FLOWMODE("FLOWMODE"),
@@ -38,7 +38,7 @@ public enum Terminal {
     ENDIF("ENDIF"),
     DEBUGIN("DEBUGIN"),
     DEBUGOUT("DEBUGOUT"),
-    NOTOPR("NOT"),
+    NOT("NOT"),
     FUN("FUN"),
     GLOBAL("GLOBAL"),
     LOCAL("LOCAL"),

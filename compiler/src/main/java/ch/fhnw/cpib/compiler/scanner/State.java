@@ -1,4 +1,8 @@
 package ch.fhnw.cpib.compiler.scanner;
 
-public class State {
+public enum State {
+    INITIAL,
+    IDENTITY,
+    LITERAL,
+    OPERATOR
 }
