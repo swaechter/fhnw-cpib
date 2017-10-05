@@ -27,6 +27,7 @@ public class Scanner {
 
     public TokenList parseFile(File file) throws ScannerException {
         String content = readFile(file);
+        content = sanitizeFile(content);
         return scanFile(content);
     }
 
@@ -44,6 +45,10 @@ public class Scanner {
             throw new ScannerException("The scanner was unable to read the input file: " + exception.getMessage(), exception);
         }
 
+    }
+
+    private String sanitizeFile(String content) {
+        return content.replace("\r\n", "\n");
     }
 
     private TokenList scanFile(String content) throws ScannerException {
