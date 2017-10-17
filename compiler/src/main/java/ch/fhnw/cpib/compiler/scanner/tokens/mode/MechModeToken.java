@@ -12,8 +12,8 @@ public class MechModeToken extends Token {
 
     private final MechMode mechmode;
 
-    public MechModeToken(String symbol, Terminal terminal, MechMode mechmode) {
-        super(symbol, terminal);
+    public MechModeToken(Terminal terminal, MechMode mechmode) {
+        super(terminal);
         this.mechmode = mechmode;
     }
 

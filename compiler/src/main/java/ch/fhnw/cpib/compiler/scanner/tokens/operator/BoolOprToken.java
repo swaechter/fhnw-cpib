@@ -14,8 +14,8 @@ public class BoolOprToken extends Token {
 
     private final Bool boolopr;
 
-    public BoolOprToken(String symbol, Terminal terminal, Bool boolopr) {
-        super(symbol, terminal);
+    public BoolOprToken(Terminal terminal, Bool boolopr) {
+        super(terminal);
         this.boolopr = boolopr;
     }
 

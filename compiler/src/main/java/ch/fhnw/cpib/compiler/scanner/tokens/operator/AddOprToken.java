@@ -12,8 +12,8 @@ public class AddOprToken extends Token {
 
     private final AddOpr addopr;
 
-    public AddOprToken(String symbol, Terminal terminal, AddOpr addopr) {
-        super(symbol, terminal);
+    public AddOprToken(Terminal terminal, AddOpr addopr) {
+        super(terminal);
         this.addopr = addopr;
     }
 

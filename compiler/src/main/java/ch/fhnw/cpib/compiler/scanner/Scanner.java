@@ -2,12 +2,8 @@ package ch.fhnw.cpib.compiler.scanner;
 
 import ch.fhnw.cpib.compiler.scanner.dictionary.Dictionary;
 import ch.fhnw.cpib.compiler.scanner.exception.ScannerException;
-import ch.fhnw.cpib.compiler.scanner.terminal.Terminal;
 import ch.fhnw.cpib.compiler.scanner.tokens.Token;
 import ch.fhnw.cpib.compiler.scanner.tokens.TokenList;
-import ch.fhnw.cpib.compiler.scanner.tokens.identifier.IdentifierToken;
-import ch.fhnw.cpib.compiler.scanner.tokens.literal.LiteralToken;
-import ch.fhnw.cpib.compiler.scanner.tokens.sentinel.SentinelToken;
 
 import java.io.File;
 import java.io.IOException;
@@ -103,7 +99,7 @@ public class Scanner {
                     if (element.isDigit()) {
                         holder.append(element);
                     } else {
-                        tokenlist.addToken(new LiteralToken(holder.toString(), Terminal.LITERAL));
+                        tokenlist.addToken(dictionary.lookupLiteral(holder.toString()));
                         holder.setLength(0);
                         state = State.INITIAL;
                         i--;
@@ -116,7 +112,7 @@ public class Scanner {
                     } else {
                         token = dictionary.lookupToken(holder.toString());
                         if (!token.isPresent()) {
-                            tokenlist.addToken(new IdentifierToken(holder.toString(), Terminal.IDENT));
+                            tokenlist.addToken(dictionary.lookupIdentifier(holder.toString()));
                         } else {
                             tokenlist.addToken(token.get());
                         }
@@ -143,7 +139,7 @@ public class Scanner {
         }
 
         // Add the end token
-        tokenlist.addToken(new SentinelToken(Terminal.SENTINEL));
+        tokenlist.addToken(dictionary.lookupSentinel());
 
         return tokenlist;
     }

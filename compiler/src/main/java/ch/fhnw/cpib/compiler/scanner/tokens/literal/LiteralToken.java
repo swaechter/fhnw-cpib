@@ -5,12 +5,15 @@ import ch.fhnw.cpib.compiler.scanner.tokens.Token;
 
 public class LiteralToken extends Token {
 
-    public LiteralToken(String name, Terminal terminal) {
-        super(name, terminal);
+    private final String value;
+
+    public LiteralToken(String value, Terminal terminal) {
+        super(terminal);
+        this.value = value;
     }
 
     @Override
     public String toString() {
-        return "(" + super.toString() + "," + getSymbol() + ")";
+        return "(" + super.toString() + "," + value + ")";
     }
 }

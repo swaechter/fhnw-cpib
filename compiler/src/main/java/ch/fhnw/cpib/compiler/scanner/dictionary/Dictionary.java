@@ -2,6 +2,8 @@ package ch.fhnw.cpib.compiler.scanner.dictionary;
 
 import ch.fhnw.cpib.compiler.scanner.terminal.Terminal;
 import ch.fhnw.cpib.compiler.scanner.tokens.Token;
+import ch.fhnw.cpib.compiler.scanner.tokens.identifier.IdentifierToken;
+import ch.fhnw.cpib.compiler.scanner.tokens.literal.LiteralToken;
 import ch.fhnw.cpib.compiler.scanner.tokens.mode.ChangeModeToken;
 import ch.fhnw.cpib.compiler.scanner.tokens.mode.FlowModeToken;
 import ch.fhnw.cpib.compiler.scanner.tokens.mode.MechModeToken;
@@ -9,86 +11,99 @@ import ch.fhnw.cpib.compiler.scanner.tokens.operator.AddOprToken;
 import ch.fhnw.cpib.compiler.scanner.tokens.operator.BoolOprToken;
 import ch.fhnw.cpib.compiler.scanner.tokens.operator.MultOprToken;
 import ch.fhnw.cpib.compiler.scanner.tokens.operator.RelOprToken;
+import ch.fhnw.cpib.compiler.scanner.tokens.sentinel.SentinelToken;
 import ch.fhnw.cpib.compiler.scanner.tokens.type.TypeToken;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class Dictionary {
 
-    private final List<Token> tokens;
+    private final Map<String, Token> tokens;
 
     public Dictionary() {
-        this.tokens = new ArrayList<>();
+        this.tokens = new HashMap<>();
 
         // Add all regular tokens
-        tokens.add(new Token("call", Terminal.CALL));
-        tokens.add(new Token("debugin", Terminal.DEBUGIN));
-        tokens.add(new Token("debugout", Terminal.DEBUGOUT));
-        tokens.add(new Token("do", Terminal.DO));
-        tokens.add(new Token("else", Terminal.ELSE));
-        tokens.add(new Token("endfun", Terminal.ENDFUN));
-        tokens.add(new Token("endproc", Terminal.ENDPROC));
-        tokens.add(new Token("endprogram", Terminal.ENDPROGRAM));
-        tokens.add(new Token("endwhile", Terminal.ENDWHILE));
-        tokens.add(new Token("endif", Terminal.ENDIF));
-        tokens.add(new Token("fun", Terminal.FUN));
-        tokens.add(new Token("global", Terminal.GLOBAL));
-        tokens.add(new Token("if", Terminal.IF));
-        tokens.add(new Token("init", Terminal.INIT));
-        tokens.add(new Token("local", Terminal.LOCAL));
-        tokens.add(new Token("not", Terminal.NOT));
-        tokens.add(new Token("proc", Terminal.PROC));
-        tokens.add(new Token("program", Terminal.PROGRAM));
-        tokens.add(new Token("returns", Terminal.RETURNS));
-        tokens.add(new Token("skip", Terminal.SKIP));
-        tokens.add(new Token("then", Terminal.THEN));
-        tokens.add(new Token("while", Terminal.WHILE));
-        tokens.add(new Token("sentinel", Terminal.SENTINEL));
+        tokens.put("call", new Token(Terminal.CALL));
+        tokens.put("debugin", new Token(Terminal.DEBUGIN));
+        tokens.put("debugout", new Token(Terminal.DEBUGOUT));
+        tokens.put("do", new Token(Terminal.DO));
+        tokens.put("else", new Token(Terminal.ELSE));
+        tokens.put("endfun", new Token(Terminal.ENDFUN));
+        tokens.put("endproc", new Token(Terminal.ENDPROC));
+        tokens.put("endprogram", new Token(Terminal.ENDPROGRAM));
+        tokens.put("endwhile", new Token(Terminal.ENDWHILE));
+        tokens.put("endif", new Token(Terminal.ENDIF));
+        tokens.put("fun", new Token(Terminal.FUN));
+        tokens.put("global", new Token(Terminal.GLOBAL));
+        tokens.put("if", new Token(Terminal.IF));
+        tokens.put("init", new Token(Terminal.INIT));
+        tokens.put("local", new Token(Terminal.LOCAL));
+        tokens.put("not", new Token(Terminal.NOT));
+        tokens.put("proc", new Token(Terminal.PROC));
+        tokens.put("program", new Token(Terminal.PROGRAM));
+        tokens.put("returns", new Token(Terminal.RETURNS));
+        tokens.put("skip", new Token(Terminal.SKIP));
+        tokens.put("then", new Token(Terminal.THEN));
+        tokens.put("while", new Token(Terminal.WHILE));
+        tokens.put("sentinel", new Token(Terminal.SENTINEL));
 
         // Symbols
-        tokens.add(new Token("(", Terminal.LPAREN));
-        tokens.add(new Token(")", Terminal.RPAREN));
-        tokens.add(new Token(",", Terminal.COMMA));
-        tokens.add(new Token(";", Terminal.SEMICOLON));
-        tokens.add(new Token(":", Terminal.COLON));
-        tokens.add(new Token(":=", Terminal.BECOMES));
+        tokens.put("(", new Token(Terminal.LPAREN));
+        tokens.put(")", new Token(Terminal.RPAREN));
+        tokens.put(",", new Token(Terminal.COMMA));
+        tokens.put(";", new Token(Terminal.SEMICOLON));
+        tokens.put(":", new Token(Terminal.COLON));
+        tokens.put(":=", new Token(Terminal.BECOMES));
 
         // Add all type tokens
-        tokens.add(new TypeToken("bool", Terminal.TYPE, TypeToken.Type.BOOL));
-        tokens.add(new TypeToken("int", Terminal.TYPE, TypeToken.Type.INT));
-        tokens.add(new TypeToken("int32", Terminal.TYPE, TypeToken.Type.INT));
-        tokens.add(new TypeToken("int64", Terminal.TYPE, TypeToken.Type.INT64));
+        tokens.put("bool", new TypeToken(Terminal.TYPE, TypeToken.Type.BOOL));
+        tokens.put("int", new TypeToken(Terminal.TYPE, TypeToken.Type.INT));
+        tokens.put("int32", new TypeToken(Terminal.TYPE, TypeToken.Type.INT));
+        tokens.put("int64", new TypeToken(Terminal.TYPE, TypeToken.Type.INT64));
 
         // Add all mode tokens
-        tokens.add(new ChangeModeToken("var", Terminal.CHANGEMODE, ChangeModeToken.ChangeMode.VAR));
-        tokens.add(new ChangeModeToken("const", Terminal.CHANGEMODE, ChangeModeToken.ChangeMode.CONST));
-        tokens.add(new FlowModeToken("in", Terminal.FLOWMODE, FlowModeToken.FlowMode.IN));
-        tokens.add(new FlowModeToken("inout", Terminal.FLOWMODE, FlowModeToken.FlowMode.INOUT));
-        tokens.add(new FlowModeToken("out", Terminal.FLOWMODE, FlowModeToken.FlowMode.OUT));
-        tokens.add(new MechModeToken("copy", Terminal.MECHMODE, MechModeToken.MechMode.COPY));
-        tokens.add(new MechModeToken("ref", Terminal.MECHMODE, MechModeToken.MechMode.REF));
+        tokens.put("var", new ChangeModeToken(Terminal.CHANGEMODE, ChangeModeToken.ChangeMode.VAR));
+        tokens.put("const", new ChangeModeToken(Terminal.CHANGEMODE, ChangeModeToken.ChangeMode.CONST));
+        tokens.put("in", new FlowModeToken(Terminal.FLOWMODE, FlowModeToken.FlowMode.IN));
+        tokens.put("inout", new FlowModeToken(Terminal.FLOWMODE, FlowModeToken.FlowMode.INOUT));
+        tokens.put("out", new FlowModeToken(Terminal.FLOWMODE, FlowModeToken.FlowMode.OUT));
+        tokens.put("copy", new MechModeToken(Terminal.MECHMODE, MechModeToken.MechMode.COPY));
+        tokens.put("ref", new MechModeToken(Terminal.MECHMODE, MechModeToken.MechMode.REF));
 
         // All all operator tokens
-        tokens.add(new AddOprToken("+", Terminal.ADDOPR, AddOprToken.AddOpr.PLUS));
-        tokens.add(new AddOprToken("-", Terminal.ADDOPR, AddOprToken.AddOpr.MINUS));
-        tokens.add(new BoolOprToken("&&", Terminal.BOOLOPR, BoolOprToken.Bool.AND));
-        tokens.add(new BoolOprToken("||", Terminal.BOOLOPR, BoolOprToken.Bool.OR));
-        tokens.add(new BoolOprToken("&?", Terminal.BOOLOPR, BoolOprToken.Bool.CAND));
-        tokens.add(new BoolOprToken("|?", Terminal.BOOLOPR, BoolOprToken.Bool.COR));
-        tokens.add(new MultOprToken("*", Terminal.MULTOPR, MultOprToken.MultOpr.TIMES));
-        tokens.add(new MultOprToken("/", Terminal.MULTOPR, MultOprToken.MultOpr.DIVE));
-        tokens.add(new MultOprToken("%", Terminal.MULTOPR, MultOprToken.MultOpr.MODE));
-        tokens.add(new RelOprToken("==", Terminal.RELOPR, RelOprToken.RelOpr.EQ));
-        tokens.add(new RelOprToken("!=", Terminal.RELOPR, RelOprToken.RelOpr.NE));
-        tokens.add(new RelOprToken("<", Terminal.RELOPR, RelOprToken.RelOpr.LT));
-        tokens.add(new RelOprToken(">", Terminal.RELOPR, RelOprToken.RelOpr.GT));
-        tokens.add(new RelOprToken("<=", Terminal.RELOPR, RelOprToken.RelOpr.LE));
-        tokens.add(new RelOprToken(">=", Terminal.RELOPR, RelOprToken.RelOpr.GE));
+        tokens.put("+", new AddOprToken(Terminal.ADDOPR, AddOprToken.AddOpr.PLUS));
+        tokens.put("-", new AddOprToken(Terminal.ADDOPR, AddOprToken.AddOpr.MINUS));
+        tokens.put("&&", new BoolOprToken(Terminal.BOOLOPR, BoolOprToken.Bool.AND));
+        tokens.put("||", new BoolOprToken(Terminal.BOOLOPR, BoolOprToken.Bool.OR));
+        tokens.put("&?", new BoolOprToken(Terminal.BOOLOPR, BoolOprToken.Bool.CAND));
+        tokens.put("|?", new BoolOprToken(Terminal.BOOLOPR, BoolOprToken.Bool.COR));
+        tokens.put("*", new MultOprToken(Terminal.MULTOPR, MultOprToken.MultOpr.TIMES));
+        tokens.put("/", new MultOprToken(Terminal.MULTOPR, MultOprToken.MultOpr.DIVE));
+        tokens.put("%", new MultOprToken(Terminal.MULTOPR, MultOprToken.MultOpr.MODE));
+        tokens.put("==", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.EQ));
+        tokens.put("!=", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.NE));
+        tokens.put("<", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.LT));
+        tokens.put(">", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.GT));
+        tokens.put("<=", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.LE));
+        tokens.put(">=", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.GE));
     }
 
     public Optional<Token> lookupToken(String symbol) {
-        return tokens.stream().filter(token -> symbol.equalsIgnoreCase(token.getSymbol())).findFirst();
+        return tokens.entrySet().stream().filter(e -> e.getKey().equalsIgnoreCase(symbol)).map(Map.Entry::getValue).findFirst();
+    }
+
+    public Token lookupLiteral(String name) {
+        return new LiteralToken(name, Terminal.LITERAL);
+    }
+
+    public Token lookupIdentifier(String value) {
+        return new IdentifierToken(value, Terminal.IDENT);
+    }
+
+    public Token lookupSentinel() {
+        return new SentinelToken(Terminal.SENTINEL);
     }
 }

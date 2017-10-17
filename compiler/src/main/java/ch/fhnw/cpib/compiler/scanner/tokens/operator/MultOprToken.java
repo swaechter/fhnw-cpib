@@ -13,8 +13,8 @@ public class MultOprToken extends Token {
 
     private final MultOpr multopr;
 
-    public MultOprToken(String symbol, Terminal terminal, MultOpr multopr) {
-        super(symbol, terminal);
+    public MultOprToken(Terminal terminal, MultOpr multopr) {
+        super(terminal);
         this.multopr = multopr;
     }
 

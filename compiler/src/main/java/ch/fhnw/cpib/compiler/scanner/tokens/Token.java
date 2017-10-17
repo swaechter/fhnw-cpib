@@ -4,17 +4,10 @@ import ch.fhnw.cpib.compiler.scanner.terminal.Terminal;
 
 public class Token {
 
-    private final String symbol;
-
     private final Terminal terminal;
 
-    public Token(String symbol, Terminal terminal) {
-        this.symbol = symbol;
+    public Token(Terminal terminal) {
         this.terminal = terminal;
-    }
-
-    public final String getSymbol() {
-        return symbol;
     }
 
     public final Terminal getTerminal() {

@@ -13,8 +13,8 @@ public class FlowModeToken extends Token {
 
     private final FlowMode flowmode;
 
-    public FlowModeToken(String symbol, Terminal terminal, FlowMode flowmode) {
-        super(symbol, terminal);
+    public FlowModeToken(Terminal terminal, FlowMode flowmode) {
+        super(terminal);
         this.flowmode = flowmode;
     }
 

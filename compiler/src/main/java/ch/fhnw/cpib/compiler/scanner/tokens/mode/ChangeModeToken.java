@@ -12,8 +12,8 @@ public class ChangeModeToken extends Token {
 
     private final ChangeMode changemode;
 
-    public ChangeModeToken(String symbol, Terminal terminal, ChangeMode changemode) {
-        super(symbol, terminal);
+    public ChangeModeToken(Terminal terminal, ChangeMode changemode) {
+        super(terminal);
         this.changemode = changemode;
     }
 

@@ -1,7 +1,7 @@
 package ch.fhnw.cpib.compiler.scanner.tokens.operator;
 
-import ch.fhnw.cpib.compiler.scanner.tokens.Token;
 import ch.fhnw.cpib.compiler.scanner.terminal.Terminal;
+import ch.fhnw.cpib.compiler.scanner.tokens.Token;
 
 public class RelOprToken extends Token {
 
@@ -16,8 +16,8 @@ public class RelOprToken extends Token {
 
     private final RelOpr relopr;
 
-    public RelOprToken(String symbol, Terminal terminal, RelOpr relopr) {
-        super(symbol, terminal);
+    public RelOprToken(Terminal terminal, RelOpr relopr) {
+        super(terminal);
         this.relopr = relopr;
     }
 

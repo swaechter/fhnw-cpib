@@ -5,12 +5,15 @@ import ch.fhnw.cpib.compiler.scanner.tokens.Token;
 
 public class IdentifierToken extends Token {
 
+    private final String name;
+
     public IdentifierToken(String name, Terminal terminal) {
-        super(name, terminal);
+        super(terminal);
+        this.name = name;
     }
 
     @Override
     public String toString() {
-        return "(" + super.toString() + "," + getSymbol() + ")";
+        return "(" + super.toString() + "," + name + ")";
     }
 }
