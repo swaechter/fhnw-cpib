@@ -12,6 +12,24 @@ global
     var p := 2 /2 // Not a comment
     q init := 0; // Always zero
     r init := m; // No idea
+
+    if p == 2 then
+        debugout p
+    elseif p == 3 then
+        debugout p
+    else
+        debugout p
+    endif
+
+    switch p
+        case 2 then
+            debugout p
+        case 3 then
+            debugout p
+        default
+            debugout p
+    endswitch
+
     while r >= n do // while > for
       q := q + 1 ;
       r := r - n

@@ -27,13 +27,17 @@ public class Dictionary {
 
         // Add all regular tokens
         tokens.put("call", new Token(Terminal.CALL));
+        tokens.put("case", new Token(Terminal.CASE));
         tokens.put("debugin", new Token(Terminal.DEBUGIN));
         tokens.put("debugout", new Token(Terminal.DEBUGOUT));
+        tokens.put("default", new Token(Terminal.DEFAULT));
         tokens.put("do", new Token(Terminal.DO));
         tokens.put("else", new Token(Terminal.ELSE));
+        tokens.put("elseif", new Token(Terminal.ELSEIF));
         tokens.put("endfun", new Token(Terminal.ENDFUN));
         tokens.put("endproc", new Token(Terminal.ENDPROC));
         tokens.put("endprogram", new Token(Terminal.ENDPROGRAM));
+        tokens.put("endswitch", new Token(Terminal.ENDSWITCH));
         tokens.put("endwhile", new Token(Terminal.ENDWHILE));
         tokens.put("endif", new Token(Terminal.ENDIF));
         tokens.put("fun", new Token(Terminal.FUN));
@@ -46,6 +50,7 @@ public class Dictionary {
         tokens.put("program", new Token(Terminal.PROGRAM));
         tokens.put("returns", new Token(Terminal.RETURNS));
         tokens.put("skip", new Token(Terminal.SKIP));
+        tokens.put("switch", new Token(Terminal.SWITCH));
         tokens.put("then", new Token(Terminal.THEN));
         tokens.put("while", new Token(Terminal.WHILE));
         tokens.put("sentinel", new Token(Terminal.SENTINEL));

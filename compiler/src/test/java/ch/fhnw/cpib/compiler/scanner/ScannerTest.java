@@ -103,6 +103,70 @@ public class ScannerTest {
         "(IDENT,m)",
         "SEMICOLON",
 
+        // Line if p == 2 then
+        "IF",
+        "(IDENT,p)",
+        "(RELOPR,EQ)",
+        "(LITERAL,2)",
+        "THEN",
+
+        // Line: debugout p
+        "DEBUGOUT",
+        "(IDENT,p)",
+
+        // Line: elseif p == 3 then
+        "ELSEIF",
+        "(IDENT,p)",
+        "(RELOPR,EQ)",
+        "(LITERAL,3)",
+        "THEN",
+
+        // Line: debugout p
+        "DEBUGOUT",
+        "(IDENT,p)",
+
+        // Line: else
+        "ELSE",
+
+        // Line: debugout p
+        "DEBUGOUT",
+        "(IDENT,p)",
+
+        // Line: endif
+        "ENDIF",
+
+        // Line: switch p
+        "SWITCH",
+        "(IDENT,p)",
+
+        // Line: case 2 then
+        "CASE",
+        "(LITERAL,2)",
+        "THEN",
+
+        // Line: debugout p
+        "DEBUGOUT",
+        "(IDENT,p)",
+
+        // Line: case 3 then
+        "CASE",
+        "(LITERAL,3)",
+        "THEN",
+
+        // Line: debugout p
+        "DEBUGOUT",
+        "(IDENT,p)",
+
+        // Line: default
+        "DEFAULT",
+
+        // Line: debugout p
+        "DEBUGOUT",
+        "(IDENT,p)",
+
+        // Line: endswitch
+        "ENDSWITCH",
+
         // Line: while r >= n do
         "WHILE",
         "(IDENT,r)",
