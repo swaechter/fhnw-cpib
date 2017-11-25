@@ -1,0 +1,12 @@
+language: java
+dist: trusty
+jdk:
+  - openjdk8
+  - oraclejdk8
+install: true
+script:
+  - mvn clean install
+notifications:
+  email:
+    on_success: always
+    on_failure: always
