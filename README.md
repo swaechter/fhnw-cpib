@@ -1,4 +1,4 @@
-# Compiler for the FHNW module cpib (Building a compiler)
+# Compiler for the FHNW module cpib (Building a compiler) [![Build Status](https://travis-ci.org/swaechter/angularj-universal.svg?branch=master)](https://travis-ci.org/swaechter/angularj-universal)
 
 ## Introduction
 
@@ -18,9 +18,9 @@ is written in Java.
 
 ## License
 
-The project os licensed under the GNU LGPL v3 or later.
+The project is licensed under the GNU LGPL v3 or later.
 
 ## Contact
 
-Feel free to contact to Simon Wächter (simon.waechter@students.fhnw.ch)
+Feel free to contact Simon Wächter (simon.waechter@students.fhnw.ch)
 or Tom Ohme (tom.ohme@students.fhnw.ch).
