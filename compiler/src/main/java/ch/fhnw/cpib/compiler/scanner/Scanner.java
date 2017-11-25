@@ -15,6 +15,14 @@ import java.util.Optional;
 
 public class Scanner {
 
+    private enum State {
+        INITIAL,
+        COMMENT,
+        IDENTITY,
+        LITERAL,
+        OPERATOR
+    }
+
     private final Dictionary dictionary;
 
     public Scanner() {

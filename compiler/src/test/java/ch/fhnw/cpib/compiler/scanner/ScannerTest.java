@@ -1,11 +1,14 @@
 package ch.fhnw.cpib.compiler.scanner;
 
+import ch.fhnw.cpib.compiler.scanner.terminal.Terminal;
 import ch.fhnw.cpib.compiler.scanner.tokens.Token;
 import ch.fhnw.cpib.compiler.scanner.tokens.TokenList;
+import ch.fhnw.cpib.compiler.scanner.tokens.sentinel.SentinelToken;
+import ch.fhnw.cpib.compiler.utils.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -222,26 +225,28 @@ public class ScannerTest {
 
     @Test
     public void testTokenList() throws Exception {
-        File file = createTemporaryFileFromInputStream("Temp", ".tmp", ClassLoader.class.getResourceAsStream("/Program.iml"));
+        File file = FileUtils.createTemporaryFileFromInputStream("Temp", ".tmp", ClassLoader.class.getResourceAsStream("/Program.iml"));
 
         Scanner scanner = new Scanner();
 
+        Token token = null;
         TokenList tokenlist = scanner.parseFile(file);
+        Assert.assertEquals(stringtokens.size(), tokenlist.getSize());
+
         for (String stringtoken : stringtokens) {
-            Token token = tokenlist.nextToken();
+            token = tokenlist.nextToken();
             System.out.println("Expected: " + stringtoken + " | Got: " + token.toString());
             Assert.assertTrue(stringtoken.equals(token.toString()));
         }
-    }
 
-    private File createTemporaryFileFromInputStream(String suffix, String prefix, InputStream inputstream) throws IOException {
-        File file = File.createTempFile(suffix, prefix);
-        OutputStream outputstream = new FileOutputStream(file);
-        int result = inputstream.read();
-        while (result != -1) {
-            outputstream.write((byte) result);
-            result = inputstream.read();
-        }
-        return file;
+        Assert.assertTrue(token != null);
+        Assert.assertTrue(token instanceof SentinelToken);
+        Assert.assertTrue(token.getTerminal().equals(Terminal.SENTINEL));
+
+        tokenlist.resetCounter();
+        token = tokenlist.nextToken();
+
+        Assert.assertTrue(token != null);
+        Assert.assertTrue(token.getTerminal().equals(Terminal.PROGRAM));
     }
 }

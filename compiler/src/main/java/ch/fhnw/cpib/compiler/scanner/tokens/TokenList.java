@@ -28,6 +28,10 @@ public class TokenList {
         }
     }
 
+    public int getSize() {
+        return tokens.size();
+    }
+
     public void resetCounter() {
         counter = 0;
     }
