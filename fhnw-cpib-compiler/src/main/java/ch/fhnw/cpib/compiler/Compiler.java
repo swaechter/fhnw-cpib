@@ -23,7 +23,7 @@ public class Compiler {
     public void compileFile(File file) {
         try {
             Token token;
-            TokenList tokenlist = scanner.parseFile(file);
+            TokenList tokenlist = scanner.scanFile(file);
             while ((token = tokenlist.nextToken()) != null) {
                 System.out.println(token.toString());
             }

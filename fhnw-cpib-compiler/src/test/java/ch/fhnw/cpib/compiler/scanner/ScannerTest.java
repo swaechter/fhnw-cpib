@@ -1,252 +1,128 @@
 package ch.fhnw.cpib.compiler.scanner;
 
-import ch.fhnw.cpib.compiler.scanner.terminal.Terminal;
-import ch.fhnw.cpib.compiler.scanner.tokens.Token;
 import ch.fhnw.cpib.compiler.scanner.tokens.TokenList;
-import ch.fhnw.cpib.compiler.scanner.tokens.sentinel.SentinelToken;
-import ch.fhnw.cpib.compiler.utils.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ScannerTest {
 
-    private final List<String> stringtokens = Arrays.asList(
-
-        // Line: program intDiv(in  m:int32, in  n:int32,
-        "PROGRAM",
-        "(IDENT,intDiv)",
-        "LPAREN",
-        "(FLOWMODE,IN)",
-        "(IDENT,m)",
-        "COLON",
-        "(TYPE,INT)",
-        "COMMA",
-        "(FLOWMODE,IN)",
-        "(IDENT,n)",
-        "COLON",
-        "(TYPE,INT)",
-        "COMMA",
-
-        // Line: out q:int32, out r:int32)
-        "(FLOWMODE,OUT)",
-        "(IDENT,q)",
-        "COLON",
-        "(TYPE,INT)",
-        "COMMA",
-        "(FLOWMODE,OUT)",
-        "(IDENT,r)",
-        "COLON",
-        "(TYPE,INT)",
-        "RPAREN",
-
-        // Line: global
-        "GLOBAL",
-
-        // Line: proc divide(in copy const m:int32, in copy const n:int32,
-        "PROC",
-        "(IDENT,divide)",
-        "LPAREN",
-        "(FLOWMODE,IN)",
-        "(MECHMODE,COPY)",
-        "(CHANGEMODE,CONST)",
-        "(IDENT,m)",
-        "COLON",
-        "(TYPE,INT)",
-        "COMMA",
-        "(FLOWMODE,IN)",
-        "(MECHMODE,COPY)",
-        "(CHANGEMODE,CONST)",
-        "(IDENT,n)",
-        "COLON",
-        "(TYPE,INT)",
-        "COMMA",
-
-        // Line: out ref var   q:int32, out ref var   r:int32)
-        "(FLOWMODE,OUT)",
-        "(MECHMODE,REF)",
-        "(CHANGEMODE,VAR)",
-        "(IDENT,q)",
-        "COLON",
-        "(TYPE,INT)",
-        "COMMA",
-        "(FLOWMODE,OUT)",
-        "(MECHMODE,REF)",
-        "(CHANGEMODE,VAR)",
-        "(IDENT,r)",
-        "COLON",
-        "(TYPE,INT)",
-        "RPAREN",
-
-        // Line: do
-        "DO",
-
-        // Line: var p := 2 /2 // Not a comment
-        "(CHANGEMODE,VAR)",
-        "(IDENT,p)",
-        "BECOMES",
-        "(LITERAL,2)",
-        "(MULTOPR,DIVE)",
-        "(LITERAL,2)",
-
-        // Line: q init := 0;
-        "(IDENT,q)",
-        "INIT",
-        "BECOMES",
-        "(LITERAL,0)",
-        "SEMICOLON",
-
-        // Line: r init := m;
-        "(IDENT,r)",
-        "INIT",
-        "BECOMES",
-        "(IDENT,m)",
-        "SEMICOLON",
-
-        // Line if p == 2 then
-        "IF",
-        "(IDENT,p)",
-        "(RELOPR,EQ)",
-        "(LITERAL,2)",
-        "THEN",
-
-        // Line: debugout p
-        "DEBUGOUT",
-        "(IDENT,p)",
-
-        // Line: elseif p == 3 then
-        "ELSEIF",
-        "(IDENT,p)",
-        "(RELOPR,EQ)",
-        "(LITERAL,3)",
-        "THEN",
-
-        // Line: debugout p
-        "DEBUGOUT",
-        "(IDENT,p)",
-
-        // Line: else
-        "ELSE",
-
-        // Line: debugout p
-        "DEBUGOUT",
-        "(IDENT,p)",
-
-        // Line: endif
-        "ENDIF",
-
-        // Line: switch p
-        "SWITCH",
-        "(IDENT,p)",
-
-        // Line: case 2 then
-        "CASE",
-        "(LITERAL,2)",
-        "THEN",
-
-        // Line: debugout p
-        "DEBUGOUT",
-        "(IDENT,p)",
-
-        // Line: case 3 then
-        "CASE",
-        "(LITERAL,3)",
-        "THEN",
-
-        // Line: debugout p
-        "DEBUGOUT",
-        "(IDENT,p)",
-
-        // Line: default
-        "DEFAULT",
-
-        // Line: debugout p
-        "DEBUGOUT",
-        "(IDENT,p)",
-
-        // Line: endswitch
-        "ENDSWITCH",
-
-        // Line: while r >= n do
-        "WHILE",
-        "(IDENT,r)",
-        "(RELOPR,GE)",
-        "(IDENT,n)",
-        "DO",
-
-        // Line: q := q + 1 ;
-        "(IDENT,q)",
-        "BECOMES",
-        "(IDENT,q)",
-        "(ADDOPR,PLUS)",
-        "(LITERAL,1)",
-        "SEMICOLON",
-
-        // Line: r := r - n
-        "(IDENT,r)",
-        "BECOMES",
-        "(IDENT,r)",
-        "(ADDOPR,MINUS)",
-        "(IDENT,n)",
-
-        // Line: endwhile
-        "ENDWHILE",
-
-        // Line: endproc
-        "ENDPROC",
-
-        // Line: do
-        "DO",
-
-        // Line: call divide(m, n, q init, r init)
-        "CALL",
-        "(IDENT,divide)",
-        "LPAREN",
-        "(IDENT,m)",
-        "COMMA",
-        "(IDENT,n)",
-        "COMMA",
-        "(IDENT,q)",
-        "INIT",
-        "COMMA",
-        "(IDENT,r)",
-        "INIT",
-        "RPAREN",
-
-        // Line: endprogram
-        "ENDPROGRAM",
-
-        // End
-        "SENTINEL"
+    // Overflow.iml and TypeConversions.iml were dropped due their use of pre- and post increment/decrement
+    private static final List<String> filenames = Arrays.asList(
+        "/Team/Program1.iml",
+        "/Team/Program2.iml",
+        "/Existing/Assoc.iml",
+        "/Existing/Cube.iml",
+        "/Existing/EuclidExtended.iml",
+        "/Existing/EuclidExtendedV2.iml",
+        "/Existing/Expr.iml",
+        "/Existing/Extreme.iml",
+        "/Existing/Factorial.iml",
+        "/Existing/Globals.iml",
+        "/Existing/IntDiv.iml",
+        "/Existing/IntDivCast.iml",
+        "/Existing/intDivFun.iml",
+        "/Existing/intDivMain.iml",
+        "/Existing/ModInverse.iml",
+        "/Existing/MultiAssi.iml",
+        "/Existing/mutRec.iml",
+        "/Existing/OutCopyTypeConversion.iml",
+        "/Existing/OverwritingOutParams.iml",
+        "/Existing/Parameters.iml",
+        "/Existing/Parameters02.iml",
+        "/Existing/RefParams.iml",
+        "/Existing/RSAExampleGallier.iml",
+        "/Existing/SameOutInit.iml",
+        "/Existing/Scopes.iml",
+        "/Existing/ScopesEdit.iml",
+        "/Existing/ScopesImport.iml",
+        "/Existing/ScopesImportInit.iml",
+        "/Existing/test.iml",
+        "/Existing/test01.iml",
+        "/Existing/test2.iml",
+        "/Existing/test02.iml",
+        "/Existing/test3.iml",
+        "/Existing/test4.iml",
+        "/Existing/test5.iml",
+        "/Existing/test6.iml",
+        "/Existing/test7.iml",
+        "/Existing/test08.iml",
+        "/Existing/test10.iml",
+        "/Existing/TestDivMod.iml",
+        "/Existing/TruthTable.iml"
     );
 
+    private final static Map<String, String> tokenmap = new HashMap<>();
+
+    private final static Scanner scanner = new Scanner();
+
+    @BeforeClass
+    public static void loadTokenMap() throws Exception {
+        InputStream inputstream = ScannerTest.class.getResourceAsStream("/TokenMap.txt");
+        String tokenmapcontent = IOUtils.toString(inputstream, StandardCharsets.UTF_8);
+        for (String line : tokenmapcontent.split("\n")) {
+            String[] parameters = line.split(":", 2);
+            Assert.assertTrue(parameters.length == 2);
+            Assert.assertTrue(parameters[0].length() > 0);
+            Assert.assertTrue(parameters[1].length() > 0);
+            tokenmap.put(parameters[0], parameters[1]);
+        }
+    }
+
     @Test
-    public void testTokenList() throws Exception {
-        File file = FileUtils.createTemporaryFileFromInputStream("Temp", ".tmp", ClassLoader.class.getResourceAsStream("/Program.iml"));
+    public void testTokenListsFromResource() throws Exception {
+        // Scan the tokens
+        for (String filename : filenames) {
+            InputStream fileinputstream = getClass().getResourceAsStream(filename);
+            String filecontent = IOUtils.toString(fileinputstream, StandardCharsets.UTF_8);
+            Assert.assertTrue(!filecontent.isEmpty());
 
-        Scanner scanner = new Scanner();
+            TokenList tokenlist = scanner.scanString(filecontent);
+            Assert.assertTrue(tokenlist.getSize() > 0);
 
-        Token token = null;
-        TokenList tokenlist = scanner.parseFile(file);
-        Assert.assertEquals(stringtokens.size(), tokenlist.getSize());
+            String realtokenlist = tokenmap.get(filename);
+            Assert.assertTrue(realtokenlist.equals(tokenlist.toString()));
+            //System.out.println(filename + ":" + tokenlist.toString());
+        }
+    }
 
-        for (String stringtoken : stringtokens) {
-            token = tokenlist.nextToken();
-            System.out.println("Expected: " + stringtoken + " | Got: " + token.toString());
-            Assert.assertTrue(stringtoken.equals(token.toString()));
+    @Test
+    public void testTokenListFromFileSystem() throws Exception {
+        Assert.assertTrue(filenames.size() > 0);
+        String filename = filenames.get(0);
+
+        // Create a temporary file
+        InputStream fileinputstream = getClass().getResourceAsStream(filename);
+        File file = createTemporaryFileFromInputStream("temp", "tmp", fileinputstream);
+
+        TokenList tokenlist = scanner.scanFile(file);
+        Assert.assertTrue(tokenlist.getSize() > 0);
+
+        String realtokenlist = tokenmap.get(filename);
+        Assert.assertTrue(realtokenlist.equals(tokenlist.toString()));
+    }
+
+    private File createTemporaryFileFromInputStream(String suffix, String prefix, InputStream inputstream) throws IOException {
+        File file = File.createTempFile(suffix, prefix);
+        file.deleteOnExit();
+
+        OutputStream outputstream = new FileOutputStream(file);
+        int result = inputstream.read();
+        while (result != -1) {
+            outputstream.write((byte) result);
+            result = inputstream.read();
         }
 
-        Assert.assertTrue(token != null);
-        Assert.assertTrue(token instanceof SentinelToken);
-        Assert.assertTrue(token.getTerminal().equals(Terminal.SENTINEL));
+        outputstream.close();
 
-        tokenlist.resetCounter();
-        token = tokenlist.nextToken();
-
-        Assert.assertTrue(token != null);
-        Assert.assertTrue(token.getTerminal().equals(Terminal.PROGRAM));
+        return file;
     }
 }

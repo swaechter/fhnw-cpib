@@ -55,6 +55,10 @@ public class Dictionary {
         tokens.put("while", new Token(Terminal.WHILE));
         tokens.put("sentinel", new Token(Terminal.SENTINEL));
 
+        // Add all regular legacy tokens
+        tokens.put("?", new Token(Terminal.DEBUGIN));
+        tokens.put("!", new Token(Terminal.DEBUGOUT));
+
         // Symbols
         tokens.put("(", new Token(Terminal.LPAREN));
         tokens.put(")", new Token(Terminal.RPAREN));
@@ -89,6 +93,7 @@ public class Dictionary {
         tokens.put("/", new MultOprToken(Terminal.MULTOPR, MultOprToken.MultOpr.DIVE));
         tokens.put("%", new MultOprToken(Terminal.MULTOPR, MultOprToken.MultOpr.MODE));
         tokens.put("==", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.EQ));
+        tokens.put("=", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.EQ));
         tokens.put("!=", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.NE));
         tokens.put("<", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.LT));
         tokens.put(">", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.GT));

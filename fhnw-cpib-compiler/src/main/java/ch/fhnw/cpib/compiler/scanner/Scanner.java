@@ -2,7 +2,8 @@ package ch.fhnw.cpib.compiler.scanner;
 
 import ch.fhnw.cpib.compiler.scanner.dictionary.Dictionary;
 import ch.fhnw.cpib.compiler.scanner.exception.ScannerException;
-import ch.fhnw.cpib.compiler.scanner.tokens.Token;
+import ch.fhnw.cpib.compiler.scanner.states.InitialState;
+import ch.fhnw.cpib.compiler.scanner.states.State;
 import ch.fhnw.cpib.compiler.scanner.tokens.TokenList;
 
 import java.io.File;
@@ -11,17 +12,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 
 public class Scanner {
-
-    private enum State {
-        INITIAL,
-        COMMENT,
-        IDENTITY,
-        LITERAL,
-        OPERATOR
-    }
 
     private final Dictionary dictionary;
 
@@ -29,13 +21,7 @@ public class Scanner {
         this.dictionary = new Dictionary();
     }
 
-    public TokenList parseFile(File file) throws ScannerException {
-        String content = readFile(file);
-        content = sanitizeFile(content);
-        return scanFile(content);
-    }
-
-    private String readFile(File file) throws ScannerException {
+    public TokenList scanFile(File file) throws ScannerException {
         // Check if the file exists
         if (!file.exists()) {
             throw new ScannerException("The scanner was unable to find the input file " + file.getAbsolutePath());
@@ -44,109 +30,54 @@ public class Scanner {
         // Read the file
         try {
             Path path = Paths.get(file.getAbsolutePath());
-            return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+            String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+            return createTokenList(sanitizeContent(content));
         } catch (IOException exception) {
             throw new ScannerException("The scanner was unable to read the input file: " + exception.getMessage(), exception);
         }
+    }
+
+    public TokenList scanString(String content) throws ScannerException {
+        return createTokenList(sanitizeContent(content));
 
     }
 
-    private String sanitizeFile(String content) {
-        return content.replace("\r\n", "\n");
+    private String sanitizeContent(String content) throws ScannerException {
+        content = content.replace("\r\n", "\n");
+        content = content.replace("\t", " ");
+        return content;
     }
 
-    private TokenList scanFile(String content) throws ScannerException {
-        State state = State.INITIAL;
-        Optional<Token> token;
+    private TokenList createTokenList(String content) throws ScannerException {
         TokenList tokenlist = new TokenList();
-        StringBuilder holder = new StringBuilder();
+        State state = new InitialState(tokenlist, dictionary);
         for (int i = 0; i < content.length(); i++) {
-            Element element = new Element(content.charAt(i));
-            switch (state) {
-                case INITIAL: {
-                    if (element.isSlash()) {
-                        holder.append(element);
-                        state = State.COMMENT;
-                    } else if (element.isDigit()) {
-                        holder.append(element);
-                        state = State.LITERAL;
-                    } else if (element.isLetter()) {
-                        holder.append(element);
-                        state = State.IDENTITY;
-                    } else if (element.isOperator()) {
-                        holder.append(element);
-                        state = State.OPERATOR;
-                    } else if (element.isSpaceOrTab()) {
-                        state = State.INITIAL;
-                    } else if (element.isNewline()) {
-                        state = State.INITIAL;
-                    } else {
-                        throw new ScannerException("Unknown character: " + element);
-                    }
-                    break;
-                }
-                case COMMENT: {
-                    if (holder.length() == 1) {
-                        if (element.isSlash()) {
-                            holder.append(element);
-                        } else {
-                            state = State.OPERATOR;
-                            i--;
-                        }
-                    } else {
-                        if (!element.isNewline()) {
-                            holder.append(element);
-                        } else {
-                            holder.setLength(0);
-                            state = State.INITIAL;
-                        }
-                    }
-                    break;
-                }
-                case LITERAL: {
-                    if (element.isDigit()) {
-                        holder.append(element);
-                    } else {
-                        tokenlist.addToken(dictionary.lookupLiteral(holder.toString()));
-                        holder.setLength(0);
-                        state = State.INITIAL;
-                        i--;
-                    }
-                    break;
-                }
-                case IDENTITY: {
-                    if (element.isDigit() || element.isLetter()) {
-                        holder.append(element);
-                    } else {
-                        token = dictionary.lookupToken(holder.toString());
-                        if (!token.isPresent()) {
-                            tokenlist.addToken(dictionary.lookupIdentifier(holder.toString()));
-                        } else {
-                            tokenlist.addToken(token.get());
-                        }
-                        holder.setLength(0);
-                        state = State.INITIAL;
-                        i--;
-                    }
-                    break;
-                }
-                case OPERATOR: {
-                    if ((token = dictionary.lookupToken(holder.toString() + element)).isPresent()) {
-                        tokenlist.addToken(token.get());
-                        holder.setLength(0);
-                        state = State.INITIAL;
-                    } else if ((token = dictionary.lookupToken(holder.toString())).isPresent()) {
-                        tokenlist.addToken(token.get());
-                        holder.setLength(0);
-                        state = State.INITIAL;
-                        i--;
-                    }
-                    break;
-                }
+            char element = content.charAt(i);
+            //System.out.println("[" + i + "]: " + element);
+            if (element == '\n') {
+                state = state.handleNewline();
+            } else if (Character.isLetter(element)) {
+                state = state.handleLetter(element);
+            } else if (Character.isDigit(element)) {
+                state = state.handleDigit(element);
+            } else if (Character.isSpaceChar(element)) {
+                state = state.handleSpace(element);
+            } else if (element == '\'') {
+                state = state.handleDash(element);
+            } else if (element == '/') {
+                state = state.handleSlash(element);
+            } else if (element == ' ') {
+                state = state.handleSpace(element);
+            } else if (element == '_') {
+                state = state.handleUnderScore(element);
+            } else if (String.valueOf(element).matches("[(),;:=*+-/<>&?!|]")) {
+                state = state.handleOperator(element);
+            } else {
+                state = state.handleUnknown(element);
             }
         }
 
-        // Add the end token
+        // Add final sentinel token
         tokenlist.addToken(dictionary.lookupSentinel());
 
         return tokenlist;

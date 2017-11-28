@@ -2,6 +2,7 @@ package ch.fhnw.cpib.compiler.scanner.tokens;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TokenList {
 
@@ -34,5 +35,10 @@ public class TokenList {
 
     public void resetCounter() {
         counter = 0;
+    }
+
+    @Override
+    public String toString() {
+        return (!tokens.isEmpty()) ? tokens.stream().map(Object::toString).collect(Collectors.joining(", ")) : "[]";
     }
 }
