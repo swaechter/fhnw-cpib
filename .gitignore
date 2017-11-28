@@ -3,6 +3,6 @@ target/
 
 # IDE from JetBrains
 .idea/
-cpib.iml
-application/application.iml
-compiler/compiler.iml
+fhnw-cpib.iml
+fhnw-cpib-application/fhnw-cpib-application.iml
+fhnw-cpib-compiler/fhnw-cpib-compiler.iml
