@@ -4,7 +4,6 @@ import ch.fhnw.cpib.compiler.parser.Parser;
 import ch.fhnw.cpib.compiler.parser.exception.ParserException;
 import ch.fhnw.cpib.compiler.scanner.Scanner;
 import ch.fhnw.cpib.compiler.scanner.exception.ScannerException;
-import ch.fhnw.cpib.compiler.scanner.tokens.Token;
 import ch.fhnw.cpib.compiler.scanner.tokens.TokenList;
 
 import java.io.File;
@@ -22,14 +21,19 @@ public class Compiler {
 
     public void compileFile(File file) {
         try {
-            Token token;
-            TokenList tokenlist = scanner.scanFile(file);
-            while ((token = tokenlist.nextToken()) != null) {
-                System.out.println(token.toString());
-            }
+            // Show the file path
+            System.out.println("Scanning file: " + file.getAbsolutePath());
+            System.out.println();
 
-            tokenlist.resetCounter();
+            // Scan the source code and show the token list
+            TokenList tokenlist = scanner.scanFile(file);
+            System.out.println("Scanned token list: " + tokenlist.toString());
+            System.out.println();
+
+            // Parse the concrete tree and show it
             parser.parseTokenList(tokenlist);
+            System.out.println("Parsed concrete tree: Not implemented yet!");
+            System.out.println();
         } catch (ScannerException exception) {
             System.out.println("During the scanning process, an error occurred: " + exception.getMessage());
             System.exit(1);
