@@ -66,11 +66,11 @@ public class ScannerTest {
 
     @BeforeClass
     public static void loadTokenMap() throws Exception {
+        // Load the expected token map
         InputStream inputstream = ScannerTest.class.getResourceAsStream("/TokenMap.txt");
-        String tokenmapcontent = IOUtils.toString(inputstream, StandardCharsets.UTF_8);
-        for (String line : tokenmapcontent.split("\n")) {
+        for (String line : IOUtils.readLines(inputstream, StandardCharsets.UTF_8)) {
             String[] parameters = line.split(":", 2);
-            Assert.assertTrue(parameters.length == 2);
+            Assert.assertEquals(2, parameters.length);
             Assert.assertTrue(parameters[0].length() > 0);
             Assert.assertTrue(parameters[1].length() > 0);
             tokenmap.put(parameters[0], parameters[1]);
@@ -83,13 +83,13 @@ public class ScannerTest {
         for (String filename : filenames) {
             InputStream fileinputstream = getClass().getResourceAsStream(filename);
             String filecontent = IOUtils.toString(fileinputstream, StandardCharsets.UTF_8);
-            Assert.assertTrue(!filecontent.isEmpty());
+            Assert.assertFalse(filecontent.isEmpty());
 
             TokenList tokenlist = scanner.scanString(filecontent);
             Assert.assertTrue(tokenlist.getSize() > 0);
 
             String realtokenlist = tokenmap.get(filename);
-            Assert.assertTrue(realtokenlist.equals(tokenlist.toString()));
+            Assert.assertEquals(realtokenlist, tokenlist.toString());
             //System.out.println(filename + ":" + tokenlist.toString());
         }
     }
@@ -107,7 +107,7 @@ public class ScannerTest {
         Assert.assertTrue(tokenlist.getSize() > 0);
 
         String realtokenlist = tokenmap.get(filename);
-        Assert.assertTrue(realtokenlist.equals(tokenlist.toString()));
+        Assert.assertEquals(realtokenlist, tokenlist.toString());
     }
 
     private File createTemporaryFileFromInputStream(String suffix, String prefix, InputStream inputstream) throws IOException {
