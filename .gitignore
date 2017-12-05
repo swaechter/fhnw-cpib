@@ -4,5 +4,7 @@ target/
 # IDE from JetBrains
 .idea/
 fhnw-cpib.iml
-fhnw-cpib-application/fhnw-cpib-application.iml
 fhnw-cpib-compiler/fhnw-cpib-compiler.iml
+fhnw-cpib-interpreter/fhnw-cpib-interpreter.iml
+fhnw-cpib-platform/fhnw-cpib-platform.iml
+fhnw-cpib-vm/fhnw-cpib-vm.iml
