@@ -5,13 +5,12 @@
 This is our IML compiler for the module cpib (Building a compiler) that
 is written in Java.
 
-| Module name | Content and responsibilities |
-| ----------------------|---------------- |
-| fhnw-cpib-compiler | Standalone application that can compile IML code to byte code     |
-| fhnw-cpib-interpreter | Standalone application that can interpret byte code and execute it in the VM |
-| fhnw-cpib-platform | Platform that provides the whole compiler as a library |
-| fhnw-cpib-vm | Library that provides the virtual machine from Mr. Lederer|
-
+| Module name           | Content and responsibilities                                                              |
+| ----------------------|------------------------------------------------------------------------------------------ |
+| fhnw-cpib-compiler    | Standalone application that can compile IML code to byte code                             |
+| fhnw-cpib-interpreter | Standalone application that can interpret byte code and execute it in the virtual machine |
+| fhnw-cpib-platform    | Platform that provides the whole compiler as a library                                    |
+| fhnw-cpib-vm          | Library that provides the virtual machine from Mr. Edgar Lederer (FHNW)                   |
 
 ## Build
 
