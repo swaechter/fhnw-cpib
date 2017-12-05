@@ -31,7 +31,7 @@ Execute some IML code:
 
     java -jar fhnw-cpib-compiler/target/fhnw-cpib-compiler-0.1.0-jar-with-dependencies.jar fhnw-cpib-platform/src/test/resources/Team/Program1.iml
 
-Copy the result and start run it in the interpreter:
+Copy the result and run it in the interpreter:
 
      java -jar fhnw-cpib-interpreter/target/fhnw-cpib-interpreter-0.1.0-jar-with-dependencies.jar
 
