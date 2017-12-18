@@ -90,8 +90,8 @@ public class ScannerTest {
             Assert.assertTrue(tokenlist.getSize() > 0);
 
             String realtokenlist = tokenmap.get(filename);
-            //Assert.assertEquals(realtokenlist, tokenlist.toString());
-            System.out.println(filename + ":" + tokenlist.toString());
+            Assert.assertEquals(realtokenlist, tokenlist.toString());
+            //System.out.println(filename + ":" + tokenlist.toString());
         }
     }
 

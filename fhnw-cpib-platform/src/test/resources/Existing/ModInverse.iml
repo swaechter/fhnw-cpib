@@ -1,4 +1,4 @@
-program ModInverse
+program ModInverse()
 global
   const m:int32 ; const a:int32 ;
   input(m, a) ;

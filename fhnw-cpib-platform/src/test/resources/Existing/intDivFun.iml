@@ -1,4 +1,4 @@
-program intDiv
+program intDiv()
 global
   fun divFun(in copy m:int, in copy n:int) returns var q:int
   local var r:int

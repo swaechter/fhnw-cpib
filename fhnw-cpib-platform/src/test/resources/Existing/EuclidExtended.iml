@@ -1,4 +1,4 @@
-program EuclidExtended
+program EuclidExtended()
 global
   var   a :int32 ; var   b :int32 ;
   const u :int32 ; const v :int32 ;

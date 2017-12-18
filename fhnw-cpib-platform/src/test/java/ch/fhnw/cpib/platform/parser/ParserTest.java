@@ -28,7 +28,7 @@ public class ParserTest {
         "/Existing/IntDiv.iml",
         //"/Existing/IntDivCast.iml",
         //"/Existing/intDivFun.iml",
-        //"/Existing/intDivMain.iml",
+        "/Existing/intDivMain.iml",
         //"/Existing/ModInverse.iml",
         "/Existing/MultiAssi.iml",
         "/Existing/mutRec.iml",
