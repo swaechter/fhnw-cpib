@@ -1,4 +1,4 @@
-program intDiv
+program intDiv()
 global
   proc inc(inout ref n:int) do n := n + 1 endproc ;
 

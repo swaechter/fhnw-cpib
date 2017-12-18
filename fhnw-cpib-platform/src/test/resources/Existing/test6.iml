@@ -1,4 +1,4 @@
-program test6
+program test6()
 global
   var g:int;
   proc p(inout ref r:int) do skip endproc

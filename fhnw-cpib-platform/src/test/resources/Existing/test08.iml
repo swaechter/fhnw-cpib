@@ -1,4 +1,4 @@
-program test08
+program test08()
 global
   g1:int32; var g2:int32; g3:int32; g4:int32; g5:int32; g6:int32;
 

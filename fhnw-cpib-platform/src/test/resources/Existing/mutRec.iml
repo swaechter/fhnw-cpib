@@ -1,4 +1,4 @@
-program mutRec
+program mutRec()
 global
   var i:int32;
 
