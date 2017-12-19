@@ -6,13 +6,6 @@ import ch.fhnw.cpib.platform.scanner.states.InitialState;
 import ch.fhnw.cpib.platform.scanner.states.State;
 import ch.fhnw.cpib.platform.scanner.tokens.TokenList;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 public class Scanner {
 
     private final Dictionary dictionary;
@@ -21,25 +14,8 @@ public class Scanner {
         this.dictionary = new Dictionary();
     }
 
-    public TokenList scanFile(File file) throws ScannerException {
-        // Check if the file exists
-        if (!file.exists()) {
-            throw new ScannerException("The scanner was unable to find the input file " + file.getAbsolutePath());
-        }
-
-        // Read the file
-        try {
-            Path path = Paths.get(file.getAbsolutePath());
-            String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-            return createTokenList(sanitizeContent(content));
-        } catch (IOException exception) {
-            throw new ScannerException("The scanner was unable to read the input file: " + exception.getMessage(), exception);
-        }
-    }
-
     public TokenList scanString(String content) throws ScannerException {
         return createTokenList(sanitizeContent(content));
-
     }
 
     private String sanitizeContent(String content) throws ScannerException {

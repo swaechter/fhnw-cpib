@@ -1,13 +1,12 @@
 package ch.fhnw.cpib.platform.scanner;
 
-import ch.fhnw.cpib.platform.Utils;
 import ch.fhnw.cpib.platform.scanner.tokens.TokenList;
-import org.apache.commons.io.IOUtils;
+import ch.fhnw.cpib.platform.utils.ReaderUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -69,7 +68,7 @@ public class ScannerTest {
     public static void loadTokenMap() throws Exception {
         // Load the expected token map
         InputStream inputstream = ScannerTest.class.getResourceAsStream("/TokenMap.txt");
-        for (String line : IOUtils.readLines(inputstream, StandardCharsets.UTF_8)) {
+        for (String line : ReaderUtils.getContentLinesFromInputStream(inputstream, StandardCharsets.UTF_8)) {
             String[] parameters = line.split(":", 2);
             Assert.assertEquals(2, parameters.length);
             Assert.assertTrue(parameters[0].length() > 0);
@@ -82,32 +81,15 @@ public class ScannerTest {
     public void testTokenListsFromResource() throws Exception {
         // Scan the tokens
         for (String filename : filenames) {
-            InputStream fileinputstream = getClass().getResourceAsStream(filename);
-            String filecontent = IOUtils.toString(fileinputstream, StandardCharsets.UTF_8);
-            Assert.assertFalse(filecontent.isEmpty());
+            String content = ReaderUtils.getContentFromInputStream(getClass().getResourceAsStream(filename), StandardCharsets.UTF_8);
+            Assert.assertFalse(content.isEmpty());
 
-            TokenList tokenlist = scanner.scanString(filecontent);
+            TokenList tokenlist = scanner.scanString(content);
             Assert.assertTrue(tokenlist.getSize() > 0);
 
             String realtokenlist = tokenmap.get(filename);
             Assert.assertEquals(realtokenlist, tokenlist.toString());
             //System.out.println(filename + ":" + tokenlist.toString());
         }
-    }
-
-    @Test
-    public void testTokenListFromFileSystem() throws Exception {
-        Assert.assertTrue(filenames.size() > 0);
-        String filename = filenames.get(0);
-
-        // Create a temporary file
-        InputStream fileinputstream = getClass().getResourceAsStream(filename);
-        File file = Utils.createTemporaryFileFromInputStream("temp", "tmp", fileinputstream);
-
-        TokenList tokenlist = scanner.scanFile(file);
-        Assert.assertTrue(tokenlist.getSize() > 0);
-
-        String realtokenlist = tokenmap.get(filename);
-        Assert.assertEquals(realtokenlist, tokenlist.toString());
     }
 }

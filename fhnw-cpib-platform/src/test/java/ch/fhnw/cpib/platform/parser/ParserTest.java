@@ -3,11 +3,10 @@ package ch.fhnw.cpib.platform.parser;
 import ch.fhnw.cpib.platform.parser.concrete.ConcreteTree;
 import ch.fhnw.cpib.platform.scanner.Scanner;
 import ch.fhnw.cpib.platform.scanner.tokens.TokenList;
-import org.apache.commons.io.IOUtils;
+import ch.fhnw.cpib.platform.utils.ReaderUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -68,8 +67,7 @@ public class ParserTest {
         // Parse the files
         for (String filename : filenames) {
             // Load the program
-            InputStream inputstream = getClass().getResourceAsStream(filename);
-            String content = IOUtils.toString(inputstream, StandardCharsets.UTF_8);
+            String content = ReaderUtils.getContentFromInputStream(getClass().getResourceAsStream(filename), StandardCharsets.UTF_8);
             Assert.assertFalse(content.isEmpty());
 
             // Scan the program
