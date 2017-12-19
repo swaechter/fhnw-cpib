@@ -94,11 +94,19 @@ public class Dictionary {
         tokens.put("%", new MultOprToken(Terminal.MULTOPR, MultOprToken.MultOpr.MODE));
         tokens.put("==", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.EQ));
         tokens.put("=", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.EQ));
-        tokens.put("!=", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.NE));
+        tokens.put("/=", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.NE));
         tokens.put("<", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.LT));
         tokens.put(">", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.GT));
         tokens.put("<=", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.LE));
         tokens.put(">=", new RelOprToken(Terminal.RELOPR, RelOprToken.RelOpr.GE));
+
+        // Add all legacy operator tokens
+        tokens.put("divE", new MultOprToken(Terminal.MULTOPR, MultOprToken.MultOpr.DIVE));
+        tokens.put("divF", new MultOprToken(Terminal.MULTOPR, MultOprToken.MultOpr.DIVE));
+        tokens.put("divT", new MultOprToken(Terminal.MULTOPR, MultOprToken.MultOpr.DIVE));
+        tokens.put("modE", new MultOprToken(Terminal.MULTOPR, MultOprToken.MultOpr.MODE));
+        tokens.put("modF", new MultOprToken(Terminal.MULTOPR, MultOprToken.MultOpr.MODE));
+        tokens.put("modT", new MultOprToken(Terminal.MULTOPR, MultOprToken.MultOpr.MODE));
     }
 
     public Optional<Token> lookupToken(String symbol) {

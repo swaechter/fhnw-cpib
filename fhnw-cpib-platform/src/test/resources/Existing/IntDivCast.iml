@@ -1,4 +1,4 @@
-program intDivCast(in  m:int1024, in  n:int32,
+program intDivCast(in  m:int64, in  n:int32,
                    out q:int32, out r:int32)
 global
   m':int32;

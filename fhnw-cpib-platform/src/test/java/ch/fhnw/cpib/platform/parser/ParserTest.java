@@ -1,5 +1,6 @@
 package ch.fhnw.cpib.platform.parser;
 
+import ch.fhnw.cpib.platform.parser.concrete.ConcreteTree;
 import ch.fhnw.cpib.platform.scanner.Scanner;
 import ch.fhnw.cpib.platform.scanner.tokens.TokenList;
 import org.apache.commons.io.IOUtils;
@@ -15,47 +16,47 @@ public class ParserTest {
 
     // Overflow.iml and TypeConversions.iml were dropped due their use of pre- and post increment/decrement
     private static final List<String> filenames = Arrays.asList(
-        //"/Team/Program1.iml",
+        //"/Team/Program1.iml"
         "/Team/Program2.iml",
-        //"/Existing/Assoc.iml",
-        //"/Existing/Cube.iml",
+        "/Existing/Assoc.iml",
+        "/Existing/Cube.iml",
         //"/Existing/EuclidExtended.iml",
-        //"/Existing/EuclidExtendedV2.iml",
-        //"/Existing/Expr.iml",
-        //"/Existing/Extreme.iml",
-        //"/Existing/Factorial.iml",
+        "/Existing/EuclidExtendedV2.iml",
+        "/Existing/Expr.iml",
+        "/Existing/Extreme.iml",
+        "/Existing/Factorial.iml",
         "/Existing/Globals.iml",
         "/Existing/IntDiv.iml",
-        //"/Existing/IntDivCast.iml",
-        //"/Existing/intDivFun.iml",
+        "/Existing/IntDivCast.iml",
+        "/Existing/intDivFun.iml",
         "/Existing/intDivMain.iml",
         //"/Existing/ModInverse.iml",
         "/Existing/MultiAssi.iml",
         "/Existing/mutRec.iml",
-        //"/Existing/OutCopyTypeConversion.iml",
+        "/Existing/OutCopyTypeConversion.iml",
         "/Existing/OverwritingOutParams.iml",
-        //"/Existing/Parameters.iml",
-        //"/Existing/Parameters02.iml",
+        "/Existing/Parameters.iml",
+        "/Existing/Parameters02.iml",
         "/Existing/RefParams.iml",
         //"/Existing/RSAExampleGallier.iml",
         "/Existing/SameOutInit.iml",
-        //"/Existing/Scopes.iml",
-        //"/Existing/ScopesEdit.iml",
+        "/Existing/Scopes.iml",
+        "/Existing/ScopesEdit.iml",
         "/Existing/ScopesImport.iml",
         "/Existing/ScopesImportInit.iml",
-        //"/Existing/test.iml",
+        "/Existing/test.iml",
         "/Existing/test01.iml",
-        //"/Existing/test2.iml",
+        "/Existing/test2.iml",
         "/Existing/test02.iml",
-        //"/Existing/test3.iml",
-        //"/Existing/test4.iml",
+        "/Existing/test3.iml",
+        "/Existing/test4.iml",
         "/Existing/test5.iml",
         "/Existing/test6.iml",
-        //"/Existing/test7.iml",
+        // "/Existing/test7.iml", output (g1, g3);
         "/Existing/test08.iml",
-        "/Existing/test10.iml"
-        //"/Existing/TestDivMod.iml",
-        //"/Existing/TruthTable.iml"
+        "/Existing/test10.iml",
+        // "/Existing/TestDivMod.iml", output (t0, tE, tF, tT, t0n, tEn, tFn, tTn);
+        "/Existing/TruthTable.iml"
     );
 
     @Test
@@ -76,7 +77,8 @@ public class ParserTest {
             Assert.assertTrue(tokenlist.getSize() > 0);
 
             // Parse the token list
-            parser.parseTokenList(tokenlist);
+            ConcreteTree.Program program = parser.parseTokenList(tokenlist);
+            Assert.assertNotNull(program);
         }
     }
 }

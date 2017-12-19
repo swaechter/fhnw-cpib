@@ -85,13 +85,8 @@ public class CommentState extends State {
         if (getToken().length() == 2) {
             return this;
         } else {
-            Optional<Token> token = getDictionary().lookupToken(getToken());
-            if (token.isPresent()) {
-                getTokenList().addToken(token.get());
-                return new ch.fhnw.cpib.platform.scanner.states.OperatorState(this, character);
-            } else {
-                return super.handleDigit(character);
-            }
+            OperatorState state = new OperatorState(this, getToken().charAt(0));
+            return state.handleOperator(character);
         }
     }
 

@@ -1,4 +1,4 @@
-program OutCopyTypeConversion(in x:int32, out y:int1024)
+program OutCopyTypeConversion(in x:int32, out y:int64)
 global
   var g1:int32;
   var g2:int64;

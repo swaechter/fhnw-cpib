@@ -9,6 +9,7 @@ import ch.fhnw.cpib.platform.scanner.tokens.TokenList;
 import ch.fhnw.cpib.platform.scanner.tokens.identifier.IdentifierToken;
 import ch.fhnw.cpib.platform.scanner.tokens.literal.LiteralToken;
 import ch.fhnw.cpib.platform.scanner.tokens.mode.ChangeModeToken;
+import ch.fhnw.cpib.platform.scanner.tokens.operator.MultOprToken;
 import ch.fhnw.cpib.platform.scanner.tokens.type.TypeToken;
 
 public class Parser {
@@ -107,6 +108,7 @@ public class Parser {
                 ConcreteTree.OptCpsStoDecl optcpsstodecl = parseOptCpsStoDecl(context);
                 consumeTerminal(context, Terminal.DO);
                 ConcreteTree.CpsCmd cpscmd = parseCpsCmd(context);
+                consumeTerminal(context, Terminal.ENDFUN);
                 return new ConcreteTree.FunDecl();
             default:
                 throw new ParserException("Invalid terminal in funDecl: " + context.getTerminal());
