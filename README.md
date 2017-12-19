@@ -1,4 +1,4 @@
-# Compiler for the FHNW module cpib (Building a compiler) [![Build Status](https://travis-ci.org/swaechter/angularj-universal.svg?branch=master)](https://travis-ci.org/swaechter/angularj-universal)
+# Compiler for the FHNW module cpib (Building a compiler) [![Build Status](https://travis-ci.org/swaechter/fhnw-cpib.svg?branch=master)](https://travis-ci.org/swaechter/fhnw-cpib)
 
 ## Introduction
 
