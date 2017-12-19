@@ -1,12 +1,12 @@
 package ch.fhnw.cpib.platform.parser.concrete;
 
-import ch.fhnw.cpib.platform.scanner.tokens.identifier.IdentifierToken;
+import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
 public class ConcreteTree {
 
     public static class Program extends Item {
 
-        private final IdentifierToken identifier;
+        private final Tokens.IdentifierToken identifier;
 
         private final ProgParamList progparamlist;
 
@@ -14,7 +14,7 @@ public class ConcreteTree {
 
         private final CpsCmd cpscmd;
 
-        public Program(IdentifierToken identifier, ProgParamList progparamlist, OptCpsDecl optcpsdecl, CpsCmd cpscmd) {
+        public Program(Tokens.IdentifierToken identifier, ProgParamList progparamlist, OptCpsDecl optcpsdecl, CpsCmd cpscmd) {
             this.identifier = identifier;
             this.progparamlist = progparamlist;
             this.optcpsdecl = optcpsdecl;

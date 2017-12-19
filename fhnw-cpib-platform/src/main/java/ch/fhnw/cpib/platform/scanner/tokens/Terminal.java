@@ -1,4 +1,4 @@
-package ch.fhnw.cpib.platform.scanner.terminal;
+package ch.fhnw.cpib.platform.scanner.tokens;
 
 public enum Terminal {
 

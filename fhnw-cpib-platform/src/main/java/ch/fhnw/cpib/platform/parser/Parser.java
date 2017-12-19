@@ -3,13 +3,9 @@ package ch.fhnw.cpib.platform.parser;
 import ch.fhnw.cpib.platform.parser.concrete.ConcreteTree;
 import ch.fhnw.cpib.platform.parser.concrete.Context;
 import ch.fhnw.cpib.platform.parser.exception.ParserException;
-import ch.fhnw.cpib.platform.scanner.terminal.Terminal;
-import ch.fhnw.cpib.platform.scanner.tokens.Token;
+import ch.fhnw.cpib.platform.scanner.tokens.Terminal;
 import ch.fhnw.cpib.platform.scanner.tokens.TokenList;
-import ch.fhnw.cpib.platform.scanner.tokens.identifier.IdentifierToken;
-import ch.fhnw.cpib.platform.scanner.tokens.literal.LiteralToken;
-import ch.fhnw.cpib.platform.scanner.tokens.mode.ChangeModeToken;
-import ch.fhnw.cpib.platform.scanner.tokens.type.TypeToken;
+import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
 public class Parser {
 
@@ -19,7 +15,7 @@ public class Parser {
     public ConcreteTree.Program parseTokenList(TokenList tokenlist) throws ParserException {
         // Get the first token to start with
         tokenlist.resetCounter();
-        Token token = tokenlist.nextToken();
+        Tokens.Token token = tokenlist.nextToken();
 
         // Initialize the context
         Context context = new Context(tokenlist);
@@ -32,12 +28,12 @@ public class Parser {
         return program;
     }
 
-    private Token consumeTerminal(Context context, Terminal expectedterminal) throws ParserException {
+    private Tokens.Token consumeTerminal(Context context, Terminal expectedterminal) throws ParserException {
         if (context.getTerminal() == expectedterminal) {
             //System.out.println("Consume: " + expectedterminal);
-            Token consumedtoken = context.getToken();
+            Tokens.Token consumedtoken = context.getToken();
             if (context.getTerminal() != Terminal.SENTINEL) {
-                Token token = context.getTokenList().nextToken();
+                Tokens.Token token = context.getTokenList().nextToken();
                 context.setToken(token);
                 context.setTerminal(token.getTerminal());
             }
@@ -52,7 +48,7 @@ public class Parser {
         switch (context.getTerminal()) {
             case PROGRAM:
                 consumeTerminal(context, Terminal.PROGRAM);
-                IdentifierToken identifier = (IdentifierToken) consumeTerminal(context, Terminal.IDENT);
+                Tokens.IdentifierToken identifier = (Tokens.IdentifierToken) consumeTerminal(context, Terminal.IDENT);
                 ConcreteTree.ProgParamList progparamlist = parseProgParamList(context);
                 ConcreteTree.OptCpsDecl optcpsdecl = parseOptCpsDecl(context);
                 consumeTerminal(context, Terminal.DO);
@@ -87,7 +83,7 @@ public class Parser {
                 ConcreteTree.TypedIdent typedident1 = parseTypedIdent(context);
                 return new ConcreteTree.StoDecl();
             case CHANGEMODE:
-                ChangeModeToken changemode = (ChangeModeToken) consumeTerminal(context, Terminal.CHANGEMODE);
+                Tokens.ChangeModeToken changemode = (Tokens.ChangeModeToken) consumeTerminal(context, Terminal.CHANGEMODE);
                 ConcreteTree.TypedIdent typedident2 = parseTypedIdent(context);
                 return new ConcreteTree.StoDecl();
             default:
@@ -99,7 +95,7 @@ public class Parser {
         switch (context.getTerminal()) {
             case FUN:
                 consumeTerminal(context, Terminal.FUN);
-                IdentifierToken identifier = (IdentifierToken) consumeTerminal(context, Terminal.IDENT);
+                Tokens.IdentifierToken identifier = (Tokens.IdentifierToken) consumeTerminal(context, Terminal.IDENT);
                 ConcreteTree.ParamList paramlist = parseParamList(context);
                 consumeTerminal(context, Terminal.RETURNS);
                 ConcreteTree.StoDecl stodecl = parseStoDecl(context);
@@ -118,7 +114,7 @@ public class Parser {
         switch (context.getTerminal()) {
             case PROC:
                 consumeTerminal(context, Terminal.PROC);
-                IdentifierToken identifier = (IdentifierToken) consumeTerminal(context, Terminal.IDENT);
+                Tokens.IdentifierToken identifier = (Tokens.IdentifierToken) consumeTerminal(context, Terminal.IDENT);
                 ConcreteTree.ParamList paramlist = parseParamList(context);
                 ConcreteTree.OptGlobImps optglobimps = parseOptGlobImps(context);
                 ConcreteTree.OptCpsStoDecl optcpsstodecl = parseOptCpsStoDecl(context);
@@ -208,12 +204,12 @@ public class Parser {
             case IDENT:
             case CHANGEMODE:
                 ConcreteTree.OptChangemode optchangemode1 = parseOptChangemode(context);
-                IdentifierToken identifier1 = (IdentifierToken) consumeTerminal(context, Terminal.IDENT);
+                Tokens.IdentifierToken identifier1 = (Tokens.IdentifierToken) consumeTerminal(context, Terminal.IDENT);
                 return new ConcreteTree.GlobImp();
             case FLOWMODE:
                 consumeTerminal(context, Terminal.FLOWMODE);
                 ConcreteTree.OptChangemode optchangemode2 = parseOptChangemode(context);
-                IdentifierToken identifier2 = (IdentifierToken) consumeTerminal(context, Terminal.IDENT);
+                Tokens.IdentifierToken identifier2 = (Tokens.IdentifierToken) consumeTerminal(context, Terminal.IDENT);
                 return new ConcreteTree.GlobImp();
             default:
                 throw new ParserException("Invalid terminal in globImp: " + context.getTerminal());
@@ -431,9 +427,9 @@ public class Parser {
     private ConcreteTree.TypedIdent parseTypedIdent(Context context) throws ParserException {
         switch (context.getTerminal()) {
             case IDENT:
-                IdentifierToken identifier = (IdentifierToken) consumeTerminal(context, Terminal.IDENT);
+                Tokens.IdentifierToken identifier = (Tokens.IdentifierToken) consumeTerminal(context, Terminal.IDENT);
                 consumeTerminal(context, Terminal.COLON);
-                TypeToken type = (TypeToken) consumeTerminal(context, Terminal.TYPE);
+                Tokens.TypeToken type = (Tokens.TypeToken) consumeTerminal(context, Terminal.TYPE);
                 return new ConcreteTree.TypedIdent();
             default:
                 throw new ParserException("Invalid terminal in typedIdent: " + context.getTerminal());
@@ -469,7 +465,7 @@ public class Parser {
                 consumeTerminal(context, Terminal.SWITCH);
                 ConcreteTree.Expr expr4 = parseExpr(context);
                 consumeTerminal(context, Terminal.CASE);
-                LiteralToken literal1 = (LiteralToken) consumeTerminal(context, Terminal.LITERAL);
+                Tokens.LiteralToken literal1 = (Tokens.LiteralToken) consumeTerminal(context, Terminal.LITERAL);
                 consumeTerminal(context, Terminal.THEN);
                 ConcreteTree.CpsCmd cpscmd3 = parseCpsCmd(context);
                 ConcreteTree.RepCase repcase1 = parseRepCase(context);
@@ -485,7 +481,7 @@ public class Parser {
                 return new ConcreteTree.Cmd();
             case CALL:
                 consumeTerminal(context, Terminal.CALL);
-                IdentifierToken identifier1 = (IdentifierToken) consumeTerminal(context, Terminal.IDENT);
+                Tokens.IdentifierToken identifier1 = (Tokens.IdentifierToken) consumeTerminal(context, Terminal.IDENT);
                 ConcreteTree.ExprList exprlist1 = parseExprList(context);
                 ConcreteTree.OptGlobInits optglobinits = parseOptGlobInits(context);
                 return new ConcreteTree.Cmd();
@@ -552,7 +548,7 @@ public class Parser {
         switch (context.getTerminal()) {
             case INIT:
                 consumeTerminal(context, Terminal.INIT);
-                IdentifierToken identifier = (IdentifierToken) consumeTerminal(context, Terminal.IDENT);
+                Tokens.IdentifierToken identifier = (Tokens.IdentifierToken) consumeTerminal(context, Terminal.IDENT);
                 ConcreteTree.RepIdents repidents = parseRepIdents(context);
                 return new ConcreteTree.OptGlobInits();
             case ENDWHILE:
@@ -577,7 +573,7 @@ public class Parser {
         switch (context.getTerminal()) {
             case COMMA:
                 consumeTerminal(context, Terminal.COMMA);
-                IdentifierToken identifier = (IdentifierToken) consumeTerminal(context, Terminal.IDENT);
+                Tokens.IdentifierToken identifier = (Tokens.IdentifierToken) consumeTerminal(context, Terminal.IDENT);
                 ConcreteTree.RepIdents repidents = parseRepIdents(context);
                 return new ConcreteTree.RepIdents();
             case ENDWHILE:
@@ -790,7 +786,7 @@ public class Parser {
                 consumeTerminal(context, Terminal.LITERAL);
                 return new ConcreteTree.Factor();
             case IDENT:
-                IdentifierToken identifier1 = (IdentifierToken) consumeTerminal(context, Terminal.IDENT);
+                Tokens.IdentifierToken identifier1 = (Tokens.IdentifierToken) consumeTerminal(context, Terminal.IDENT);
                 ConcreteTree.OptInitOrExprList optinitorexprlist1 = parseOptInitOrExprList(context);
                 return new ConcreteTree.Factor();
             case ADDOPR:
@@ -918,7 +914,7 @@ public class Parser {
         switch (context.getTerminal()) {
             case CASE:
                 consumeTerminal(context, Terminal.CASE);
-                LiteralToken literal = (LiteralToken) consumeTerminal(context, Terminal.LITERAL);
+                Tokens.LiteralToken literal = (Tokens.LiteralToken) consumeTerminal(context, Terminal.LITERAL);
                 consumeTerminal(context, Terminal.THEN);
                 ConcreteTree.CpsCmd cpscmd = parseCpsCmd(context);
                 return new ConcreteTree.RepCase();

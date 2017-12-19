@@ -1,7 +1,7 @@
 package ch.fhnw.cpib.platform.scanner.states;
 
 import ch.fhnw.cpib.platform.scanner.exception.ScannerException;
-import ch.fhnw.cpib.platform.scanner.tokens.Token;
+import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
 import java.util.Optional;
 
@@ -13,7 +13,7 @@ public class IdentityState extends State {
 
     @Override
     public State handleNewline() throws ScannerException {
-        Optional<Token> token = getDictionary().lookupToken(getToken());
+        Optional<Tokens.Token> token = getDictionary().lookupToken(getToken());
         getTokenList().addToken(token.orElseGet(() -> getDictionary().lookupIdentifier(getToken())));
         return new InitialState(this);
     }
@@ -32,7 +32,7 @@ public class IdentityState extends State {
 
     @Override
     public State handleSpace(Character character) throws ScannerException {
-        Optional<Token> token = getDictionary().lookupToken(getToken());
+        Optional<Tokens.Token> token = getDictionary().lookupToken(getToken());
         getTokenList().addToken(token.orElseGet(() -> getDictionary().lookupIdentifier(getToken())));
         return new InitialState(this);
     }
@@ -51,14 +51,14 @@ public class IdentityState extends State {
 
     @Override
     public State handleSlash(Character character) throws ScannerException {
-        Optional<Token> token = getDictionary().lookupToken(getToken());
+        Optional<Tokens.Token> token = getDictionary().lookupToken(getToken());
         getTokenList().addToken(token.orElseGet(() -> getDictionary().lookupIdentifier(getToken())));
         return new CommentState(this, character);
     }
 
     @Override
     public State handleOperator(Character character) throws ScannerException {
-        Optional<Token> token = getDictionary().lookupToken(getToken());
+        Optional<Tokens.Token> token = getDictionary().lookupToken(getToken());
         getTokenList().addToken(token.orElseGet(() -> getDictionary().lookupIdentifier(getToken())));
         return new OperatorState(this, character);
     }

@@ -1,14 +1,14 @@
 package ch.fhnw.cpib.platform.parser.concrete;
 
-import ch.fhnw.cpib.platform.scanner.terminal.Terminal;
-import ch.fhnw.cpib.platform.scanner.tokens.Token;
+import ch.fhnw.cpib.platform.scanner.tokens.Terminal;
 import ch.fhnw.cpib.platform.scanner.tokens.TokenList;
+import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
 public class Context {
 
     private final TokenList tokenlist;
 
-    private Token token;
+    private Tokens.Token token;
 
     private Terminal terminal;
 
@@ -20,11 +20,11 @@ public class Context {
         return tokenlist;
     }
 
-    public Token getToken() {
+    public Tokens.Token getToken() {
         return token;
     }
 
-    public void setToken(Token token) {
+    public void setToken(Tokens.Token token) {
         this.token = token;
     }
 

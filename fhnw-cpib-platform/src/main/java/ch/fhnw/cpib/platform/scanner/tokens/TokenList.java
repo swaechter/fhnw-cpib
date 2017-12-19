@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public class TokenList {
 
-    private final List<Token> tokens;
+    private final List<Tokens.Token> tokens;
 
     private int counter;
 
@@ -15,13 +15,13 @@ public class TokenList {
         this.counter = 0;
     }
 
-    public void addToken(Token token) {
+    public void addToken(Tokens.Token token) {
         tokens.add(token);
     }
 
-    public Token nextToken() {
+    public Tokens.Token nextToken() {
         if (tokens.size() > counter) {
-            Token token = tokens.get(counter);
+            Tokens.Token token = tokens.get(counter);
             counter++;
             return token;
         } else {
