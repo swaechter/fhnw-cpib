@@ -1,7 +1,7 @@
-program ModInverse()
+program ModInverse(in const m:int32, in const a:int32, out const g:int32, out const u:int32, out const v:int32, out const u':int32, out const v':int32)
 global
-  const m:int32 ; const a:int32 ;
-  input(m, a) ;
+  //const m:int32 ; const a:int32 ;
+  //input(m, a) ;
   //requires 0 <= a < m;
   //ensures g == 1 ==> (1 == u * m + v * a && 0 <= v < m);
   //ensures g == gcd(m, a) > 0;
@@ -11,10 +11,10 @@ global
   //ensures abs(v') * g == m;
   //ensures 0 <= v < abs(v');
 
-  const g :int32 ;
-  const u :int32 ; const v :int32 ;
-  const u':int32 ; const v':int32 ;
-  output(g, u, v, u', v') ;
+  //const g :int32 ;
+  //const u :int32 ; const v :int32 ;
+  //const u':int32 ; const v':int32 ;
+  //output(g, u, v, u', v') ;
 
   proc ModInverse
     (in copy const m:int32, in copy const a:int32,

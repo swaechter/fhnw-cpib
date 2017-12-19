@@ -16,11 +16,11 @@ public class ParserTest {
 
     // Overflow.iml and TypeConversions.iml were dropped due their use of pre- and post increment/decrement
     private static final List<String> filenames = Arrays.asList(
-        //"/Team/Program1.iml"
+        "/Team/Program1.iml",
         "/Team/Program2.iml",
         "/Existing/Assoc.iml",
         "/Existing/Cube.iml",
-        //"/Existing/EuclidExtended.iml",
+        "/Existing/EuclidExtended.iml",
         "/Existing/EuclidExtendedV2.iml",
         "/Existing/Expr.iml",
         "/Existing/Extreme.iml",
@@ -30,7 +30,7 @@ public class ParserTest {
         "/Existing/IntDivCast.iml",
         "/Existing/intDivFun.iml",
         "/Existing/intDivMain.iml",
-        //"/Existing/ModInverse.iml",
+        "/Existing/ModInverse.iml",
         "/Existing/MultiAssi.iml",
         "/Existing/mutRec.iml",
         "/Existing/OutCopyTypeConversion.iml",
@@ -38,7 +38,7 @@ public class ParserTest {
         "/Existing/Parameters.iml",
         "/Existing/Parameters02.iml",
         "/Existing/RefParams.iml",
-        //"/Existing/RSAExampleGallier.iml",
+        "/Existing/RSAExampleGallier.iml",
         "/Existing/SameOutInit.iml",
         "/Existing/Scopes.iml",
         "/Existing/ScopesEdit.iml",
@@ -52,10 +52,10 @@ public class ParserTest {
         "/Existing/test4.iml",
         "/Existing/test5.iml",
         "/Existing/test6.iml",
-        // "/Existing/test7.iml", output (g1, g3);
+        "/Existing/test7.iml",
         "/Existing/test08.iml",
         "/Existing/test10.iml",
-        // "/Existing/TestDivMod.iml", output (t0, tE, tF, tT, t0n, tEn, tFn, tTn);
+        "/Existing/TestDivMod.iml",
         "/Existing/TruthTable.iml"
     );
 

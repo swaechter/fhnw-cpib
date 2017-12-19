@@ -9,7 +9,6 @@ import ch.fhnw.cpib.platform.scanner.tokens.TokenList;
 import ch.fhnw.cpib.platform.scanner.tokens.identifier.IdentifierToken;
 import ch.fhnw.cpib.platform.scanner.tokens.literal.LiteralToken;
 import ch.fhnw.cpib.platform.scanner.tokens.mode.ChangeModeToken;
-import ch.fhnw.cpib.platform.scanner.tokens.operator.MultOprToken;
 import ch.fhnw.cpib.platform.scanner.tokens.type.TypeToken;
 
 public class Parser {
@@ -463,8 +462,7 @@ public class Parser {
                 consumeTerminal(context, Terminal.THEN);
                 ConcreteTree.CpsCmd cpscmd1 = parseCpsCmd(context);
                 ConcreteTree.RepElseif repelseif = parseRepElseif(context);
-                consumeTerminal(context, Terminal.ELSE);
-                ConcreteTree.CpsCmd cpscmd2 = parseCpsCmd(context);
+                ConcreteTree.OptElse optelse1 = parseOptElse(context);
                 consumeTerminal(context, Terminal.ENDIF);
                 return new ConcreteTree.Cmd();
             case SWITCH:
@@ -947,6 +945,21 @@ public class Parser {
         }
     }
 
+    private ConcreteTree.OptElse parseOptElse(Context context) throws ParserException {
+        switch (context.getTerminal()) {
+            case ELSE:
+                consumeTerminal(context, Terminal.ELSE);
+                ConcreteTree.CpsCmd cpscmd = parseCpsCmd(context);
+                return new ConcreteTree.OptElse();
+            case ENDIF:
+                // TODO: Add epsilon
+                return new ConcreteTree.OptElse();
+            default:
+                throw new ParserException("Invalid terminal in optElse: " + context.getTerminal());
+        }
+
+    }
+
     private ConcreteTree.RepElseif parseRepElseif(Context context) throws ParserException {
         switch (context.getTerminal()) {
             case ELSEIF:
@@ -956,6 +969,7 @@ public class Parser {
                 ConcreteTree.CpsCmd cpscmd = parseCpsCmd(context);
                 ConcreteTree.RepElseif repelseif = parseRepElseif(context);
                 return new ConcreteTree.RepElseif();
+            case ENDIF:
             case ELSE:
                 // TODO: Add epsilon
                 return new ConcreteTree.RepElseif();

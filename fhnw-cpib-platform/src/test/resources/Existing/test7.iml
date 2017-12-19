@@ -1,11 +1,11 @@
-program test7()
+program test7(out g1:int32, in g2:int32, inout g3:bool)
 global
-  output (g1, g3);
+  //output (g1, g3);
 
   fun f(in copy const x:int32, x2:bool) returns x7:int32
   global in g1, g3, g2, x17
   local
-    x6:bool; y:int8
+    x6:bool; y:int32
   do
     y := x init;
     call g(x6, x6 init) init g3
@@ -17,11 +17,11 @@ global
 
   proc h() global out g3 do skip endproc;
 
-  x17:int32;
-  g1:int32;
-  input (g2, g3);
-  var g2:int32;
-  const g3:bool
+  x17:int32
+  //g1:int32;
+  //input (g2, g3);
+  //var g2:int32;
+  //const g3:bool
 do
   g1 := 5;
   g2 init := f(f(g1, g1), g1);

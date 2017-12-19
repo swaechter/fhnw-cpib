@@ -1,16 +1,16 @@
-program TestDivMod()
-global
-  output (t0, tE, tF, tT, t0n, tEn, tFn, tTn);
+program TestDivMod(out t0:bool, out tE:bool, out tF:bool, out tT:bool, out t0n:bool, out tEn:bool, out tFn:bool, out tTn:bool)
+//global
+  //output (t0, tE, tF, tT, t0n, tEn, tFn, tTn);
 
-  var t0:bool;
-  var tE:bool;
-  var tF:bool;
-  var tT:bool;
-  var n:int32;
-  var t0n:bool;
-  var tEn:bool;
-  var tFn:bool;
-  var tTn:bool
+  //var t0:bool;
+  //var tE:bool;
+  //var tF:bool;
+  //var tT:bool;
+  //var n:int32;
+  //var t0n:bool;
+  //var tEn:bool;
+  //var tFn:bool;
+  //var tTn:bool
 do
   t0 init :=
     +6 divE +3 = +2 &? +6 modE +3 = 0 &?

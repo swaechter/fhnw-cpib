@@ -1,12 +1,15 @@
-program EuclidExtended()
+program EuclidExtended
+  (in a:int32, in b:int32,
+   out g:int32, out u:int32, out v:int32, out u':int32, out v':int32)
+
 global
-  var   a :int32 ; var   b :int32 ;
-  const u :int32 ; const v :int32 ;
-  const u':int32 ; const v':int32 ;
+  //var   a :int32 ; var   b :int32 ;
+  //const u :int32 ; const v :int32 ;
+  //const u':int32 ; const v':int32 ;
 
-  input(a, b) ;
+  //input(a, b) ;
 
-  output(a, b, u, v, u', v') ;
+  //output(a, b, u, v, u', v') ;
 
   proc euclidExtended
     (inout copy var g :int32, inout copy var g':int32,

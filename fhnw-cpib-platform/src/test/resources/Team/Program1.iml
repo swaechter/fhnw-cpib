@@ -7,11 +7,11 @@ program intDiv(in  m:int32, in  n:int32, // Wait for the next line // Wait for i
 
 global
   proc divide(in copy const m:int32, in copy const n:int32,
-              out ref var   q:int32, out ref var   r:int32)
+              out ref var __p__local_init':int32, out ref var   r:int32)
   do
-    var __p__local_init' := 42; // Break me!
-    var p := 2 /2 // Not a comment
-    q init := 0; // Always zero
+    //var __p__local_init' := 42; // Break me!
+   // var p := 2 /2 // Not a comment
+    __p__local_init' init := 0; // Always zero
     r init := m; // No idea
 
     if p == 2 then
@@ -20,16 +20,16 @@ global
         debugout p
     else
         debugout p
-    endif
+    endif;
 
     switch p
         case 2 then
             debugout p
         case 3 then
             debugout p
-        default
+        default then
             debugout p
-    endswitch
+    endswitch;
 
     while r >= n do // while > for
       q := q + 1 ;
