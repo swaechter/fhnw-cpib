@@ -76,7 +76,7 @@ public class ParserTest {
 
             // Parse the token list
             ConcreteTree.Program program = parser.parseTokenList(tokenlist);
-            Assert.assertNotNull(program);
+            Assert.assertTrue(program.toString().length() > 0);
         }
     }
 }

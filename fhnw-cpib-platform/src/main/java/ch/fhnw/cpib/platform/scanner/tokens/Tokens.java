@@ -28,6 +28,10 @@ public class Tokens {
             this.name = name;
         }
 
+        public String getName() {
+            return name;
+        }
+
         @Override
         public String toString() {
             return "(" + super.toString() + "," + name + ")";
@@ -41,6 +45,10 @@ public class Tokens {
         public LiteralToken(String value, Terminal terminal) {
             super(terminal);
             this.value = value;
+        }
+
+        public String getValue() {
+            return value;
         }
 
         @Override
