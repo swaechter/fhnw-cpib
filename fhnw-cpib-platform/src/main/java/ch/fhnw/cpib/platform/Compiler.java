@@ -20,18 +20,21 @@ public class Compiler {
 
     public void compileString(String content) {
         try {
-            // Show the file path
-            System.out.println("Scanning content: " + content);
+            // Show the content
+            System.out.println("===== Scanning content =====");
+            System.out.println(content);
             System.out.println();
 
             // Scan the source code and show the token list
             TokenList tokenlist = scanner.scanString(content);
-            System.out.println("Scanned token list: " + tokenlist.toString());
+            System.out.println("===== Scanned token list =====");
+            System.out.println(tokenlist.toString());
             System.out.println();
 
             // Parse the concrete tree and show it
             ConcreteTree.Program program = parser.parseTokenList(tokenlist);
-            System.out.println("Concrete parsing tree: " + program);
+            System.out.println("===== Concrete parsing tree =====");
+            System.out.println(program);
 
             System.out.println();
         } catch (ScannerException exception) {

@@ -942,7 +942,7 @@ public class ConcreteTree {
 
         @Override
         public String toString() {
-            return getHead("<CmdSwitch>") + expr + literal + cpscmd + repcase + optdefault + getHead("</CmdSwitch>");
+            return getHead("<CmdSwitch Value='" + literal.getValue() + "'>") + expr + cpscmd + repcase + optdefault + getHead("</CmdSwitch>");
         }
     }
 
