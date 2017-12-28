@@ -34,14 +34,29 @@ public class AbstractTree {
 
     public static class ProgParam extends AbstractNode {
 
-        public ProgParam(int idendation) {
+        private final Tokens.FlowModeToken flowmode;
+
+        private final Tokens.ChangeModeToken changemode;
+
+        private final TypedIdent typedident;
+
+        private final ProgParam nextprogparam;
+
+        public ProgParam(Tokens.FlowModeToken flowmode, Tokens.ChangeModeToken changemode, TypedIdent typedident, ProgParam nextprogparam, int idendation) {
             super(idendation);
+            this.flowmode = flowmode;
+            this.changemode = changemode;
+            this.typedident = typedident;
+            this.nextprogparam = nextprogparam;
         }
 
         @Override
         public String toString() {
             return getHead("<ProgParam>")
-                + getBody("TODO Content")
+                + getBody("<Mode Name='FLOWMODE' Attribute='" + flowmode.getFlowMode() + "'/>'")
+                + getBody("<Mode Name='CHANGEMODE' Attribute='" + changemode.getChangeMode() + "'/>'")
+                + typedident
+                + (nextprogparam != null ? nextprogparam : getBody("<NoNextProgParam/>"))
                 + getHead("</ProgParam>");
         }
     }
@@ -204,12 +219,47 @@ public class AbstractTree {
         public TypedIdent(int idendation) {
             super(idendation);
         }
+    }
+
+    public static class TypedIdentIdent extends TypedIdent<Tokens.IdentifierToken> {
+
+        private final Tokens.IdentifierToken identifier1;
+
+        private final Tokens.IdentifierToken identifier2;
+
+        public TypedIdentIdent(Tokens.IdentifierToken identifier1, Tokens.IdentifierToken identifier2, int idendation) {
+            super(idendation);
+            this.identifier1 = identifier1;
+            this.identifier2 = identifier2;
+        }
 
         @Override
         public String toString() {
-            return getHead("<TODO>")
-                + getBody("TODO Content")
-                + getHead("</TODO>");
+            return getHead("<TypedIdentIdent>")
+                + getBody("<Ident Name='" + identifier1.getName() + "'/>")
+                + getBody("<Ident Name='" + identifier2.getName() + "'/>")
+                + getHead("</TypedIdentIdent>");
+        }
+    }
+
+    public static class TypedIdentType extends TypedIdent<Tokens.IdentifierToken> {
+
+        private final Tokens.IdentifierToken identifier;
+
+        private final Tokens.TypeToken type;
+
+        public TypedIdentType(Tokens.IdentifierToken identifier, Tokens.TypeToken type, int idendation) {
+            super(idendation);
+            this.identifier = identifier;
+            this.type = type;
+        }
+
+        @Override
+        public String toString() {
+            return getHead("<TypedIdentType>")
+                + getBody("<Ident Name='" + identifier.getName() + "'/>")
+                + getBody("<Type Type='" + type.getType() + "'/>")
+                + getHead("</TypedIdentType>");
         }
     }
 

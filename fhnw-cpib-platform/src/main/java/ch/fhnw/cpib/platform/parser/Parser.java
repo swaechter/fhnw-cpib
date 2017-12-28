@@ -335,16 +335,17 @@ public class Parser {
 
     private ConcreteTree.ProgParam parseProgParam(Context context, int idendation) throws ParserException {
         switch (context.getTerminal()) {
-            case FLOWMODE:
-                Tokens.FlowModeToken flowmode1 = (Tokens.FlowModeToken) consumeTerminal(context, Terminal.FLOWMODE);
-                ConcreteTree.OptChangemode optchangemode1 = parseOptChangemode(context, idendation + 1);
-                ConcreteTree.TypedIdent typeident1 = parseTypedIdent(context, idendation + 1);
-                return new ConcreteTree.ProgParamFlowmode(flowmode1, optchangemode1, typeident1, idendation);
             case IDENT:
             case CHANGEMODE:
                 ConcreteTree.OptChangemode optchangemode2 = parseOptChangemode(context, idendation + 1);
                 ConcreteTree.TypedIdent typeident2 = parseTypedIdent(context, idendation + 1);
                 return new ConcreteTree.ProgParamExpression(optchangemode2, typeident2, idendation);
+            case FLOWMODE:
+                Tokens.FlowModeToken flowmode1 = (Tokens.FlowModeToken) consumeTerminal(context, Terminal.FLOWMODE);
+                ConcreteTree.OptChangemode optchangemode1 = parseOptChangemode(context, idendation + 1);
+                ConcreteTree.TypedIdent typeident1 = parseTypedIdent(context, idendation + 1);
+                return new ConcreteTree.ProgParamFlowmode(flowmode1, optchangemode1, typeident1, idendation);
+
             default:
                 throw new ParserException("Invalid terminal in progParam: " + context.getTerminal());
         }

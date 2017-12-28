@@ -1,6 +1,7 @@
 package ch.fhnw.cpib.platform.parser.concretetree;
 
 import ch.fhnw.cpib.platform.parser.abstracttree.AbstractTree;
+import ch.fhnw.cpib.platform.scanner.tokens.Terminal;
 import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
 public class ConcreteTree {
@@ -29,7 +30,7 @@ public class ConcreteTree {
         }
 
         public AbstractTree.Program toAbstract() {
-            return new AbstractTree.Program(identifier, progparamlist.toAbstract(), optcpsdecl.toAbstract(), cpscmd.toAbstract());
+            return new AbstractTree.Program(identifier, progparamlist.toAbstract(1), optcpsdecl.toAbstract(1), cpscmd.toAbstract(1));
         }
     }
 
@@ -276,6 +277,8 @@ public class ConcreteTree {
         OptChangemode(int idendation) {
             super(idendation);
         }
+
+        public abstract Tokens.ChangeModeToken toAbstract();
     }
 
     public static class OptChangemodeChangemode extends OptChangemode {
@@ -291,6 +294,11 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<OptChangemodeChangemode Mode='" + changemode.getChangeMode() + "'>") + getHead("</OptChangemodeChangemode>");
         }
+
+        @Override
+        public Tokens.ChangeModeToken toAbstract() {
+            return changemode;
+        }
     }
 
     public static class OptChangemodeEpsilon extends OptChangemode {
@@ -302,6 +310,11 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<OptChangemodeEpsilon/>");
+        }
+
+        @Override
+        public Tokens.ChangeModeToken toAbstract() {
+            return new Tokens.ChangeModeToken(Terminal.CHANGEMODE, Tokens.ChangeModeToken.ChangeMode.CONST);
         }
     }
 
@@ -391,7 +404,7 @@ public class ConcreteTree {
             super(idendation);
         }
 
-        public abstract AbstractTree.Declaration toAbstract();
+        public abstract AbstractTree.Declaration toAbstract(int idendation);
     }
 
     public static class OptCpsDeclGlobal extends OptCpsDecl {
@@ -409,8 +422,8 @@ public class ConcreteTree {
         }
 
         @Override
-        public AbstractTree.Declaration toAbstract() {
-            return cpsdecl.toAbstract();
+        public AbstractTree.Declaration toAbstract(int idendation) {
+            return cpsdecl.toAbstract(idendation);
         }
     }
 
@@ -426,7 +439,7 @@ public class ConcreteTree {
         }
 
         @Override
-        public AbstractTree.Declaration toAbstract() {
+        public AbstractTree.Declaration toAbstract(int idendation) {
             return null;
         }
     }
@@ -448,7 +461,7 @@ public class ConcreteTree {
             return getHead("<CpsDecl>") + decl + repcpsdecl + getHead("</CpsDecl>");
         }
 
-        public AbstractTree.Declaration toAbstract() {
+        public AbstractTree.Declaration toAbstract(int idendation) {
             return null;
             //return decl.toAbstract(repcpsdecl);
         }
@@ -594,8 +607,8 @@ public class ConcreteTree {
             return getHead("<ProgParamList>") + optprogparamlist + getHead("</ProgParamList>");
         }
 
-        public AbstractTree.ProgParam toAbstract() {
-            return optprogparamlist.toAbstract();
+        public AbstractTree.ProgParam toAbstract(int idendation) {
+            return optprogparamlist.toAbstract(idendation);
         }
     }
 
@@ -605,7 +618,7 @@ public class ConcreteTree {
             super(idendation);
         }
 
-        public abstract AbstractTree.ProgParam toAbstract();
+        public abstract AbstractTree.ProgParam toAbstract(int idendation);
     }
 
     public static class OptProgParamListExpression extends OptProgParamList {
@@ -626,9 +639,8 @@ public class ConcreteTree {
         }
 
         @Override
-        public AbstractTree.ProgParam toAbstract() {
-            return new AbstractTree.ProgParam(getIdendation());
-            //return new AbstractTree.ProgramParameter(progparam.toAbstract(), repprogparamlist.toAbstract());
+        public AbstractTree.ProgParam toAbstract(int idendation) {
+            return progparam.toAbstract(repprogparamlist, idendation);
         }
     }
 
@@ -644,7 +656,7 @@ public class ConcreteTree {
         }
 
         @Override
-        public AbstractTree.ProgParam toAbstract() {
+        public AbstractTree.ProgParam toAbstract(int idendation) {
             return null;
         }
     }
@@ -654,6 +666,8 @@ public class ConcreteTree {
         RepProgParamList(int idendation) {
             super(idendation);
         }
+
+        public abstract AbstractTree.ProgParam toAbstract(int idendation);
     }
 
     public static class RepProgParamListComma extends RepProgParamList {
@@ -672,6 +686,11 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<RepProgParamListComma>") + progparam + repprogparamlist + getHead("</RepProgParamListComma>");
         }
+
+        @Override
+        public AbstractTree.ProgParam toAbstract(int idendation) {
+            return progparam.toAbstract(repprogparamlist, idendation);
+        }
     }
 
     public static class RepProgParamListEpsilon extends RepProgParamList {
@@ -684,12 +703,43 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<RepProgParamListEpsilon/>");
         }
+
+        @Override
+        public AbstractTree.ProgParam toAbstract(int idendation) {
+            return null;
+        }
     }
 
     public static abstract class ProgParam extends ConcreteNode {
 
         ProgParam(int idendation) {
             super(idendation);
+        }
+
+        public abstract AbstractTree.ProgParam toAbstract(RepProgParamList repprogparamlist, int idendation);
+    }
+
+    public static class ProgParamExpression extends ProgParam {
+
+        private final OptChangemode optchangemode;
+
+        private final TypedIdent typedident;
+
+        public ProgParamExpression(OptChangemode optchangemode, TypedIdent typedident, int idendation) {
+            super(idendation);
+            this.optchangemode = optchangemode;
+            this.typedident = typedident;
+        }
+
+        @Override
+        public String toString() {
+            return getHead("<ProgParamExpression>") + optchangemode + typedident + getHead("<ProgParamExpression>");
+        }
+
+        @Override
+        public AbstractTree.ProgParam toAbstract(RepProgParamList repprogparamlist, int idendation) {
+            Tokens.FlowModeToken flowmode = new Tokens.FlowModeToken(Terminal.FLOWMODE, Tokens.FlowModeToken.FlowMode.IN);
+            return new AbstractTree.ProgParam(flowmode, optchangemode.toAbstract(), typedident.toAbstract(idendation + 1), repprogparamlist.toAbstract(idendation + 1), idendation);
         }
     }
 
@@ -712,23 +762,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<ProgParamFlowmode Mode='" + flowmode.getFlowMode() + "'>") + optchangemode + typedident + getHead("<ProgParamFlowmode>");
         }
-    }
-
-    public static class ProgParamExpression extends ProgParam {
-
-        private final OptChangemode optchangemode;
-
-        private final TypedIdent typedident;
-
-        public ProgParamExpression(OptChangemode optchangemode, TypedIdent typedident, int idendation) {
-            super(idendation);
-            this.optchangemode = optchangemode;
-            this.typedident = typedident;
-        }
 
         @Override
-        public String toString() {
-            return getHead("<ProgParamExpression>") + optchangemode + typedident + getHead("<ProgParamExpression>");
+        public AbstractTree.ProgParam toAbstract(RepProgParamList repprogparamlist, int idendation) {
+            return new AbstractTree.ProgParam(flowmode, optchangemode.toAbstract(), typedident.toAbstract(idendation + 1), repprogparamlist.toAbstract(idendation + 1), idendation);
         }
     }
 
@@ -889,6 +926,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<TypedIdent Name='" + identifier.getName() + "' Type='" + type.getType() + "'/>");
         }
+
+        public AbstractTree.TypedIdent toAbstract(int idendation) {
+            return new AbstractTree.TypedIdentType(identifier, type, idendation);
+        }
     }
 
     public static abstract class Cmd extends ConcreteNode {
@@ -897,7 +938,7 @@ public class ConcreteTree {
             super(idendation);
         }
 
-        public abstract AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd);
+        public abstract AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd, int idendation);
     }
 
     public static class CmdSkip extends Cmd {
@@ -912,7 +953,7 @@ public class ConcreteTree {
         }
 
         @Override
-        public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd) {
+        public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd, int idendation) {
             return null;
         }
     }
@@ -941,8 +982,8 @@ public class ConcreteTree {
         }
 
         @Override
-        public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd) {
-            return new AbstractTree.SkipCmd(null, getIdendation() + 1);
+        public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd, int idendation) {
+            return new AbstractTree.SkipCmd(null, idendation + 1);
         }
     }
 
@@ -970,7 +1011,7 @@ public class ConcreteTree {
         }
 
         @Override
-        public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd) {
+        public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd, int idendation) {
             return null;
         }
     }
@@ -1002,7 +1043,7 @@ public class ConcreteTree {
         }
 
         @Override
-        public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd) {
+        public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd, int idendation) {
             return null;
         }
     }
@@ -1025,7 +1066,7 @@ public class ConcreteTree {
         }
 
         @Override
-        public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd) {
+        public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd, int idendation) {
             return null;
         }
     }
@@ -1051,7 +1092,7 @@ public class ConcreteTree {
         }
 
         @Override
-        public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd) {
+        public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd, int idendation) {
             return null;
         }
     }
@@ -1071,8 +1112,8 @@ public class ConcreteTree {
         }
 
         @Override
-        public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd) {
-            return new AbstractTree.InputCmd(expr.toAbstract(), repcpscmd.toAbstract(), getIdendation() + 1);
+        public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd, int idendation) {
+            return new AbstractTree.InputCmd(expr.toAbstract(), repcpscmd.toAbstract(idendation + 1), idendation);
         }
     }
 
@@ -1093,8 +1134,8 @@ public class ConcreteTree {
             return getHead("<CpsCmd>") + cmd + repcpscmd + getHead("</CpsCmd>");
         }
 
-        public AbstractTree.Cmd toAbstract() {
-            return cmd.toAbstract(repcpscmd);
+        public AbstractTree.Cmd toAbstract(int idendation) {
+            return cmd.toAbstract(repcpscmd, idendation);
         }
     }
 
@@ -1104,7 +1145,7 @@ public class ConcreteTree {
             super(idendation);
         }
 
-        public abstract AbstractTree.Cmd toAbstract();
+        public abstract AbstractTree.Cmd toAbstract(int idendation);
     }
 
     public static class RepCpsCmdSemicolon extends RepCpsCmd {
@@ -1125,8 +1166,8 @@ public class ConcreteTree {
         }
 
         @Override
-        public AbstractTree.Cmd toAbstract() {
-            return cmd.toAbstract(repcpscmd);
+        public AbstractTree.Cmd toAbstract(int idendation) {
+            return cmd.toAbstract(repcpscmd, idendation);
         }
     }
 
@@ -1142,7 +1183,7 @@ public class ConcreteTree {
         }
 
         @Override
-        public AbstractTree.Cmd toAbstract() {
+        public AbstractTree.Cmd toAbstract(int idendation) {
             return null;
         }
     }
