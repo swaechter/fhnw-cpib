@@ -1,7 +1,7 @@
 package ch.fhnw.cpib.platform.parser;
 
-import ch.fhnw.cpib.platform.parser.concrete.ConcreteTree;
-import ch.fhnw.cpib.platform.parser.concrete.Context;
+import ch.fhnw.cpib.platform.parser.concretetree.ConcreteTree;
+import ch.fhnw.cpib.platform.parser.concretetree.Context;
 import ch.fhnw.cpib.platform.parser.exception.ParserException;
 import ch.fhnw.cpib.platform.scanner.tokens.Terminal;
 import ch.fhnw.cpib.platform.scanner.tokens.TokenList;

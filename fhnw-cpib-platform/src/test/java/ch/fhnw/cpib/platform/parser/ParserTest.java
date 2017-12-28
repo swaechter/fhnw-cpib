@@ -1,6 +1,7 @@
 package ch.fhnw.cpib.platform.parser;
 
-import ch.fhnw.cpib.platform.parser.concrete.ConcreteTree;
+import ch.fhnw.cpib.platform.parser.abstracttree.AbstractTree;
+import ch.fhnw.cpib.platform.parser.concretetree.ConcreteTree;
 import ch.fhnw.cpib.platform.scanner.Scanner;
 import ch.fhnw.cpib.platform.scanner.tokens.TokenList;
 import ch.fhnw.cpib.platform.utils.ReaderUtils;
@@ -78,5 +79,34 @@ public class ParserTest {
             ConcreteTree.Program program = parser.parseTokenList(tokenlist);
             Assert.assertTrue(program.toString().length() > 0);
         }
+    }
+
+    @Test
+    public void testAbstractTree() throws Exception {
+        // Create the scanner and parser
+        Scanner scanner = new Scanner();
+        Parser parser = new Parser();
+
+        // Load the program
+        String filename = "/Team/Program3.iml";
+        String content = ReaderUtils.getContentFromInputStream(getClass().getResourceAsStream(filename), StandardCharsets.UTF_8);
+        Assert.assertFalse(content.isEmpty());
+
+        // Scan the program
+        TokenList tokenlist = scanner.scanString(content);
+        Assert.assertTrue(tokenlist.getSize() > 0);
+        System.out.println(tokenlist);
+        System.out.println();
+
+        // Parse the token list
+        ConcreteTree.Program concreteprogram = parser.parseTokenList(tokenlist);
+        Assert.assertTrue(concreteprogram.toString().length() > 0);
+        System.out.println(concreteprogram);
+        System.out.println();
+
+        // Make the parse tree abstract
+        AbstractTree.Program abstractprogram = concreteprogram.toAbstract();
+        System.out.println(abstractprogram);
+        System.out.println();
     }
 }

@@ -1,7 +1,7 @@
 package ch.fhnw.cpib.platform;
 
 import ch.fhnw.cpib.platform.parser.Parser;
-import ch.fhnw.cpib.platform.parser.concrete.ConcreteTree;
+import ch.fhnw.cpib.platform.parser.concretetree.ConcreteTree;
 import ch.fhnw.cpib.platform.parser.exception.ParserException;
 import ch.fhnw.cpib.platform.scanner.Scanner;
 import ch.fhnw.cpib.platform.scanner.exception.ScannerException;
