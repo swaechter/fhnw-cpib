@@ -10,8 +10,7 @@ public abstract class AbstractNode extends Node {
     }
 
     public void check() {
-        System.out.println("Checks not implemented yet!");
-        System.out.println();
+        // TODO: Implement checks
     }
 
     public int code(IVirtualMachine machine, int location) throws IVirtualMachine.CodeTooSmallError {

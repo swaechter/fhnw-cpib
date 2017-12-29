@@ -19,6 +19,7 @@ public class ScannerTest {
     private static final List<String> filenames = Arrays.asList(
         "/Team/Program1.iml",
         "/Team/Program2.iml",
+        "/Team/Program3.iml",
         "/Existing/Assoc.iml",
         "/Existing/Cube.iml",
         "/Existing/EuclidExtended.iml",
