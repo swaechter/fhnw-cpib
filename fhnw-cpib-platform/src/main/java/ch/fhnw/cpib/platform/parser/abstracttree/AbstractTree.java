@@ -61,17 +61,123 @@ public class AbstractTree {
         }
     }
 
+    public static class Param extends AbstractNode {
+
+        private final Tokens.FlowModeToken flowmode;
+
+        private final Tokens.MechModeToken mechmode;
+
+        private final Tokens.ChangeModeToken changemode;
+
+        private final TypedIdent typedident;
+
+        private final Param nextparam;
+
+        public Param(Tokens.FlowModeToken flowmode, Tokens.MechModeToken mechmode, Tokens.ChangeModeToken changemode, TypedIdent typedident, Param nextparam, int idendation) {
+            super(idendation);
+            this.flowmode = flowmode;
+            this.mechmode = mechmode;
+            this.changemode = changemode;
+            this.typedident = typedident;
+            this.nextparam = nextparam;
+        }
+
+        @Override
+        public String toString() {
+            return getHead("<Param>")
+                + getBody("<Mode Name='FLOWMODE' Attribute='" + flowmode.getFlowMode() + "'/>'")
+                + getBody("<Mode Name='MECHMODE' Attribute='" + mechmode.getMechMode() + "'/>'")
+                + getBody("<Mode Name='CHANGEMODE' Attribute='" + changemode.getChangeMode() + "'/>'")
+                + typedident
+                + (nextparam != null ? nextparam : getBody("<NoNextParam/>"))
+                + getHead("</Param>");
+        }
+    }
+
     public abstract static class Declaration extends AbstractNode {
 
-        public Declaration(int idendation) {
+        private final Declaration nextdeclaration;
+
+        public Declaration(Declaration nextdeclaration, int idendation) {
             super(idendation);
+            this.nextdeclaration = nextdeclaration;
+        }
+
+        public Declaration getNextDeclaration() {
+            return nextdeclaration;
+        }
+    }
+
+    public static class StoDecl extends Declaration {
+
+        private final Tokens.ChangeModeToken changemode;
+
+        private final TypedIdent typedident;
+
+        public StoDecl(Tokens.ChangeModeToken changemode, TypedIdent typedident, Declaration nextdeclaration, int idendation) {
+            super(nextdeclaration, idendation);
+            this.changemode = changemode;
+            this.typedident = typedident;
+        }
+
+        @Override
+        public String toString() {
+            return getHead("<StoDecl>")
+                + getBody("<Mode Name='CHANGEMODE' Attribute='" + changemode.getChangeMode() + "'/>'")
+                + typedident
+                + (getNextDeclaration() != null ? getNextDeclaration() : getBody("<NoNextDeclaration/>"))
+                + getHead("</StoDecl>");
+        }
+    }
+
+    public static class FunDecl extends Declaration {
+
+        public FunDecl(Declaration nextdeclaration, int idendation) {
+            super(nextdeclaration, idendation);
         }
 
         @Override
         public String toString() {
             return getHead("<TODO>")
-                + getBody("TODO Content")
+                + getBody("TODO FunDecl")
                 + getHead("</TODO>");
+        }
+    }
+
+    public static class ProcDecl extends Declaration {
+
+        private final Tokens.IdentifierToken identifier;
+
+        private final Param param;
+
+        private final GlobalImport globalimport;
+
+        private final Declaration declaration;
+
+        private final Declaration nextdeclaration;
+
+        private final Cmd cmd;
+
+        public ProcDecl(Tokens.IdentifierToken identifier, Param param, GlobalImport globalimport, Declaration declaration, Declaration nextdeclaration, Cmd cmd, int idendation) {
+            super(nextdeclaration, idendation);
+            this.identifier = identifier;
+            this.param = param;
+            this.globalimport = globalimport;
+            this.declaration = declaration;
+            this.nextdeclaration = nextdeclaration;
+            this.cmd = cmd;
+        }
+
+        @Override
+        public String toString() {
+            return getHead("<ProcDecl>")
+                + getBody("<Ident Name='" + identifier.getName() + "'/>")
+                + (param != null ? param : getBody("<NoNextParam/>"))
+                + (globalimport != null ? globalimport : getBody("<NoGlobalImport/>"))
+                + (cmd != null ? cmd : getBody("<NoCmd/>"))
+                + (declaration != null ? declaration : getBody("<NoDeclaration/>"))
+                + (nextdeclaration != null ? nextdeclaration : getBody("<NoNextDeclaration/>"))
+                + getHead("</ProcDecl>");
         }
     }
 
@@ -87,13 +193,6 @@ public class AbstractTree {
         public Cmd getNextCmd() {
             return nextcmd;
         }
-
-        @Override
-        public String toString() {
-            return getHead("<TODO>")
-                + getBody("TODO Content")
-                + getHead("</TODO>");
-        }
     }
 
     public static class SkipCmd extends Cmd {
@@ -104,9 +203,9 @@ public class AbstractTree {
 
         @Override
         public String toString() {
-            return getHead("<TODO>")
-                + getBody("TODO Content")
-                + getHead("</TODO>");
+            return getHead("<CmdSkip>")
+                + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextCmd/>"))
+                + getHead("</CmdSkip>");
         }
     }
 
@@ -119,7 +218,7 @@ public class AbstractTree {
         @Override
         public String toString() {
             return getHead("<TODO>")
-                + getBody("TODO Content")
+                + getBody("TODO AssiCmd")
                 + getHead("</TODO>");
         }
     }
@@ -133,7 +232,7 @@ public class AbstractTree {
         @Override
         public String toString() {
             return getHead("<TODO>")
-                + getBody("TODO Content")
+                + getBody("TODO CpsCmd")
                 + getHead("</TODO>");
         }
     }
@@ -149,7 +248,7 @@ public class AbstractTree {
         @Override
         public String toString() {
             return getHead("<TODO>")
-                + getBody("TODO Content")
+                + getBody("TODO CondCmd")
                 + getHead("</TODO>");
         }
     }
@@ -163,7 +262,7 @@ public class AbstractTree {
         @Override
         public String toString() {
             return getHead("<TODO>")
-                + getBody("TODO Content")
+                + getBody("TODO WhileCmd")
                 + getHead("</TODO>");
         }
     }
@@ -177,7 +276,7 @@ public class AbstractTree {
         @Override
         public String toString() {
             return getHead("<TODO>")
-                + getBody("TODO Content")
+                + getBody("TODO ProcCall")
                 + getHead("</TODO>");
         }
     }
@@ -209,7 +308,7 @@ public class AbstractTree {
         @Override
         public String toString() {
             return getHead("<TODO>")
-                + getBody("TODO Content")
+                + getBody("TODO Output Cmd")
                 + getHead("</TODO>");
         }
     }
@@ -268,82 +367,171 @@ public class AbstractTree {
         public Expression(int idendation) {
             super(idendation);
         }
-
-        @Override
-        public String toString() {
-            return getHead("<TODO>")
-                + getBody("TODO Content")
-                + getHead("</TODO>");
-        }
     }
 
     public static class LiteralExpr extends Expression {
 
-        public LiteralExpr(int idendation) {
+        private final Tokens.LiteralToken literal;
+
+        public LiteralExpr(Tokens.LiteralToken literal, int idendation) {
             super(idendation);
+            this.literal = literal;
         }
 
         @Override
         public String toString() {
-            return getHead("<TODO>")
-                + getBody("TODO Content")
-                + getHead("</TODO>");
+            return getHead("<LiteralExpr>")
+                + getBody("TODO Literal: " + literal.getValue())
+                + getHead("</LiteralExpr>");
         }
     }
 
     public static class StoreExpr extends Expression {
 
-        public StoreExpr(int idendation) {
+        private final Tokens.IdentifierToken identifier;
+
+        private final boolean initialized;
+
+        public StoreExpr(Tokens.IdentifierToken identifier, boolean initialized, int idendation) {
             super(idendation);
+            this.identifier = identifier;
+            this.initialized = initialized;
         }
 
         @Override
         public String toString() {
-            return getHead("<TODO>")
-                + getBody("TODO Content")
-                + getHead("</TODO>");
+            return getHead("<StoreExpr>")
+                + getBody("<Ident Name='" + identifier.getName() + "'/>")
+                + getBody("<Initialized>" + initialized + "</Initialized>")
+                + getHead("</StoreExpr>");
         }
     }
 
     public static class FunCallExpr extends Expression {
 
-        public FunCallExpr(int idendation) {
+        public FunCallExpr(RoutineCall foo, int idendation) {
             super(idendation);
         }
 
         @Override
         public String toString() {
             return getHead("<TODO>")
-                + getBody("TODO Content")
+                + getBody("TODO FunCallExpr")
                 + getHead("</TODO>");
         }
     }
 
     public static class MonadicExpr extends Expression {
 
-        public MonadicExpr(int idendation) {
+        private final Tokens.OperationToken operation;
+
+        private final Expression expression;
+
+        public MonadicExpr(Tokens.OperationToken operation, Expression expression, int idendation) {
             super(idendation);
+            this.operation = operation;
+            this.expression = expression;
         }
 
         @Override
         public String toString() {
-            return getHead("<TODO>")
-                + getBody("TODO Content")
-                + getHead("</TODO>");
+            return getHead("<MonadicExpr>")
+                + getBody("TODO Operator: " + operation.getOperation())
+                + expression
+                + getHead("</MonadicExpr>");
         }
     }
 
     public static class DyadicExpr extends Expression {
 
-        public DyadicExpr(int idendation) {
+        private final Tokens.OperationToken operation;
+
+        private final Expression expression1;
+
+        private final Expression expression2;
+
+        public DyadicExpr(Tokens.OperationToken operation, Expression expression1, Expression expression2, int idendation) {
             super(idendation);
+            this.operation = operation;
+            this.expression1 = expression1;
+            this.expression2 = expression2;
+        }
+
+        @Override
+        public String toString() {
+            return getHead("<ExprDyadic>")
+                + getBody("TODO Operator: " + operation.getOperation())
+                + expression1
+                + expression2
+                + getHead("</ExprDyadic>");
+        }
+    }
+
+    public static class RoutineCall extends AbstractNode {
+
+        private final Tokens.IdentifierToken identifier;
+
+        private final ExpressionList expressionlist;
+
+        public RoutineCall(Tokens.IdentifierToken identifier, ExpressionList expressionlist, int idendation) {
+            super(idendation);
+            this.identifier = identifier;
+            this.expressionlist = expressionlist;
         }
 
         @Override
         public String toString() {
             return getHead("<TODO>")
-                + getBody("TODO Content")
+                + getBody("TODO Routine Call")
                 + getHead("</TODO>");
+        }
+    }
+
+    public static class ExpressionList extends AbstractNode {
+
+        private final Expression expression;
+
+        private final ExpressionList expressionList;
+
+        public ExpressionList(Expression expression, ExpressionList expressionList, int idendation) {
+            super(idendation);
+            this.expression = expression;
+            this.expressionList = expressionList;
+        }
+
+        @Override
+        public String toString() {
+            return getHead("<TODO>")
+                + getBody("TODO ExpressionList")
+                + getHead("</TODO>");
+        }
+    }
+
+    public static class GlobalInit extends AbstractNode {
+
+        public GlobalInit(int idendation) {
+            super(idendation);
+        }
+
+        @Override
+        public String toString() {
+            return getHead("<GlobalInit>")
+                + getBody("TODO GlobalInit")
+                + getHead("</GlobalInit>");
+        }
+    }
+
+    public static class GlobalImport extends AbstractNode {
+
+        public GlobalImport(int idendation) {
+            super(idendation);
+        }
+
+        @Override
+        public String toString() {
+            return getHead("<GlobalImport>")
+                + getBody("TODO Global Import")
+                + getHead("</GlobalImport>");
         }
     }
 }

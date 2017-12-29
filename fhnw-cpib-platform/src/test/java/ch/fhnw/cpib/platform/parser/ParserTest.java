@@ -5,9 +5,12 @@ import ch.fhnw.cpib.platform.parser.concretetree.ConcreteTree;
 import ch.fhnw.cpib.platform.scanner.Scanner;
 import ch.fhnw.cpib.platform.scanner.tokens.TokenList;
 import ch.fhnw.cpib.platform.utils.ReaderUtils;
+import ch.fhnw.cpib.vm.IVirtualMachine;
+import ch.fhnw.cpib.vm.VirtualMachine;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -83,9 +86,18 @@ public class ParserTest {
 
     @Test
     public void testAbstractTree() throws Exception {
+        // Fake the standard input and provide a value for debugin
+        ByteArrayInputStream in = new ByteArrayInputStream("42\n".getBytes());
+        System.setIn(in);
+
         // Create the scanner and parser
         Scanner scanner = new Scanner();
         Parser parser = new Parser();
+
+        // Create the virtual machine
+        int codesize = 1000;
+        int storesize = 1000;
+        IVirtualMachine machine = new VirtualMachine(codesize, storesize);
 
         // Load the program
         String filename = "/Team/Program3.iml";
@@ -101,12 +113,29 @@ public class ParserTest {
         // Parse the token list
         ConcreteTree.Program concreteprogram = parser.parseTokenList(tokenlist);
         Assert.assertTrue(concreteprogram.toString().length() > 0);
-        System.out.println(concreteprogram);
-        System.out.println();
+        //System.out.println(concreteprogram);
+        //System.out.println();
 
         // Make the parse tree abstract
         AbstractTree.Program abstractprogram = concreteprogram.toAbstract();
         System.out.println(abstractprogram);
         System.out.println();
+
+        // Check the abstract tree
+        abstractprogram.check();
+
+        // Generate the code for the abstract tree
+        //abstractprogram.code(machine, 0);
+
+        // Generate the code by hand
+        machine.IntLoad(0, 995);
+        machine.IntInput(1, "x");
+        machine.IntLoad(2, 995);
+        machine.Deref(3);
+        machine.IntOutput(4, "x");
+        machine.Stop(5);
+
+        // Execute the code for the abstract tree
+        machine.execute();
     }
 }

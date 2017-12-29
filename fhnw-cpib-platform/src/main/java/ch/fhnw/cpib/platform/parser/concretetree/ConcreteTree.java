@@ -39,6 +39,8 @@ public class ConcreteTree {
         Decl(int idendation) {
             super(idendation);
         }
+
+        public abstract AbstractTree.Declaration toAbstract(RepCpsDecl repcpsdecl, int idendation);
     }
 
     public static class DeclSto extends Decl {
@@ -53,6 +55,11 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<DeclSto>") + stodecl + getHead("</DeclSto>");
+        }
+
+        @Override
+        public AbstractTree.Declaration toAbstract(RepCpsDecl repcpsdecl, int idendation) {
+            return stodecl.toAbstract(stodecl, repcpsdecl, idendation);
         }
     }
 
@@ -69,6 +76,12 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<DeclFun>") + fundecl + getHead("</DeclFun>");
         }
+
+        @Override
+        public AbstractTree.Declaration toAbstract(RepCpsDecl repcpsdecl, int idendation) {
+            // TODO: Implement
+            return null;
+        }
     }
 
     public static class DeclProc extends Decl {
@@ -84,6 +97,11 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<DeclProc>") + procdecl + getHead("</DeclProc>");
         }
+
+        @Override
+        public AbstractTree.Declaration toAbstract(RepCpsDecl repcpsdecl, int idendation) {
+            return procdecl.toAbstract(repcpsdecl, idendation);
+        }
     }
 
     public static abstract class StoDecl extends ConcreteNode {
@@ -91,6 +109,8 @@ public class ConcreteTree {
         StoDecl(int idendation) {
             super(idendation);
         }
+
+        public abstract AbstractTree.Declaration toAbstract(StoDecl stodecl, RepCpsDecl repcpsdecl, int idendation);
     }
 
     public static class StoDeclIdent extends StoDecl {
@@ -105,6 +125,12 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<StoDeclIdent>") + typedident + getHead("</StoDeclIdent>");
+        }
+
+        @Override
+        public AbstractTree.Declaration toAbstract(StoDecl stodecl, RepCpsDecl repcpsdecl, int idendation) {
+            Tokens.ChangeModeToken changemode = new Tokens.ChangeModeToken(Terminal.CHANGEMODE, Tokens.ChangeModeToken.ChangeMode.CONST);
+            return new AbstractTree.StoDecl(changemode, typedident.toAbstract(idendation + 1), repcpsdecl.toAbstract(idendation), idendation);
         }
     }
 
@@ -123,6 +149,11 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<StoDeclChangemode Mode='" + changemode.getChangeMode() + "'>") + typedident + getHead("</StoDeclChangemode>");
+        }
+
+        @Override
+        public AbstractTree.Declaration toAbstract(StoDecl stodecl, RepCpsDecl repcpsdecl, int idendation) {
+            return new AbstractTree.StoDecl(changemode, typedident.toAbstract(idendation + 1), repcpsdecl.toAbstract(idendation), idendation);
         }
     }
 
@@ -154,6 +185,11 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<FunDecl Name='" + identifier.getName() + "'>") + paramlist + stodecl + optglobimps + optcpsstodecl + cpscmd + getHead("</FunDecl>");
         }
+
+        public AbstractTree.Declaration toAbstract(FunDecl fundecl, RepCpsDecl repcpsdecl, int idendation) {
+            // TODO: Implement
+            return null;
+        }
     }
 
     public static class ProcDecl extends ConcreteNode {
@@ -181,6 +217,12 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<ProcDecl Name='" + identifier.getName() + "'>") + paramlist + optglobimps + optcpsstodecl + cpscmd + getHead("</ProcDecl>");
         }
+
+        public AbstractTree.Declaration toAbstract(RepCpsDecl repcpsdecl, int idendation) {
+            // TODO: Implement
+            return new AbstractTree.ProcDecl(identifier, paramlist.toAbstract(idendation + 1), optglobimps.toAbstract(idendation), null, repcpsdecl.toAbstract(idendation), cpscmd.toAbstract(idendation + 1), idendation);
+        }
+
     }
 
     public static abstract class OptGlobImps extends ConcreteNode {
@@ -188,6 +230,8 @@ public class ConcreteTree {
         OptGlobImps(int idendation) {
             super(idendation);
         }
+
+        public abstract AbstractTree.GlobalImport toAbstract(int idendation);
     }
 
     public static class OptGlobImpsGlobal extends OptGlobImps {
@@ -203,6 +247,12 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<OptGlobImpsGlobal>") + globimps + getHead("</OptGlobImpsGlobal>");
         }
+
+        @Override
+        public AbstractTree.GlobalImport toAbstract(int idendation) {
+            // TODO: Implement
+            return null;
+        }
     }
 
     public static class OptGlobImpsEpsilon extends OptGlobImps {
@@ -214,6 +264,12 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<OptGlobImpsEpsilon/>");
+        }
+
+        @Override
+        public AbstractTree.GlobalImport toAbstract(int idendation) {
+            // TODO: Implement
+            return null;
         }
     }
 
@@ -232,6 +288,10 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<GlobImps>") + globimp + repglobimps + getHead("</GlobImps>");
+        }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
         }
     }
 
@@ -258,6 +318,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<RepGlobImpsComma>") + globimp + repglobimps + getHead("</RepGlobImpsComma>");
         }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
+        }
     }
 
     public static class RepGlobImpsEpsilon extends RepGlobImps {
@@ -270,6 +334,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<RepGlobImpsEpsilon/>");
         }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
+        }
     }
 
     public static abstract class OptChangemode extends ConcreteNode {
@@ -278,7 +346,7 @@ public class ConcreteTree {
             super(idendation);
         }
 
-        public abstract Tokens.ChangeModeToken toAbstract();
+        public abstract Tokens.ChangeModeToken toAbstract(int idendation);
     }
 
     public static class OptChangemodeChangemode extends OptChangemode {
@@ -296,7 +364,7 @@ public class ConcreteTree {
         }
 
         @Override
-        public Tokens.ChangeModeToken toAbstract() {
+        public Tokens.ChangeModeToken toAbstract(int idenda) {
             return changemode;
         }
     }
@@ -313,7 +381,7 @@ public class ConcreteTree {
         }
 
         @Override
-        public Tokens.ChangeModeToken toAbstract() {
+        public Tokens.ChangeModeToken toAbstract(int idendation) {
             return new Tokens.ChangeModeToken(Terminal.CHANGEMODE, Tokens.ChangeModeToken.ChangeMode.CONST);
         }
     }
@@ -323,6 +391,8 @@ public class ConcreteTree {
         OptMechmode(int idendation) {
             super(idendation);
         }
+
+        public abstract Tokens.MechModeToken toAbstract(int idendation);
     }
 
     public static class OptMechmodeMechmode extends OptMechmode {
@@ -338,6 +408,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<OptMechmodeMechmode Mode='" + mechmode.getMechMode() + "'>") + getHead("</OptMechmodeMechmode>");
         }
+
+        public Tokens.MechModeToken toAbstract(int idendation) {
+            return mechmode;
+        }
     }
 
     public static class OptMechmodeEpsilon extends OptMechmode {
@@ -349,6 +423,10 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<OptMechmodeEpsilon/>");
+        }
+
+        public Tokens.MechModeToken toAbstract(int idendation) {
+            return new Tokens.MechModeToken(Terminal.MECHMODE, Tokens.MechModeToken.MechMode.COPY);
         }
     }
 
@@ -375,6 +453,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<GlobImp Name='" + identifier.getName() + "'>") + optchangemode + getHead("</GlobImp>");
         }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
+        }
     }
 
     public static class GlobImpFlowmode extends GlobImp {
@@ -395,6 +477,10 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<GlobImp Mode='" + flowmode.getFlowMode() + "' Name='" + identifier.getName() + "'>") + optchangemode + getHead("</GlobImp>");
+        }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
         }
     }
 
@@ -462,8 +548,7 @@ public class ConcreteTree {
         }
 
         public AbstractTree.Declaration toAbstract(int idendation) {
-            return null;
-            //return decl.toAbstract(repcpsdecl);
+            return decl.toAbstract(repcpsdecl, idendation);
         }
     }
 
@@ -472,6 +557,8 @@ public class ConcreteTree {
         RepCpsDecl(int idendation) {
             super(idendation);
         }
+
+        public abstract AbstractTree.Declaration toAbstract(int idendation);
     }
 
     public static class RepCpsDeclSemicolon extends RepCpsDecl {
@@ -490,6 +577,12 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<RepCpsDeclSemicolon>") + decl + repcpsdecl + getHead("</RepCpsDeclSemicolon>");
         }
+
+        @Override
+        public AbstractTree.Declaration toAbstract(int idendation) {
+            // TODO: Implement
+            return decl.toAbstract(repcpsdecl, idendation + 1);
+        }
     }
 
     public static class RepCpsDeclEpsilon extends RepCpsDecl {
@@ -501,6 +594,11 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<RepCpsDeclEpsilon/>");
+        }
+
+        @Override
+        public AbstractTree.Declaration toAbstract(int idendation) {
+            return null;
         }
     }
 
@@ -524,6 +622,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<OptCpsStoDeclLocal>") + cpsstodecl + getHead("</OptCpsStoDeclLocal>");
         }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
+        }
     }
 
     public static class OptCpsStoDeclEpsilon extends OptCpsStoDecl {
@@ -535,6 +637,10 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<OptCpsStoDeclEpsilon/>");
+        }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
         }
     }
 
@@ -553,6 +659,10 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<CpsStoDecl>") + stodecl + repcpsstodecl + getHead("</CpsStoDecl>");
+        }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
         }
     }
 
@@ -579,6 +689,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<RepCpsStoDeclSemicolon>") + stodecl + repcpsstodecl + getHead("</RepCpsStoDeclSemicolon>");
         }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
+        }
     }
 
     public static class RepCpsStoDeclEpsilon extends RepCpsStoDecl {
@@ -590,6 +704,10 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<RepCpsStoDeclEpsilon>") + getHead("</RepCpsStoDeclEpsilon>");
+        }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
         }
     }
 
@@ -739,7 +857,7 @@ public class ConcreteTree {
         @Override
         public AbstractTree.ProgParam toAbstract(RepProgParamList repprogparamlist, int idendation) {
             Tokens.FlowModeToken flowmode = new Tokens.FlowModeToken(Terminal.FLOWMODE, Tokens.FlowModeToken.FlowMode.IN);
-            return new AbstractTree.ProgParam(flowmode, optchangemode.toAbstract(), typedident.toAbstract(idendation + 1), repprogparamlist.toAbstract(idendation + 1), idendation);
+            return new AbstractTree.ProgParam(flowmode, optchangemode.toAbstract(idendation), typedident.toAbstract(idendation + 1), repprogparamlist.toAbstract(idendation + 1), idendation);
         }
     }
 
@@ -765,7 +883,7 @@ public class ConcreteTree {
 
         @Override
         public AbstractTree.ProgParam toAbstract(RepProgParamList repprogparamlist, int idendation) {
-            return new AbstractTree.ProgParam(flowmode, optchangemode.toAbstract(), typedident.toAbstract(idendation + 1), repprogparamlist.toAbstract(idendation + 1), idendation);
+            return new AbstractTree.ProgParam(flowmode, optchangemode.toAbstract(idendation), typedident.toAbstract(idendation + 1), repprogparamlist.toAbstract(idendation + 1), idendation);
         }
     }
 
@@ -782,6 +900,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<ParamList>") + optparamlist + getHead("</ParamList>");
         }
+
+        public AbstractTree.Param toAbstract(int idendation) {
+            return optparamlist.toAbstract(idendation);
+        }
     }
 
     public static abstract class OptParamList extends ConcreteNode {
@@ -789,6 +911,8 @@ public class ConcreteTree {
         OptParamList(int idendation) {
             super(idendation);
         }
+
+        public abstract AbstractTree.Param toAbstract(int idendation);
     }
 
     public static class OptParamListRepeating extends OptParamList {
@@ -807,6 +931,11 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<OptParamListRepeating>") + param + repparamlist + getHead("</OptParamListRepeating>");
         }
+
+        @Override
+        public AbstractTree.Param toAbstract(int idendation) {
+            return param.toAbstract(repparamlist, idendation);
+        }
     }
 
     public static class OptParamListEpsilon extends OptParamList {
@@ -819,6 +948,11 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<OptParamListEpsilon/>");
         }
+
+        @Override
+        public AbstractTree.Param toAbstract(int idendation) {
+            return null;
+        }
     }
 
     public static abstract class RepParamList extends ConcreteNode {
@@ -826,6 +960,8 @@ public class ConcreteTree {
         RepParamList(int idendation) {
             super(idendation);
         }
+
+        public abstract AbstractTree.Param toAbstract(int idendation);
     }
 
     public static class RepParamListComma extends RepParamList {
@@ -844,6 +980,11 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<RepParamListComma>") + param + repparamlist + getHead("</RepParamListComma>");
         }
+
+        public AbstractTree.Param toAbstract(int idendation) {
+            // TODO: Implement
+            return null;
+        }
     }
 
     public static class RepParamListEpsilon extends RepParamList {
@@ -856,6 +997,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<RepParamListEpsilon/>");
         }
+
+        public AbstractTree.Param toAbstract(int idendation) {
+            return null;
+        }
     }
 
     public static abstract class Param extends ConcreteNode {
@@ -863,6 +1008,8 @@ public class ConcreteTree {
         Param(int idendation) {
             super(idendation);
         }
+
+        public abstract AbstractTree.Param toAbstract(RepParamList repparamlist, int idendation);
     }
 
     public static class ParamExpression extends Param {
@@ -883,6 +1030,12 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<ParamExpression>") + optmechmode + optchangemode + typedident + getHead("</ParamExpression>");
+        }
+
+        @Override
+        public AbstractTree.Param toAbstract(RepParamList repparamlist, int idendation) {
+            // TODO: Implement
+            return null;
         }
     }
 
@@ -907,6 +1060,11 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<ParamFlowmode Mode='" + flowmode.getFlowMode() + "'>") + optmechmode + optchangemode + typedident + getHead("</ParamFlowmode>");
+        }
+
+        @Override
+        public AbstractTree.Param toAbstract(RepParamList repparamlist, int idendation) {
+            return new AbstractTree.Param(flowmode, optmechmode.toAbstract(idendation), optchangemode.toAbstract(idendation), typedident.toAbstract(idendation + 1), repparamlist.toAbstract(idendation), idendation);
         }
     }
 
@@ -954,7 +1112,7 @@ public class ConcreteTree {
 
         @Override
         public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd, int idendation) {
-            return null;
+            return new AbstractTree.SkipCmd(null, idendation);
         }
     }
 
@@ -983,7 +1141,9 @@ public class ConcreteTree {
 
         @Override
         public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd, int idendation) {
-            return new AbstractTree.SkipCmd(null, idendation + 1);
+            // TODO: Fix my stupidity
+            return null;
+            //return new AbstractTree.Expr(null, idendation + 1);
         }
     }
 
@@ -1113,7 +1273,7 @@ public class ConcreteTree {
 
         @Override
         public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd, int idendation) {
-            return new AbstractTree.InputCmd(expr.toAbstract(), repcpscmd.toAbstract(idendation + 1), idendation);
+            return new AbstractTree.InputCmd(expr.toAbstract(idendation), repcpscmd.toAbstract(idendation + 1), idendation);
         }
     }
 
@@ -1211,6 +1371,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<OptGlobInitsInit Name='" + identifier.getName() + "'>") + repidents + getHead("</OptGlobInitsInit>");
         }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
+        }
     }
 
     public static class OptGlobInitsEpsilon extends OptGlobInits {
@@ -1222,6 +1386,10 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<OptGlobInitsEpsilon/>");
+        }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
         }
     }
 
@@ -1248,6 +1416,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<RepIdentsComma Name='" + identifier.getName() + "'>") + repidents + getHead("</RepIdentsComma>");
         }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
+        }
     }
 
     public static class RepIdentsEpsilon extends RepIdents {
@@ -1259,6 +1431,10 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<RepIdentsEpsilon/>");
+        }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
         }
     }
 
@@ -1279,9 +1455,8 @@ public class ConcreteTree {
             return getHead("<Expr>") + term1 + repterm1 + getHead("</Expr>");
         }
 
-        public AbstractTree.Expression toAbstract() {
-            // TODO: Fix
-            return null;
+        public AbstractTree.Expression toAbstract(int idendation) {
+            return repterm1.toAbstract(term1.toAbstract(idendation), idendation);
         }
     }
 
@@ -1290,6 +1465,8 @@ public class ConcreteTree {
         RepTerm1(int idendation) {
             super(idendation);
         }
+
+        public abstract AbstractTree.Expression toAbstract(AbstractTree.Expression expression, int idendation);
     }
 
     public static class RepTerm1BoolOpr extends RepTerm1 {
@@ -1309,7 +1486,12 @@ public class ConcreteTree {
 
         @Override
         public String toString() {
-            return getHead("<RepTerm1BoolOpr Opr='" + boolopr.getBoolOpr() + "'>") + term1 + repterm1 + getHead("</RepTerm1BoolOpr>");
+            return getHead("<RepTerm1BoolOpr Opr='" + boolopr.getOperation() + "'>") + term1 + repterm1 + getHead("</RepTerm1BoolOpr>");
+        }
+
+        @Override
+        public AbstractTree.Expression toAbstract(AbstractTree.Expression expression, int idendation) {
+            return repterm1.toAbstract(new AbstractTree.DyadicExpr(boolopr, expression, term1.toAbstract(idendation + 1), idendation), idendation + 1);
         }
     }
 
@@ -1322,6 +1504,11 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<RepTerm1Epsilon/>");
+        }
+
+        @Override
+        public AbstractTree.Expression toAbstract(AbstractTree.Expression expression, int idendation) {
+            return expression;
         }
     }
 
@@ -1341,6 +1528,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<Term1>") + term2 + repterm2 + getHead("</Term1>");
         }
+
+        public AbstractTree.Expression toAbstract(int idendation) {
+            return repterm2.toAbstract(term2.toAbstract(idendation), idendation);
+        }
     }
 
     public static abstract class RepTerm2 extends ConcreteNode {
@@ -1348,6 +1539,8 @@ public class ConcreteTree {
         RepTerm2(int idendation) {
             super(idendation);
         }
+
+        public abstract AbstractTree.Expression toAbstract(AbstractTree.Expression expression, int idendation);
     }
 
     public static class RepTerm2RelOpr extends RepTerm2 {
@@ -1367,7 +1560,13 @@ public class ConcreteTree {
 
         @Override
         public String toString() {
-            return getHead("<RepTerm2RelOpr Opr='" + relopr.getRelOpr() + "'>") + term2 + repterm2 + getHead("</RepTerm2RelOpr>");
+            return getHead("<RepTerm2RelOpr Opr='" + relopr.getOperation() + "'>") + term2 + repterm2 + getHead("</RepTerm2RelOpr>");
+        }
+
+        @Override
+        public AbstractTree.Expression toAbstract(AbstractTree.Expression expression, int idendation) {
+            return repterm2.toAbstract(new AbstractTree.DyadicExpr(relopr, null, null, idendation), idendation + 1);
+            //return repterm2.toAbstract(new AbstractTree.DyadicExpr(relopr, expression, term2.toAbstract(idendation + 1), idendation + 1), idendation);
         }
     }
 
@@ -1380,6 +1579,11 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<RepTerm2Epsilon/>");
+        }
+
+        @Override
+        public AbstractTree.Expression toAbstract(AbstractTree.Expression expression, int idendation) {
+            return expression;
         }
     }
 
@@ -1399,6 +1603,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<Term2>") + term3 + repterm3 + getHead("</Term2>");
         }
+
+        public AbstractTree.Expression toAbstract(int idendation) {
+            return repterm3.toAbstract(term3.toAbstract(idendation), idendation);
+        }
     }
 
     public static abstract class RepTerm3 extends ConcreteNode {
@@ -1406,6 +1614,8 @@ public class ConcreteTree {
         RepTerm3(int idendation) {
             super(idendation);
         }
+
+        public abstract AbstractTree.Expression toAbstract(AbstractTree.Expression expression, int idendation);
     }
 
     public static class RepTerm3AddOpr extends RepTerm3 {
@@ -1425,7 +1635,12 @@ public class ConcreteTree {
 
         @Override
         public String toString() {
-            return getHead("<RepTerm3AddOpr Opr='" + addopr.getAddOpr() + "'>") + term3 + repterm3 + getHead("</RepTerm3AddOpr>");
+            return getHead("<RepTerm3AddOpr Opr='" + addopr.getOperation() + "'>") + term3 + repterm3 + getHead("</RepTerm3AddOpr>");
+        }
+
+        @Override
+        public AbstractTree.Expression toAbstract(AbstractTree.Expression expression, int idendation) {
+            return repterm3.toAbstract(new AbstractTree.DyadicExpr(addopr, expression, term3.toAbstract(idendation + 1), idendation), idendation);
         }
     }
 
@@ -1438,6 +1653,11 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<RepTerm3Epsilon/>");
+        }
+
+        @Override
+        public AbstractTree.Expression toAbstract(AbstractTree.Expression expression, int idendation) {
+            return expression;
         }
     }
 
@@ -1457,6 +1677,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<Term3>") + factor + repfactor + getHead("</Term3>");
         }
+
+        public AbstractTree.Expression toAbstract(int idendation) {
+            return repfactor.toAbstract(factor.toAbstract(idendation + 1), idendation);
+        }
     }
 
     public static abstract class RepFactor extends ConcreteNode {
@@ -1464,6 +1688,8 @@ public class ConcreteTree {
         RepFactor(int idendation) {
             super(idendation);
         }
+
+        public abstract AbstractTree.Expression toAbstract(AbstractTree.Expression expression, int idendation);
     }
 
     public static class RepFactorMultOpr extends RepFactor {
@@ -1483,7 +1709,14 @@ public class ConcreteTree {
 
         @Override
         public String toString() {
-            return getHead("<RepFactorMultOpr Opr='" + multopr.getMultOpr() + "'>") + factor + repfactor + getHead("</RepFactorMultOpr>");
+            return getHead("<RepFactorMultOpr Opr='" + multopr.getOperation() + "'>") + factor + repfactor + getHead("</RepFactorMultOpr>");
+        }
+
+        @Override
+        public AbstractTree.Expression toAbstract(AbstractTree.Expression expression, int idendation) {
+            // TODO: Implement
+            return null;
+//            return repfactor.toAbstract(new AbstractTree.DyadicExpr(kkk), idendation);
         }
     }
 
@@ -1497,6 +1730,11 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<RepFactorEpsilon/>");
         }
+
+        @Override
+        public AbstractTree.Expression toAbstract(AbstractTree.Expression expression, int idendation) {
+            return expression;
+        }
     }
 
     public static abstract class Factor extends ConcreteNode {
@@ -1504,6 +1742,8 @@ public class ConcreteTree {
         Factor(int idendation) {
             super(idendation);
         }
+
+        public abstract AbstractTree.Expression toAbstract(int idendation);
     }
 
     public static class FactorLiteral extends Factor {
@@ -1518,6 +1758,11 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<FactorLiteral Name='" + literal.getValue() + "'") + getHead("</FactorLiteral>");
+        }
+
+        @Override
+        public AbstractTree.Expression toAbstract(int idendation) {
+            return new AbstractTree.LiteralExpr(literal, idendation);
         }
     }
 
@@ -1537,6 +1782,11 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<FactorIdent Name='" + identifier.getName() + "'>") + optinitorexprlist + getHead("</FactorIdent>");
         }
+
+        @Override
+        public AbstractTree.Expression toAbstract(int idendation) {
+            return optinitorexprlist.toAbstract(identifier, idendation);
+        }
     }
 
     public static class FactorExpression extends Factor {
@@ -1555,6 +1805,11 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<FactorExpression>") + monadicopr + factor + getHead("</FactorExpression>");
         }
+
+        @Override
+        public AbstractTree.Expression toAbstract(int idendation) {
+            return new AbstractTree.MonadicExpr(monadicopr.toAbstract(idendation + 1), factor.toAbstract(idendation + 1), idendation);
+        }
     }
 
     public static class FactorLparen extends Factor {
@@ -1570,6 +1825,11 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<FactorLparen>") + expr + getHead("</FactorLparen>");
         }
+
+        @Override
+        public AbstractTree.Expression toAbstract(int idendation) {
+            return expr.toAbstract(idendation);
+        }
     }
 
     public static abstract class OptInitOrExprList extends ConcreteNode {
@@ -1577,6 +1837,8 @@ public class ConcreteTree {
         OptInitOrExprList(int idendation) {
             super(idendation);
         }
+
+        public abstract AbstractTree.Expression toAbstract(Tokens.IdentifierToken identifier, int idendation);
     }
 
     public static class OptInitOrExprListInit extends OptInitOrExprList {
@@ -1588,6 +1850,11 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<OptInitOrExprListInit/>");
+        }
+
+        @Override
+        public AbstractTree.Expression toAbstract(Tokens.IdentifierToken identifier, int idendation) {
+            return new AbstractTree.StoreExpr(identifier, true, idendation);
         }
     }
 
@@ -1604,6 +1871,11 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<OptInitOrExprListLparen>") + exprlist + getHead("</OptInitOrExprListLparen>");
         }
+
+        @Override
+        public AbstractTree.Expression toAbstract(Tokens.IdentifierToken identifier, int idendation) {
+            return new AbstractTree.FunCallExpr(new AbstractTree.RoutineCall(identifier, exprlist.toAbstract(idendation + 1), idendation), idendation);
+        }
     }
 
     public static class OptInitOrExprListEpsilon extends OptInitOrExprList {
@@ -1616,6 +1888,11 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<OptInitOrExprListEpsilon/>");
         }
+
+        @Override
+        public AbstractTree.Expression toAbstract(Tokens.IdentifierToken identifier, int idendation) {
+            return new AbstractTree.StoreExpr(identifier, false, idendation);
+        }
     }
 
     public static abstract class MonadicOpr extends ConcreteNode {
@@ -1623,6 +1900,8 @@ public class ConcreteTree {
         MonadicOpr(int idendation) {
             super(idendation);
         }
+
+        public abstract Tokens.OperationToken toAbstract(int idendation);
     }
 
     public static class MonadicOprNot extends MonadicOpr {
@@ -1634,6 +1913,12 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<MonadicOprAddopr/>");
+        }
+
+        @Override
+        public Tokens.OperationToken toAbstract(int idendation) {
+            // TODO: Implement
+            return null;
         }
     }
 
@@ -1648,7 +1933,13 @@ public class ConcreteTree {
 
         @Override
         public String toString() {
-            return getHead("<MonadicOprAddopr Mode='" + addopr.getAddOpr() + "'>") + getHead("</MonadicOprAddopr>");
+            return getHead("<MonadicOprAddopr Mode='" + addopr.getOperation() + "'>") + getHead("</MonadicOprAddopr>");
+        }
+
+        @Override
+        public Tokens.OperationToken toAbstract(int idendation) {
+            // TODO: Implement
+            return null;
         }
     }
 
@@ -1665,6 +1956,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<ExprList>") + optexprlist + getHead("</ExprList>");
         }
+
+        public AbstractTree.ExpressionList toAbstract(int idendation) {
+            return optexprlist.toAbstract(idendation);
+        }
     }
 
     public static abstract class OptExprList extends ConcreteNode {
@@ -1672,6 +1967,8 @@ public class ConcreteTree {
         OptExprList(int idendation) {
             super(idendation);
         }
+
+        public abstract AbstractTree.ExpressionList toAbstract(int idendation);
     }
 
     public static class OptExprListExpression extends OptExprList {
@@ -1690,6 +1987,11 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<OptExprListExpression>") + expr + repexprlist + getHead("</OptExprListExpression>");
         }
+
+        @Override
+        public AbstractTree.ExpressionList toAbstract(int idendation) {
+            return new AbstractTree.ExpressionList(expr.toAbstract(idendation + 1), repexprlist.toAbstract(idendation), idendation);
+        }
     }
 
     public static class OptExprListEpsilon extends OptExprList {
@@ -1702,6 +2004,11 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<OptExprListEpsilon/>");
         }
+
+        @Override
+        public AbstractTree.ExpressionList toAbstract(int idendation) {
+            return null;
+        }
     }
 
     public static abstract class RepExprList extends ConcreteNode {
@@ -1709,6 +2016,8 @@ public class ConcreteTree {
         RepExprList(int idendation) {
             super(idendation);
         }
+
+        public abstract AbstractTree.ExpressionList toAbstract(int idendation);
     }
 
     public static class RepExprListComma extends RepExprList {
@@ -1727,6 +2036,11 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<RepExprListComma>") + expr + repexprlist + getHead("</RepExprListComma>");
         }
+
+        @Override
+        public AbstractTree.ExpressionList toAbstract(int idendation) {
+            return new AbstractTree.ExpressionList(expr.toAbstract(idendation + 1), repexprlist.toAbstract(idendation + 1), idendation);
+        }
     }
 
     public static class RepExprListEpsilon extends RepExprList {
@@ -1738,6 +2052,11 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<RepExprListEpsilon/>");
+        }
+
+        @Override
+        public AbstractTree.ExpressionList toAbstract(int idendation) {
+            return null;
         }
     }
 
@@ -1764,6 +2083,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<RepCaseCase Name='" + literal.getValue() + "'>") + cpscmd + getHead("</RepCaseCase>");
         }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
+        }
     }
 
     public static class RepCaseEpsilon extends RepCase {
@@ -1775,6 +2098,10 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<RepCaseEpsilon/>");
+        }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
         }
     }
 
@@ -1798,6 +2125,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<OptDefaultDefault/>") + cpscmd + getHead("</OptDefaultDefault>");
         }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
+        }
     }
 
     public static class OptDefaultEpsilon extends OptDefault {
@@ -1809,6 +2140,10 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<OptDefaultEpsilon/>");
+        }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
         }
     }
 
@@ -1832,6 +2167,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<OptElseElse>") + cpscmd + getHead("</OptElseElse>");
         }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
+        }
     }
 
     public static class OptElseEpsilon extends OptElse {
@@ -1843,6 +2182,10 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<OptElseEpsilon/>");
+        }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
         }
     }
 
@@ -1872,6 +2215,10 @@ public class ConcreteTree {
         public String toString() {
             return getHead("<RepElseifElseif>") + expr + cpscmd + repelseif + getHead("</RepElseifElseif>");
         }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
+        }
     }
 
     public static class RepElseifEpsilon extends RepElseif {
@@ -1883,6 +2230,10 @@ public class ConcreteTree {
         @Override
         public String toString() {
             return getHead("<RepElseifEpsilon/>");
+        }
+
+        public Object toAbstract(int idendation) {
+            throw new RuntimeException("Abstract conversion not implemented yet!");
         }
     }
 }

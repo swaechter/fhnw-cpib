@@ -10,6 +10,11 @@
     <artifactId>fhnw-cpib-platform</artifactId>
     <dependencies>
         <dependency>
+            <groupId>ch.fhnw</groupId>
+            <artifactId>fhnw-cpib-vm</artifactId>
+            <version>0.1.0</version>
+        </dependency>
+        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.6</version>

@@ -130,57 +130,91 @@ public class Tokens {
         }
     }
 
-    public static class AddOprToken extends Token {
+    public static abstract class OperationToken extends Token {
+
+        public enum Operation {
+            PLUS,
+            MINUS,
+            AND,
+            OR,
+            CAND,
+            COR,
+            TIMES,
+            DIVE,
+            MODE,
+            EQ,
+            NE,
+            LT,
+            GT,
+            LE,
+            GE
+        }
+
+        private final Operation operation;
+
+        public OperationToken(Terminal terminal, Operation operation) {
+            super(terminal);
+            this.operation = operation;
+        }
+
+        public Operation getOperation() {
+            return operation;
+        }
+
+        @Override
+        public String toString() {
+            return "(" + super.toString() + "," + getOperation() + ")";
+        }
+    }
+
+    public static class AddOprToken extends OperationToken {
 
         public enum AddOpr {
             PLUS,
             MINUS
         }
 
-        private final AddOpr addopr;
-
         public AddOprToken(Terminal terminal, AddOpr addopr) {
-            super(terminal);
-            this.addopr = addopr;
+            super(terminal, convertOperation(addopr));
         }
 
-        public AddOpr getAddOpr() {
-            return addopr;
-        }
-
-        @Override
-        public String toString() {
-            return "(" + super.toString() + "," + addopr + ")";
+        private static OperationToken.Operation convertOperation(AddOpr addopr) {
+            if (addopr == AddOpr.PLUS) {
+                return OperationToken.Operation.PLUS;
+            } else {
+                return OperationToken.Operation.MINUS;
+            }
         }
     }
 
-    public static class BoolOprToken extends Token {
+    public static class BoolOprToken extends OperationToken {
 
-        public enum Bool {
+        public enum BoolOpr {
             AND,
             OR,
             CAND,
             COR
         }
 
-        private final Bool boolopr;
 
-        public BoolOprToken(Terminal terminal, Bool boolopr) {
-            super(terminal);
-            this.boolopr = boolopr;
+        public BoolOprToken(Terminal terminal, BoolOpr boolopr) {
+            super(terminal, convertOperation(boolopr));
         }
 
-        public Bool getBoolOpr() {
-            return boolopr;
-        }
-
-        @Override
-        public String toString() {
-            return "(" + super.toString() + "," + boolopr + ")";
+        private static OperationToken.Operation convertOperation(BoolOpr boolopr) {
+            if (boolopr == BoolOpr.AND) {
+                return Operation.AND;
+            } else if (boolopr == BoolOpr.OR) {
+                return Operation.OR;
+            } else if (boolopr == BoolOpr.CAND) {
+                return Operation.CAND;
+            } else {
+                return Operation.COR;
+            }
         }
     }
 
-    public static class MultOprToken extends Token {
+    public static class MultOprToken extends OperationToken {
 
         public enum MultOpr {
             TIMES,
@@ -188,24 +222,22 @@ public class Tokens {
             MODE
         }
 
-        private final MultOpr multopr;
-
         public MultOprToken(Terminal terminal, MultOpr multopr) {
-            super(terminal);
-            this.multopr = multopr;
+            super(terminal, convertOperation(multopr));
         }
 
-        public MultOpr getMultOpr() {
-            return multopr;
-        }
-
-        @Override
-        public String toString() {
-            return "(" + super.toString() + "," + multopr + ")";
+        private static OperationToken.Operation convertOperation(MultOpr multopr) {
+            if (multopr == MultOpr.TIMES) {
+                return Operation.TIMES;
+            } else if (multopr == MultOpr.DIVE) {
+                return Operation.DIVE;
+            } else {
+                return Operation.MODE;
+            }
         }
     }
 
-    public static class RelOprToken extends Token {
+    public static class RelOprToken extends OperationToken {
 
         public enum RelOpr {
             EQ,
@@ -216,20 +248,24 @@ public class Tokens {
             GE
         }
 
-        private final RelOpr relopr;
-
         public RelOprToken(Terminal terminal, RelOpr relopr) {
-            super(terminal);
-            this.relopr = relopr;
+            super(terminal, convertOperation(relopr));
         }
 
-        public RelOpr getRelOpr() {
-            return relopr;
-        }
-
-        @Override
-        public String toString() {
-            return "(" + super.toString() + "," + relopr + ")";
+        private static OperationToken.Operation convertOperation(RelOpr relopr) {
+            if (relopr == RelOpr.EQ) {
+                return Operation.EQ;
+            } else if (relopr == RelOpr.NE) {
+                return Operation.NE;
+            } else if (relopr == RelOpr.LT) {
+                return Operation.LT;
+            } else if (relopr == RelOpr.GT) {
+                return Operation.GT;
+            } else if (relopr == RelOpr.LE) {
+                return Operation.LE;
+            } else {
+                return Operation.GE;
+            }
         }
     }
 

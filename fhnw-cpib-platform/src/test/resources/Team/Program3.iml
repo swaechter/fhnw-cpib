@@ -1,6 +1,28 @@
 program HiAndBye(in m:int32, in n:int32, out q:int32, out var r:int32)
-global x:int32
+global x:int32; y:int32; z:int32; zz:bool; g:int32;
+
+proc p1(in copy const x:int32)
+    global
+        out const g
+    do
+        g init := x + 1
+endproc;
+
+proc p2(out copy x:int32, out copy y:int32)
+    do
+        skip
+endproc;
+
+proc p3(out copy x:int32, out copy y:int32)
+    do
+        y init := 6;
+        x init := 5
+endproc
+
 do
   debugin x init;
-  debugout x
+  debugout x;
+
+  call p1(3) init g;
+  debugout g
 endprogram

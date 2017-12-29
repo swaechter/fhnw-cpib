@@ -74,10 +74,10 @@ public class Dictionary {
         // All all operator tokens
         tokens.put("+", new Tokens.AddOprToken(Terminal.ADDOPR, Tokens.AddOprToken.AddOpr.PLUS));
         tokens.put("-", new Tokens.AddOprToken(Terminal.ADDOPR, Tokens.AddOprToken.AddOpr.MINUS));
-        tokens.put("&&", new Tokens.BoolOprToken(Terminal.BOOLOPR, Tokens.BoolOprToken.Bool.AND));
-        tokens.put("||", new Tokens.BoolOprToken(Terminal.BOOLOPR, Tokens.BoolOprToken.Bool.OR));
-        tokens.put("&?", new Tokens.BoolOprToken(Terminal.BOOLOPR, Tokens.BoolOprToken.Bool.CAND));
-        tokens.put("|?", new Tokens.BoolOprToken(Terminal.BOOLOPR, Tokens.BoolOprToken.Bool.COR));
+        tokens.put("&&", new Tokens.BoolOprToken(Terminal.BOOLOPR, Tokens.BoolOprToken.BoolOpr.AND));
+        tokens.put("||", new Tokens.BoolOprToken(Terminal.BOOLOPR, Tokens.BoolOprToken.BoolOpr.OR));
+        tokens.put("&?", new Tokens.BoolOprToken(Terminal.BOOLOPR, Tokens.BoolOprToken.BoolOpr.CAND));
+        tokens.put("|?", new Tokens.BoolOprToken(Terminal.BOOLOPR, Tokens.BoolOprToken.BoolOpr.COR));
         tokens.put("*", new Tokens.MultOprToken(Terminal.MULTOPR, Tokens.MultOprToken.MultOpr.TIMES));
         tokens.put("/", new Tokens.MultOprToken(Terminal.MULTOPR, Tokens.MultOprToken.MultOpr.DIVE));
         tokens.put("%", new Tokens.MultOprToken(Terminal.MULTOPR, Tokens.MultOprToken.MultOpr.MODE));
