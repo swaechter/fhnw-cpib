@@ -132,15 +132,38 @@ public class AbstractTree {
 
     public static class FunDecl extends Declaration {
 
-        public FunDecl(Declaration nextdeclaration, int idendation) {
-            super(nextdeclaration, idendation);
+        private final Tokens.IdentifierToken identifier;
+
+        private final Param param;
+
+        private final StoDecl storedeclaration;
+
+        private final GlobalImport globalimport1;
+
+        private final Cmd cmd;
+
+        private final GlobalImport globalimport2;
+
+        public FunDecl(Tokens.IdentifierToken identifier, Param param, StoDecl storedeclaration, GlobalImport globalimport1, Cmd cmd, GlobalImport globalimport2, int idendation) {
+            super(storedeclaration, idendation);
+            this.identifier = identifier;
+            this.param = param;
+            this.storedeclaration = storedeclaration;
+            this.globalimport1 = globalimport1;
+            this.cmd = cmd;
+            this.globalimport2 = globalimport2;
         }
 
         @Override
         public String toString() {
-            return getHead("<TODO>")
-                + getBody("TODO FunDecl")
-                + getHead("</TODO>");
+            return getHead("<FunDecl>")
+                + getBody("<Ident Name='" + identifier.getName() + "'/>")
+                + (param != null ? param : getBody("<NoParam/>"))
+                + (storedeclaration != null ? storedeclaration : getBody("<NoNextStoreDeclaration/>"))
+                + (globalimport1 != null ? globalimport1 : getBody("<NoGlobalImport/>"))
+                + (cmd != null ? cmd : getBody("<NoCmd/>"))
+                + (globalimport2 != null ? globalimport2 : getBody("<NoGlobalImport/>"))
+                + getHead("</FunDecl>");
         }
     }
 
@@ -198,7 +221,7 @@ public class AbstractTree {
     public static class SkipCmd extends Cmd {
 
         public SkipCmd(Cmd nextcmd, int idendation) {
-            super(nextcmd, idendation);
+            super(nextcmd, idendation); // TODO: Check if skip does really what we think
         }
 
         @Override
@@ -237,47 +260,149 @@ public class AbstractTree {
         }
     }
 
-    // TODO: SwitchCmd extends Cmd
+    public static class SwitchCmd extends Cmd {
 
-    public static class CondCmd extends Cmd {
+        private final Expression expression;
 
-        public CondCmd(Cmd nextcmd, int idendation) {
+        private final RepCaseCmd repcasecmd;
+
+        private final Cmd cmd;
+
+        public SwitchCmd(Expression expression, RepCaseCmd repcasecmd, Cmd cmd, Cmd nextcmd, int idendation) {
             super(nextcmd, idendation);
+            this.expression = expression;
+            this.repcasecmd = repcasecmd;
+            this.cmd = cmd;
         }
 
         @Override
         public String toString() {
-            return getHead("<TODO>")
-                + getBody("TODO CondCmd")
-                + getHead("</TODO>");
+            return getHead("<SwitchCmd>")
+                + expression
+                + repcasecmd
+                + (cmd != null ? cmd : getBody("<NoDefaultCmd/>"))
+                + getHead("</SwitchCmd>");
+        }
+    }
+
+    public static class RepCaseCmd extends Cmd {
+
+        private final Tokens.LiteralToken literal;
+
+        private final Cmd cmd;
+
+        public RepCaseCmd(Tokens.LiteralToken literal, Cmd cmd, RepCaseCmd nextcmd, int idendation) {
+            super(nextcmd, idendation);
+            this.literal = literal;
+            this.cmd = cmd;
+        }
+
+        @Override
+        public String toString() {
+            return getHead("<RepCaseCmd>")
+                + getBody("<Literal Value='" + literal.getValue() + "'/>")
+                + cmd
+                + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextRepCaseCmd/>"))
+                + getHead("</RepCaseCmd>");
+        }
+    }
+
+    public static class CondCmd extends Cmd {
+
+        private final Expression expression;
+
+        private final Cmd cmd;
+
+        private final RepCondCmd repcondcmd;
+
+        private final Cmd othercmd;
+
+        public CondCmd(Expression expression, Cmd cmd, RepCondCmd repcondcmd, Cmd othercmd, Cmd nextcmd, int idendation) {
+            super(nextcmd, idendation);
+            this.expression = expression;
+            this.cmd = cmd;
+            this.repcondcmd = repcondcmd;
+            this.othercmd = othercmd;
+        }
+
+        @Override
+        public String toString() {
+            return getHead("<CondCmd>")
+                + expression
+                + cmd
+                + (repcondcmd != null ? repcondcmd : getBody("<NoNextRepCondCmd/>"))
+                + (othercmd != null ? othercmd : getBody("<NoOtherCmd/>"))
+                + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextCmd/>"))
+                + getHead("</CondCmd>");
+        }
+    }
+
+    public static class RepCondCmd extends Cmd {
+
+        private final Expression expression;
+
+        private final Cmd cmd;
+
+        private final RepCondCmd repcondcmd;
+
+        public RepCondCmd(Expression expression, Cmd cmd, RepCondCmd repCondCmd, int idendation) {
+            super(null, idendation);
+            this.expression = expression;
+            this.cmd = cmd;
+            this.repcondcmd = repCondCmd;
+        }
+
+        @Override
+        public String toString() {
+            return getHead("<RepCondCmd>")
+                + expression
+                + cmd
+                + (repcondcmd != null ? repcondcmd : getBody("<NoNextRepCondCmd/>"))
+                + getHead("</RepCondCmd>");
         }
     }
 
     public static class WhileCmd extends Cmd {
 
-        public WhileCmd(Cmd nextcmd, int idendation) {
+        private final Expression expression;
+
+        private final Cmd cmd;
+
+        public WhileCmd(Expression expression, Cmd cmd, Cmd nextcmd, int idendation) {
             super(nextcmd, idendation);
+            this.expression = expression;
+            this.cmd = cmd;
         }
 
         @Override
         public String toString() {
-            return getHead("<TODO>")
-                + getBody("TODO WhileCmd")
-                + getHead("</TODO>");
+            return getHead("<WhileCmd>")
+                + expression
+                + cmd
+                + (getNextCmd() != null ? getNextCmd() : getBody("<NoCmd/>"))
+                + getHead("</WhileCmd>");
         }
     }
 
     public static class ProcCallCmd extends Cmd {
 
-        public ProcCallCmd(Cmd nextcmd, int idendation) {
+        private final RoutineCall routinecall;
+
+        private final GlobalInit globalinit;
+
+        public ProcCallCmd(RoutineCall routinecall, GlobalInit globalinit, Cmd nextcmd, int idendation) {
             super(nextcmd, idendation);
+            this.routinecall = routinecall;
+            this.globalinit = globalinit;
         }
 
         @Override
         public String toString() {
-            return getHead("<TODO>")
-                + getBody("TODO ProcCall")
-                + getHead("</TODO>");
+            return getHead("<ProcCallCmd>")
+                + routinecall
+                + (globalinit != null ? globalinit : getBody("<NoGlobalInit/>"))
+                + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextCmd/>"))
+                + getHead("</ProcCallCmd>");
         }
     }
 
@@ -292,24 +417,28 @@ public class AbstractTree {
 
         @Override
         public String toString() {
-            return getHead("<CmdInput>")
+            return getHead("<InputCmd>")
                 + (expression != null ? expression : getBody("<NoExpression/>"))
-                + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextElement/>"))
-                + getHead("</CmdInput>");
+                + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextCmd/>"))
+                + getHead("</InputCmd>");
         }
     }
 
     public static class OutputCmd extends Cmd {
 
-        public OutputCmd(Cmd nextcmd, int idendation) {
+        private final Expression expression;
+
+        public OutputCmd(Expression expression, Cmd nextcmd, int idendation) {
             super(nextcmd, idendation);
+            this.expression = expression;
         }
 
         @Override
         public String toString() {
-            return getHead("<TODO>")
-                + getBody("TODO Output Cmd")
-                + getHead("</TODO>");
+            return getHead("<OutputCmd>")
+                + (expression != null ? expression : getBody("<NoExpression/>"))
+                + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextCmd/>"))
+                + getHead("</OutputCmd>");
         }
     }
 
@@ -481,9 +610,10 @@ public class AbstractTree {
 
         @Override
         public String toString() {
-            return getHead("<TODO>")
-                + getBody("TODO Routine Call")
-                + getHead("</TODO>");
+            return getHead("<RoutineCall>")
+                + getBody("<Ident Name='" + identifier.getName() + "'/>")
+                + expressionlist
+                + getHead("</RoutineCall>");
         }
     }
 
@@ -523,14 +653,29 @@ public class AbstractTree {
 
     public static class GlobalImport extends AbstractNode {
 
-        public GlobalImport(int idendation) {
+        private final Tokens.FlowModeToken flowmode;
+
+        private final Tokens.ChangeModeToken changemode;
+
+        private final Tokens.IdentifierToken identifier;
+
+        private final GlobalImport nextglobalimport;
+
+        public GlobalImport(Tokens.FlowModeToken flowmode, Tokens.ChangeModeToken changemode, Tokens.IdentifierToken identifier, GlobalImport nextglobalimport, int idendation) {
             super(idendation);
+            this.flowmode = flowmode;
+            this.changemode = changemode;
+            this.identifier = identifier;
+            this.nextglobalimport = nextglobalimport;
         }
 
         @Override
         public String toString() {
             return getHead("<GlobalImport>")
-                + getBody("TODO Global Import")
+                + getBody("<Mode Name='FLOWMODE' Attribute='" + flowmode.getFlowMode() + "'/>'")
+                + getBody("<Mode Name='CHANGEMODE' Attribute='" + changemode.getChangeMode() + "'/>'")
+                + getBody("<Ident Name='" + identifier.getName() + "'/>")
+                + (nextglobalimport != null ? nextglobalimport : getBody("<NoNextGlobalImport/>"))
                 + getHead("</GlobalImport>");
         }
     }

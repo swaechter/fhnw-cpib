@@ -477,11 +477,11 @@ public class Parser {
             case DEBUGIN:
                 consumeTerminal(context, Terminal.DEBUGIN);
                 ConcreteTree.Expr expr6 = parseExpr(context, idendation + 1);
-                return new ConcreteTree.CmdDebug(expr6, idendation);
+                return new ConcreteTree.CmdDebugIn(expr6, idendation);
             case DEBUGOUT:
                 consumeTerminal(context, Terminal.DEBUGOUT);
                 ConcreteTree.Expr expr7 = parseExpr(context, idendation + 1);
-                return new ConcreteTree.CmdDebug(expr7, idendation);
+                return new ConcreteTree.CmdDebugOut(expr7, idendation);
             default:
                 throw new ParserException("Invalid terminal in cmd: " + context.getTerminal());
         }
@@ -895,8 +895,10 @@ public class Parser {
                 Tokens.LiteralToken literal = (Tokens.LiteralToken) consumeTerminal(context, Terminal.LITERAL);
                 consumeTerminal(context, Terminal.THEN);
                 ConcreteTree.CpsCmd cpscmd = parseCpsCmd(context, idendation + 1);
-                return new ConcreteTree.RepCaseCase(literal, cpscmd, idendation);
+                ConcreteTree.RepCase repcase = parseRepCase(context, idendation + 1);
+                return new ConcreteTree.RepCaseCase(literal, cpscmd, repcase, idendation);
             case ENDSWITCH:
+            case DEFAULT:
                 return new ConcreteTree.RepCaseEpsilon(idendation);
             default:
                 throw new ParserException("Invalid terminal in repCase: " + context.getTerminal());
