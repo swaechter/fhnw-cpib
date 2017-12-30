@@ -1157,9 +1157,7 @@ public class ConcreteTree {
 
         @Override
         public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd, int idendation) {
-            // TODO: Fix my stupidity
-            return null;
-            //return new AbstractTree.Expr(null, idendation + 1);
+            return new AbstractTree.AssiCmd(expr1.toAbstract(idendation + 1), repexprlist1.toAbstract(idendation + 1), expr2.toAbstract(idendation + 1), repexprlist2.toAbstract(idendation + 1), repcpscmd.toAbstract(idendation), idendation);
         }
     }
 
@@ -1606,9 +1604,7 @@ public class ConcreteTree {
 
         @Override
         public AbstractTree.Expression toAbstract(AbstractTree.Expression expression, int idendation) {
-            // TODO: Cleanup
-            return repterm2.toAbstract(new AbstractTree.DyadicExpr(relopr, null, null, idendation), idendation + 1);
-            //return repterm2.toAbstract(new AbstractTree.DyadicExpr(relopr, expression, term2.toAbstract(idendation + 1), idendation + 1), idendation);
+            return repterm2.toAbstract(new AbstractTree.DyadicExpr(relopr, expression, term2.toAbstract(idendation + 1), idendation + 1), idendation);
         }
     }
 
@@ -1756,11 +1752,7 @@ public class ConcreteTree {
 
         @Override
         public AbstractTree.Expression toAbstract(AbstractTree.Expression expression, int idendation) {
-            //return new AbstractTree.DyadicExpr(multopr, expression, )
-            //return repfactor.toAbstract(new AbstractTree.DyadicExpr())
-            // TODO: Implement
-            return null;
-//            return repfactor.toAbstract(new AbstractTree.DyadicExpr(kkk), idendation);
+            return repfactor.toAbstract(new AbstractTree.DyadicExpr(multopr, expression, factor.toAbstract(idendation + 1), idendation + 1), idendation);
         }
     }
 
@@ -1950,19 +1942,21 @@ public class ConcreteTree {
 
     public static class MonadicOprNot extends MonadicOpr {
 
-        public MonadicOprNot(int idendation) {
+        private final Tokens.BoolOprToken boolopr;
+
+        public MonadicOprNot(Tokens.BoolOprToken boolopr, int idendation) {
             super(idendation);
+            this.boolopr = boolopr;
         }
 
         @Override
         public String toString() {
-            return getHead("<MonadicOprAddopr/>");
+            return getHead("<MonadicOprAddopr Operation='" + boolopr.getOperation() + "'/>");
         }
 
         @Override
         public Tokens.OperationToken toAbstract(int idendation) {
-            // TODO: Implement
-            return null;
+            return boolopr;
         }
     }
 
@@ -1977,7 +1971,7 @@ public class ConcreteTree {
 
         @Override
         public String toString() {
-            return getHead("<MonadicOprAddopr Mode='" + addopr.getOperation() + "'>") + getHead("</MonadicOprAddopr>");
+            return getHead("<MonadicOprAddopr Operation='" + addopr.getOperation() + "'/>");
         }
 
         @Override

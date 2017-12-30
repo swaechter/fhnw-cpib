@@ -823,8 +823,8 @@ public class Parser {
     private ConcreteTree.MonadicOpr parseMonadicOpr(Context context, int idendation) throws ParserException {
         switch (context.getTerminal()) {
             case NOT:
-                consumeTerminal(context, Terminal.NOT);
-                return new ConcreteTree.MonadicOprNot(idendation);
+                Tokens.BoolOprToken boolopr = (Tokens.BoolOprToken) consumeTerminal(context, Terminal.NOT);
+                return new ConcreteTree.MonadicOprNot(boolopr, idendation);
             case ADDOPR:
                 Tokens.AddOprToken addopr = (Tokens.AddOprToken) consumeTerminal(context, Terminal.ADDOPR);
                 return new ConcreteTree.MonadicOprAddopr(addopr, idendation);

@@ -232,29 +232,30 @@ public class AbstractTree {
 
     public static class AssiCmd extends Cmd {
 
-        public AssiCmd(Cmd nextcmd, int idendation) {
+        private final Expression expression1;
+
+        private final ExpressionList expressionlist1;
+
+        private final Expression expression2;
+
+        private final ExpressionList expressionlist2;
+
+        public AssiCmd(Expression expression1, ExpressionList expressionlist1, Expression expression2, ExpressionList expressionlist2, Cmd nextcmd, int idendation) {
             super(nextcmd, idendation);
+            this.expression1 = expression1;
+            this.expressionlist1 = expressionlist1;
+            this.expression2 = expression2;
+            this.expressionlist2 = expressionlist2;
         }
 
         @Override
         public String toString() {
-            return getHead("<TODO>")
-                + getBody("TODO AssiCmd")
-                + getHead("</TODO>");
-        }
-    }
-
-    public static class CpsCmd extends Cmd {
-
-        public CpsCmd(Cmd nextcmd, int idendation) {
-            super(nextcmd, idendation);
-        }
-
-        @Override
-        public String toString() {
-            return getHead("<TODO>")
-                + getBody("TODO CpsCmd")
-                + getHead("</TODO>");
+            return getHead("<AssiCmd>")
+                + expression1
+                + (expressionlist1 != null ? expressionlist1 : getBody("<NoNextExpressionList/>"))
+                + expression2
+                + (expressionlist2 != null ? expressionlist2 : getBody("<NoNextExpressionList/>"))
+                + getHead("</AssiCmd>");
         }
     }
 
@@ -508,7 +509,7 @@ public class AbstractTree {
         @Override
         public String toString() {
             return getHead("<LiteralExpr>")
-                + getBody("TODO Literal: " + literal.getValue())
+                + getBody("<Literal Value='" + literal.getValue() + "'/>")
                 + getHead("</LiteralExpr>");
         }
     }
@@ -536,15 +537,18 @@ public class AbstractTree {
 
     public static class FunCallExpr extends Expression {
 
-        public FunCallExpr(RoutineCall foo, int idendation) {
+        private final RoutineCall routinecall;
+
+        public FunCallExpr(RoutineCall routinecall, int idendation) {
             super(idendation);
+            this.routinecall = routinecall;
         }
 
         @Override
         public String toString() {
-            return getHead("<TODO>")
-                + getBody("TODO FunCallExpr")
-                + getHead("</TODO>");
+            return getHead("<FunCallExpr>")
+                + routinecall
+                + getHead("</FunCallExpr>");
         }
     }
 
@@ -563,7 +567,7 @@ public class AbstractTree {
         @Override
         public String toString() {
             return getHead("<MonadicExpr>")
-                + getBody("TODO Operator: " + operation.getOperation())
+                + getBody("<Operation Operation='" + operation.getOperation() + "'/>")
                 + expression
                 + getHead("</MonadicExpr>");
         }
@@ -587,7 +591,7 @@ public class AbstractTree {
         @Override
         public String toString() {
             return getHead("<ExprDyadic>")
-                + getBody("TODO Operator: " + operation.getOperation())
+                + getBody("<Operation Operation='" + operation.getOperation() + "'/>")
                 + expression1
                 + expression2
                 + getHead("</ExprDyadic>");
@@ -610,7 +614,7 @@ public class AbstractTree {
         public String toString() {
             return getHead("<RoutineCall>")
                 + getBody("<Ident Name='" + identifier.getName() + "'/>")
-                + expressionlist
+                + (expressionlist != null ? expressionlist : getBody("<NoNextExpressionList/>"))
                 + getHead("</RoutineCall>");
         }
     }
@@ -619,19 +623,20 @@ public class AbstractTree {
 
         private final Expression expression;
 
-        private final ExpressionList expressionList;
+        private final ExpressionList expressionlist;
 
-        public ExpressionList(Expression expression, ExpressionList expressionList, int idendation) {
+        public ExpressionList(Expression expression, ExpressionList expressionlist, int idendation) {
             super(idendation);
             this.expression = expression;
-            this.expressionList = expressionList;
+            this.expressionlist = expressionlist;
         }
 
         @Override
         public String toString() {
-            return getHead("<TODO>")
-                + getBody("TODO ExpressionList")
-                + getHead("</TODO>");
+            return getHead("<ExpressionList>")
+                + expression
+                + (expressionlist != null ? expression : getBody("<NoNextExpressionList/>"))
+                + getHead("</ExpressionList>");
         }
     }
 
