@@ -67,8 +67,8 @@ public class ParserTest {
         "/Team/Program3.iml",
         "/Existing/Assoc.iml",
         "/Existing/Cube.iml",
-        //"/Existing/EuclidExtended.iml",
-        //"/Existing/EuclidExtendedV2.iml",
+        "/Existing/EuclidExtended.iml",
+        "/Existing/EuclidExtendedV2.iml",
         "/Existing/Expr.iml",
         "/Existing/Extreme.iml",
         "/Existing/Factorial.iml",
@@ -77,15 +77,15 @@ public class ParserTest {
         "/Existing/IntDivCast.iml",
         "/Existing/intDivFun.iml",
         "/Existing/intDivMain.iml",
-        //"/Existing/ModInverse.iml",
+        "/Existing/ModInverse.iml",
         "/Existing/MultiAssi.iml",
         "/Existing/mutRec.iml",
         "/Existing/OutCopyTypeConversion.iml",
         "/Existing/OverwritingOutParams.iml",
-        //"/Existing/Parameters.iml",
+        "/Existing/Parameters.iml",
         "/Existing/Parameters02.iml",
         "/Existing/RefParams.iml",
-        //"/Existing/RSAExampleGallier.iml",
+        "/Existing/RSAExampleGallier.iml",
         //"/Existing/SameOutInit.iml",
         "/Existing/Scopes.iml",
         "/Existing/ScopesEdit.iml",
@@ -96,7 +96,7 @@ public class ParserTest {
         "/Existing/test2.iml",
         "/Existing/test02.iml",
         "/Existing/test3.iml",
-        //"/Existing/test4.iml",
+        "/Existing/test4.iml",
         "/Existing/test5.iml",
         "/Existing/test6.iml",
         "/Existing/test7.iml",
@@ -156,5 +156,31 @@ public class ParserTest {
             // Check the abstract tree
             abstractprogram.check();
         }
+    }
+
+    @Test
+    public void testSingleExample() throws Exception {
+        // Create the scanner and parser
+        Scanner scanner = new Scanner();
+        Parser parser = new Parser();
+
+        // Load the program
+        String content = ReaderUtils.getContentFromInputStream(getClass().getResourceAsStream("/Existing/Globals.iml"), StandardCharsets.UTF_8);
+        Assert.assertFalse(content.isEmpty());
+
+        // Scan the program
+        TokenList tokenlist = scanner.scanString(content);
+        Assert.assertTrue(tokenlist.getSize() > 0);
+
+        // Parse the token list
+        ConcreteTree.Program concreteprogram = parser.parseTokenList(tokenlist);
+        Assert.assertTrue(concreteprogram.toString().length() > 0);
+
+        // Make the parse tree abstract
+        AbstractTree.Program abstractprogram = concreteprogram.toAbstract();
+        System.out.println(abstractprogram);
+
+        // Check the abstract tree
+        abstractprogram.check();
     }
 }

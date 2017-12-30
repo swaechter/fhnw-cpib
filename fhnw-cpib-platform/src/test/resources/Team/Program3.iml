@@ -1,107 +1,14 @@
-program HiAndBye(in m:int32, in n:int32, out q:int32, out var r:int32)
+program HiAndBye()
 global
-    x:int32; y:int32; z:int32; zz:bool; g:int32;
-
-    proc p1(in copy const x:int32)
-        global
-            out const g,
-            out const x
+    fun divFun() returns var q:int
         do
-            g init := x + 1
-    endproc;
-
-    proc p2(out copy x:int32, out copy y:int32)
-        do
-            skip
-    endproc;
-
-    proc p3(out copy x:int32, out copy y:int32)
-        do
-            y init := 6;
-            x init := 5
-    endproc;
-
-    proc divide(in copy var m:int, in copy const n:int, out ref q:int, out ref r:int)
-        //global
-        //    inout r1, inout const r2, divide
-        // TODO: Fix crash
-        // local
-        //       var f:int
-        do
-            //f init := 0;
-            //r init := m;
+            l1 init := 0;
+            l2 init := m;
             while r >= n do
-                debugout f
-                //q := q + 1;
-                //r := r - n
+                debugout q
             endwhile
-    endproc;
-
-    fun divFun(in copy m:int, in copy n:int) returns var q:int
-        local
-            var r:int
-        do
-            q init := 0;
-            r init := m;
-        while r >= n do
-            //q := q + 1;
-            //r := r - n
-            debugout q
-        endwhile
     endfun
 do
     debugin x init;
-    debugout x;
-
-    while r >= n do
-        debugin x;
-        debugin q;
-        debugout q
-    endwhile;
-
-    skip;
-
-    // TODO: Fix crash
-    //call p1(3) init g;
-    debugout g;
-
-    if x = 98 then
-        debugout 99
-    endif;
-
-    if x = 98 then
-        debugout 99
-    elseif x = 99 then
-        debugout 100
-    endif;
-
-    if x = 42 then
-        debugout 43
-    elseif x = 100 then
-        debugout 101
-    else
-        debugout g
-    endif;
-
-    if x = g then
-        debugout x1;
-        debugout x2
-    elseif x = 100 then
-        debugout 101
-    elseif x = 101 then
-        debugout 102
-    else
-        debugout g
-    endif;
-
-    debugout g;
-
-    switch x
-        case 42 then
-            debugout 43
-        case 100 then
-            debugout 101
-        default then
-            debugout x
-    endswitch
+    debugout x
 endprogram

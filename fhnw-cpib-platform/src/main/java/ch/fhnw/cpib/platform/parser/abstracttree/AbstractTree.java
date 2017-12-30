@@ -136,22 +136,22 @@ public class AbstractTree {
 
         private final Param param;
 
-        private final StoDecl storedeclaration;
+        private final Declaration storedeclaration;
 
-        private final GlobalImport globalimport1;
+        private final GlobalImport globalimport;
+
+        private final Declaration declaration;
 
         private final Cmd cmd;
 
-        private final GlobalImport globalimport2;
-
-        public FunDecl(Tokens.IdentifierToken identifier, Param param, StoDecl storedeclaration, GlobalImport globalimport1, Cmd cmd, GlobalImport globalimport2, int idendation) {
-            super(storedeclaration, idendation);
+        public FunDecl(Tokens.IdentifierToken identifier, Param param, Declaration storedeclaration, GlobalImport globalimport, Declaration declaration, Cmd cmd, Declaration nextdeclaration, int idendation) {
+            super(nextdeclaration, idendation);
             this.identifier = identifier;
             this.param = param;
             this.storedeclaration = storedeclaration;
-            this.globalimport1 = globalimport1;
+            this.globalimport = globalimport;
+            this.declaration = declaration;
             this.cmd = cmd;
-            this.globalimport2 = globalimport2;
         }
 
         @Override
@@ -160,9 +160,10 @@ public class AbstractTree {
                 + getBody("<Ident Name='" + identifier.getName() + "'/>")
                 + (param != null ? param : getBody("<NoParam/>"))
                 + (storedeclaration != null ? storedeclaration : getBody("<NoNextStoreDeclaration/>"))
-                + (globalimport1 != null ? globalimport1 : getBody("<NoGlobalImport/>"))
+                + (globalimport != null ? globalimport : getBody("<NoGlobalImport/>"))
                 + (cmd != null ? cmd : getBody("<NoCmd/>"))
-                + (globalimport2 != null ? globalimport2 : getBody("<NoGlobalImport/>"))
+                + (declaration != null ? declaration : getBody("<NoDeclaration/>"))
+                + (getNextDeclaration() != null ? getNextDeclaration() : getBody("<NoNextDeclaration/>"))
                 + getHead("</FunDecl>");
         }
     }
@@ -177,8 +178,6 @@ public class AbstractTree {
 
         private final Declaration declaration;
 
-        private final Declaration nextdeclaration;
-
         private final Cmd cmd;
 
         public ProcDecl(Tokens.IdentifierToken identifier, Param param, GlobalImport globalimport, Declaration declaration, Declaration nextdeclaration, Cmd cmd, int idendation) {
@@ -187,7 +186,6 @@ public class AbstractTree {
             this.param = param;
             this.globalimport = globalimport;
             this.declaration = declaration;
-            this.nextdeclaration = nextdeclaration;
             this.cmd = cmd;
         }
 
@@ -199,7 +197,7 @@ public class AbstractTree {
                 + (globalimport != null ? globalimport : getBody("<NoGlobalImport/>"))
                 + (cmd != null ? cmd : getBody("<NoCmd/>"))
                 + (declaration != null ? declaration : getBody("<NoDeclaration/>"))
-                + (nextdeclaration != null ? nextdeclaration : getBody("<NoNextDeclaration/>"))
+                + (getNextDeclaration() != null ? getNextDeclaration() : getBody("<NoNextDeclaration/>"))
                 + getHead("</ProcDecl>");
         }
     }
@@ -639,14 +637,21 @@ public class AbstractTree {
 
     public static class GlobalInit extends AbstractNode {
 
-        public GlobalInit(int idendation) {
+        private final Tokens.IdentifierToken identifier;
+
+        private final GlobalInit nextglobalinit;
+
+        public GlobalInit(Tokens.IdentifierToken identifier, GlobalInit nextglobalinit, int idendation) {
             super(idendation);
+            this.identifier = identifier;
+            this.nextglobalinit = nextglobalinit;
         }
 
         @Override
         public String toString() {
             return getHead("<GlobalInit>")
-                + getBody("TODO GlobalInit")
+                + getBody("<Ident Name='" + identifier.getName() + "'/>")
+                + (nextglobalinit != null ? nextglobalinit : getBody("<NoNextGlobalInit/>"))
                 + getHead("</GlobalInit>");
         }
     }

@@ -59,7 +59,7 @@ public class ConcreteTree {
 
         @Override
         public AbstractTree.Declaration toAbstract(RepCpsDecl repcpsdecl, int idendation) {
-            return stodecl.toAbstract(stodecl, repcpsdecl, idendation);
+            return stodecl.toAbstract(repcpsdecl, idendation);
         }
     }
 
@@ -109,7 +109,9 @@ public class ConcreteTree {
             super(idendation);
         }
 
-        public abstract AbstractTree.Declaration toAbstract(StoDecl stodecl, RepCpsDecl repcpsdecl, int idendation);
+        public abstract AbstractTree.Declaration toAbstract(RepCpsDecl repcpsdecl, int idendation);
+
+        public abstract AbstractTree.Declaration toAbstract2(RepCpsStoDecl repcpsstodecl, int idendation);
     }
 
     public static class StoDeclIdent extends StoDecl {
@@ -127,9 +129,15 @@ public class ConcreteTree {
         }
 
         @Override
-        public AbstractTree.Declaration toAbstract(StoDecl stodecl, RepCpsDecl repcpsdecl, int idendation) {
+        public AbstractTree.Declaration toAbstract(RepCpsDecl repcpsdecl, int idendation) {
             Tokens.ChangeModeToken changemode = new Tokens.ChangeModeToken(Terminal.CHANGEMODE, Tokens.ChangeModeToken.ChangeMode.CONST);
-            return new AbstractTree.StoDecl(changemode, typedident.toAbstract(idendation + 1), repcpsdecl.toAbstract(idendation), idendation);
+            return new AbstractTree.StoDecl(changemode, typedident.toAbstract(idendation + 1), repcpsdecl != null ? repcpsdecl.toAbstract(idendation + 1) : null, idendation);
+        }
+
+        @Override
+        public AbstractTree.Declaration toAbstract2(RepCpsStoDecl repcpsstodecl, int idendation) {
+            Tokens.ChangeModeToken changemode = new Tokens.ChangeModeToken(Terminal.CHANGEMODE, Tokens.ChangeModeToken.ChangeMode.CONST);
+            return new AbstractTree.StoDecl(changemode, typedident.toAbstract(idendation + 1), repcpsstodecl.toAbstract(idendation + 1), idendation);
         }
     }
 
@@ -151,8 +159,13 @@ public class ConcreteTree {
         }
 
         @Override
-        public AbstractTree.Declaration toAbstract(StoDecl stodecl, RepCpsDecl repcpsdecl, int idendation) {
-            return new AbstractTree.StoDecl(changemode, typedident.toAbstract(idendation + 1), repcpsdecl.toAbstract(idendation), idendation);
+        public AbstractTree.Declaration toAbstract(RepCpsDecl repcpsdecl, int idendation) {
+            return new AbstractTree.StoDecl(changemode, typedident.toAbstract(idendation + 1), repcpsdecl != null ? repcpsdecl.toAbstract(idendation + 1) : null, idendation);
+        }
+
+        @Override
+        public AbstractTree.Declaration toAbstract2(RepCpsStoDecl repcpsstodecl, int idendation) {
+            return new AbstractTree.StoDecl(changemode, typedident.toAbstract(idendation + 1), repcpsstodecl.toAbstract(idendation + 1), idendation);
         }
     }
 
@@ -186,8 +199,7 @@ public class ConcreteTree {
         }
 
         public AbstractTree.Declaration toAbstract(RepCpsDecl repcpsdecl, int idendation) {
-            // TODO: Clean up strange mess....
-            return new AbstractTree.FunDecl(identifier, paramlist.toAbstract(idendation + 1), null, optglobimps.toAbstract(idendation + 1), cpscmd.toAbstract(idendation + 1), null, idendation);
+            return new AbstractTree.FunDecl(identifier, paramlist.toAbstract(idendation + 1), stodecl.toAbstract(null, idendation + 1), optglobimps.toAbstract(idendation + 1), optcpsstodecl.toAbstract(idendation + 1), cpscmd.toAbstract(idendation + 1), repcpsdecl.toAbstract(idendation + 1), idendation);
         }
     }
 
@@ -220,7 +232,6 @@ public class ConcreteTree {
         public AbstractTree.Declaration toAbstract(RepCpsDecl repcpsdecl, int idendation) {
             return new AbstractTree.ProcDecl(identifier, paramlist.toAbstract(idendation + 1), optglobimps.toAbstract(idendation + 1), optcpsstodecl.toAbstract(idendation), repcpsdecl.toAbstract(idendation), cpscmd.toAbstract(idendation + 1), idendation);
         }
-
     }
 
     public static abstract class OptGlobImps extends ConcreteNode {
@@ -456,8 +467,8 @@ public class ConcreteTree {
 
         @Override
         public AbstractTree.GlobalImport toAbstract(RepGlobImps repglobimps, int idendation) {
-            // TODO: Implement
-            return null;
+            Tokens.FlowModeToken flowmode = new Tokens.FlowModeToken(Terminal.FLOWMODE, Tokens.FlowModeToken.FlowMode.IN);
+            return new AbstractTree.GlobalImport(flowmode, optchangemode.toAbstract(idendation + 1), identifier, repglobimps.toAbstract(idendation), idendation);
         }
     }
 
@@ -583,8 +594,7 @@ public class ConcreteTree {
 
         @Override
         public AbstractTree.Declaration toAbstract(int idendation) {
-            // TODO: Implement
-            return decl.toAbstract(repcpsdecl, idendation + 1);
+            return decl.toAbstract(repcpsdecl, idendation);
         }
     }
 
@@ -667,9 +677,7 @@ public class ConcreteTree {
         }
 
         public AbstractTree.Declaration toAbstract(int idendation) {
-            // FIXME: Implement abstract conversion
-            throw new RuntimeException("Current abstract conversion is not implemented!");
-            //return stodecl.toAbstract(stodecl, repcpsstodecl, idendation);
+            return stodecl.toAbstract2(repcpsstodecl, idendation);
         }
     }
 
@@ -678,6 +686,8 @@ public class ConcreteTree {
         RepCpsStoDecl(int idendation) {
             super(idendation);
         }
+
+        public abstract AbstractTree.Declaration toAbstract(int idendation);
     }
 
     public static class RepCpsStoDeclSemicolon extends RepCpsStoDecl {
@@ -697,8 +707,8 @@ public class ConcreteTree {
             return getHead("<RepCpsStoDeclSemicolon>") + stodecl + repcpsstodecl + getHead("</RepCpsStoDeclSemicolon>");
         }
 
-        public Object toAbstract(int idendation) {
-            throw new RuntimeException("Abstract conversion not implemented yet!"); // TODO: Implement
+        public AbstractTree.Declaration toAbstract(int idendation) {
+            return stodecl.toAbstract2(repcpsstodecl, idendation);
         }
     }
 
@@ -713,8 +723,8 @@ public class ConcreteTree {
             return getHead("<RepCpsStoDeclEpsilon>") + getHead("</RepCpsStoDeclEpsilon>");
         }
 
-        public Object toAbstract(int idendation) {
-            throw new RuntimeException("Abstract conversion not implemented yet!"); // TODO: Implement
+        public AbstractTree.Declaration toAbstract(int idendation) {
+            return null;
         }
     }
 
@@ -1040,8 +1050,8 @@ public class ConcreteTree {
 
         @Override
         public AbstractTree.Param toAbstract(RepParamList repparamlist, int idendation) {
-            // TODO: Implement
-            return null;
+            Tokens.FlowModeToken flowmode = new Tokens.FlowModeToken(Terminal.FLOWMODE, Tokens.FlowModeToken.FlowMode.IN);
+            return new AbstractTree.Param(flowmode, optmechmode.toAbstract(idendation + 1), optchangemode.toAbstract(idendation + 1), typedident.toAbstract(idendation + 1), repparamlist.toAbstract(idendation), idendation);
         }
     }
 
@@ -1402,7 +1412,7 @@ public class ConcreteTree {
         }
 
         public AbstractTree.GlobalInit toAbstract(int idendation) {
-            throw new RuntimeException("Abstract conversion not implemented yet!"); // TODO: Implement
+            return new AbstractTree.GlobalInit(identifier, repidents.toAbstract(idendation + 1), idendation);
         }
     }
 
@@ -1427,6 +1437,8 @@ public class ConcreteTree {
         RepIdents(int idendation) {
             super(idendation);
         }
+
+        public abstract AbstractTree.GlobalInit toAbstract(int idendation);
     }
 
     public static class RepIdentsComma extends RepIdents {
@@ -1446,8 +1458,8 @@ public class ConcreteTree {
             return getHead("<RepIdentsComma Name='" + identifier.getName() + "'>") + repidents + getHead("</RepIdentsComma>");
         }
 
-        public Object toAbstract(int idendation) {
-            throw new RuntimeException("Abstract conversion not implemented yet!"); // TODO: Implement
+        public AbstractTree.GlobalInit toAbstract(int idendation) {
+            return new AbstractTree.GlobalInit(identifier, repidents.toAbstract(idendation + 1), idendation);
         }
     }
 
@@ -1462,8 +1474,8 @@ public class ConcreteTree {
             return getHead("<RepIdentsEpsilon/>");
         }
 
-        public Object toAbstract(int idendation) {
-            throw new RuntimeException("Abstract conversion not implemented yet!"); // TODO: Implement
+        public AbstractTree.GlobalInit toAbstract(int idendation) {
+            return null;
         }
     }
 
