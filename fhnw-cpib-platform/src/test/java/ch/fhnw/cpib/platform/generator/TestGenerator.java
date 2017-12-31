@@ -61,7 +61,6 @@ public class TestGenerator {
             //System.out.println(output.getValue1());
             //System.out.println();
             Assert.assertTrue(output.getValue0().contains("42"));
-            Assert.assertTrue(output.getValue1().isEmpty());
         }
     }
 }
