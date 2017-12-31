@@ -1,7 +1,13 @@
 package ch.fhnw.cpib.platform.parser.abstracttree;
 
+import ch.fhnw.cpib.platform.Compiler;
 import ch.fhnw.cpib.platform.generator.Generator;
+import ch.fhnw.cpib.platform.parser.context.*;
+import ch.fhnw.cpib.platform.parser.exception.ContextException;
 import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AbstractTree {
 
@@ -31,6 +37,18 @@ public class AbstractTree {
                 + (declaration != null ? declaration : getBody("<NoDeclarations/>"))
                 + (cmd != null ? cmd : getBody("<NoCmd/>"))
                 + ("</Program>");
+        }
+
+        public void check() throws ContextException {
+            if (progparam != null) {
+                progparam.check();
+            }
+            if (declaration != null) {
+                declaration.check();
+            }
+            if (cmd != null) {
+                cmd.check();
+            }
         }
 
         @Override
@@ -79,6 +97,18 @@ public class AbstractTree {
                 + (nextprogparam != null ? nextprogparam : getBody("<NoNextProgParam/>"))
                 + getHead("</ProgParam>");
         }
+
+        public void check() throws ContextException {
+            //check if identifier exist in global store table
+            if (Compiler.getGlobalStoreTable().getStore(typedident.getIdentifier().getName()) != null) {
+                throw new ContextException("Identifier " + typedident.getIdentifier().getName() + " is already declared");
+            }
+            //store identifier in global store table
+            Compiler.getGlobalStoreTable().addStore(new Store(typedident.getIdentifier().getName(), typedident.getType(), changemode.getChangeMode() == Tokens.ChangeModeToken.ChangeMode.CONST));
+            if (nextprogparam != null) {
+                nextprogparam.check();
+            }
+        }
     }
 
     public static class Param extends AbstractNode {
@@ -112,6 +142,38 @@ public class AbstractTree {
                 + (nextparam != null ? nextparam : getBody("<NoNextParam/>"))
                 + getHead("</Param>");
         }
+
+        /*public void check(Routine routine) throws ContextException {
+            Store store = declarationStorage.check();
+            switch (flowmode.getFlowMode()) {
+                case IN:
+                    //passing parameter must be constant
+                    if (mechmode.getMechMode() == Tokens.MechModeToken.MechMode.REF && !store.isConst()) {
+                        throw new ContextException("IN reference parameter can not be var! Ident: " + store.getIdentifier());
+                    }
+                    store.initialize();
+                    break;
+                case INOUT:
+                    if (routine.getRoutineType() != RoutineType.PROCEDURE) {
+                        throw new ContextException("INOUT parameter in function declaration! Ident: " + store.getIdentifier());
+                    }
+                    if (store.isConst()) {
+                        throw new ContextException("INOUT parameter can not be constant! Ident: " + store.getIdentifier());
+                    }
+                    store.initialize();
+                    break;
+                case OUT:
+                    if (routine.getRoutineType() != RoutineType.PROCEDURE) {
+                        throw new ContextException("OUT parameter in function declaration! Ident: " + store.getIdentifier());
+                    }
+                    break;
+                default:
+                    break;
+            }
+            if (nextparam != null) {
+                nextparam.check(routine);
+            }
+        }*/
     }
 
     public abstract static class Declaration extends AbstractNode {
@@ -125,6 +187,9 @@ public class AbstractTree {
 
         public Declaration getNextDeclaration() {
             return nextdeclaration;
+        }
+
+        public void check() throws ContextException {
         }
     }
 
@@ -147,6 +212,32 @@ public class AbstractTree {
                 + typedident
                 + (getNextDeclaration() != null ? getNextDeclaration() : getBody("<NoNextDeclaration/>"))
                 + getHead("</StoDecl>");
+        }
+
+        public void check() throws ContextException {
+            //check if global scope applies
+            StoreTable storetable = null;
+            if (Compiler.getScope() == null) {
+                storetable = Compiler.getGlobalStoreTable();
+            } else {
+                storetable = Compiler.getScope().getStoreTable();
+            }
+
+            //check if identifier exist in global store table
+            String identifier = typedident.getIdentifier().getName();
+            if (storetable.getStore(identifier) != null) {
+                throw new ContextException("Identifier " + typedident.getIdentifier().getName() + " is already declared");
+            }
+            //store identifier in global store table
+            storetable.addStore(new Store(typedident.getIdentifier().getName(), typedident.getType(), false));
+
+            Store store = storetable.getStore(typedident.getIdentifier().getName());
+            store.setRelative(true);
+            store.setReference(false);
+
+            if (getNextDeclaration() != null) {
+                getNextDeclaration().check();
+            }
         }
     }
 
@@ -186,6 +277,32 @@ public class AbstractTree {
                 + (getNextDeclaration() != null ? getNextDeclaration() : getBody("<NoNextDeclaration/>"))
                 + getHead("</FunDecl>");
         }
+
+        /*public void check() throws ContextException {
+            //check if function exist in global routine table
+            Routine function = new Routine(identifier.getName(), RoutineType.FUNCTION, storedeclaration.typedIdent.getTypeEnum());
+            //store function in global routine table if not
+            if (!Compiler.getGlobalRoutineTable().insert(function)) {
+                throw new ContextException("Function " + identifier.getName() + " is already declared.");
+            }
+            Compiler.setScope(function.getScope());
+            if (param != null) {
+                param.check(function);
+            }
+            if (storedeclaration != null) {
+                storedeclaration.check();
+            }
+            if (globalimport != null) {
+                globalimport.check(function);
+            }
+            if (cmd != null) {
+                cmd.check();
+            }
+            Compiler.setScope(null);
+            if (getNextDeclaration() != null) {
+                getNextDeclaration().check();
+            }
+        }*/
     }
 
     public static class ProcDecl extends Declaration {
@@ -220,6 +337,29 @@ public class AbstractTree {
                 + (getNextDeclaration() != null ? getNextDeclaration() : getBody("<NoNextDeclaration/>"))
                 + getHead("</ProcDecl>");
         }
+
+        /*public void check() throws ContextException {
+            //store function in global procedure table
+            Routine procedure = new Routine(identifier.getName(), RoutineType.PROCEDURE);
+            Compiler.getGlobalRoutineTable().insert(procedure);
+            Compiler.setScope(procedure.getScope());
+            if (param != null) {
+                param.check(procedure);
+            }
+            if (globalimport != null) {
+                globalimport.check(procedure);
+            }
+            if (cmd != null) {
+                cmd.check();
+            }
+            if (declaration != null) {
+                declaration.check();
+            }
+            Compiler.setScope(null);
+            if (getNextDeclaration() != null) {
+                getNextDeclaration().check();
+            }
+        }*/
     }
 
     public abstract static class Cmd extends AbstractNode {
@@ -234,6 +374,9 @@ public class AbstractTree {
         public Cmd getNextCmd() {
             return nextcmd;
         }
+
+        public void check() throws ContextException {
+        }
     }
 
     public static class SkipCmd extends Cmd {
@@ -247,6 +390,12 @@ public class AbstractTree {
             return getHead("<CmdSkip>")
                 + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextCmd/>"))
                 + getHead("</CmdSkip>");
+        }
+
+        public void check() throws ContextException {
+            if (getNextCmd() != null) {
+                getNextCmd().check();
+            }
         }
     }
 
@@ -277,6 +426,30 @@ public class AbstractTree {
                 + (expressionlist2 != null ? expressionlist2 : getBody("<NoNextExpressionList/>"))
                 + getHead("</AssiCmd>");
         }
+
+        public void check() throws ContextException {
+            List<ExpressionInfo> targetexprinfos = new ArrayList<>();
+            List<ExpressionInfo> sourceexprinfos = new ArrayList<>();
+            ExpressionInfo sourceexprinfo = expression1.check();
+            ExpressionInfo targetexprinfo = expression2.check();
+            if (expressionlist1 != null) {
+                expressionlist1.check(targetexprinfos);
+            }
+            if (expressionlist2 != null) {
+                expressionlist2.check(sourceexprinfos);
+            }
+
+            //check if first type on each side has same type
+            boolean normalassignmentvalid = targetexprinfo.getType() == sourceexprinfo.getType();
+
+            //normal assignment
+            if (expressionlist1 == null && expressionlist2 == null) {
+                if (!normalassignmentvalid) {
+                    throw new ContextException("Assignment not possible due different datatypes: " +
+                        targetexprinfo.getType() + " = " + sourceexprinfo.getType());
+                }
+            }
+        }
     }
 
     public static class SwitchCmd extends Cmd {
@@ -302,6 +475,13 @@ public class AbstractTree {
                 + (cmd != null ? cmd : getBody("<NoDefaultCmd/>"))
                 + getHead("</SwitchCmd>");
         }
+
+        public void check() {
+            //check if switch expr and case literal have the same data type
+
+            //store expr in global switch table
+
+        }
     }
 
     public static class RepCaseCmd extends Cmd {
@@ -323,6 +503,11 @@ public class AbstractTree {
                 + cmd
                 + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextRepCaseCmd/>"))
                 + getHead("</RepCaseCmd>");
+        }
+
+        public void check() throws ContextException {
+            //check if case literal are different
+
         }
     }
 
@@ -354,6 +539,23 @@ public class AbstractTree {
                 + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextCmd/>"))
                 + getHead("</CondCmd>");
         }
+
+        public void check() throws ContextException {
+            //check expr return type is from type BOOL
+            ExpressionInfo exprinfo = expression.check();
+            if (exprinfo.getType() != Tokens.TypeToken.Type.BOOL) {
+                throw new ContextException("IF condition needs to be BOOL. Current type: " + exprinfo.getType());
+            }
+            if (repcondcmd != null) {
+                repcondcmd.check();
+            }
+            if (othercmd != null) {
+                othercmd.check();
+            }
+            if (getNextCmd() != null) {
+                getNextCmd().check();
+            }
+        }
     }
 
     public static class RepCondCmd extends Cmd {
@@ -379,6 +581,17 @@ public class AbstractTree {
                 + (repcondcmd != null ? repcondcmd : getBody("<NoNextRepCondCmd/>"))
                 + getHead("</RepCondCmd>");
         }
+
+        public void check() throws ContextException {
+            //check expr return type is from type BOOL
+            ExpressionInfo exprinfo = expression.check();
+            if (exprinfo.getType() != Tokens.TypeToken.Type.BOOL) {
+                throw new ContextException("ELSEIF condition needs to be BOOL. Current type: " + exprinfo.getType());
+            }
+            if (repcondcmd != null) {
+                repcondcmd.check();
+            }
+        }
     }
 
     public static class WhileCmd extends Cmd {
@@ -400,6 +613,18 @@ public class AbstractTree {
                 + cmd
                 + (getNextCmd() != null ? getNextCmd() : getBody("<NoCmd/>"))
                 + getHead("</WhileCmd>");
+        }
+
+        public void check() throws ContextException {
+            //check expr return type is from type BOOL
+            ExpressionInfo exprinfo = expression.check();
+            if (exprinfo.getType() != Tokens.TypeToken.Type.BOOL) {
+                throw new ContextException("WHILE condition needs to be BOOL. Current type: " + exprinfo.getType());
+            }
+
+            if (getNextCmd() != null) {
+                getNextCmd().check();
+            }
         }
     }
 
@@ -423,6 +648,15 @@ public class AbstractTree {
                 + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextCmd/>"))
                 + getHead("</ProcCallCmd>");
         }
+
+        public void check() throws ContextException {
+            if (globalinit != null) {
+                globalinit.check();
+            }
+            if (getNextCmd() != null) {
+                getNextCmd().check();
+            }
+        }
     }
 
     public static class InputCmd extends Cmd {
@@ -440,6 +674,12 @@ public class AbstractTree {
                 + (expression != null ? expression : getBody("<NoExpression/>"))
                 + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextCmd/>"))
                 + getHead("</InputCmd>");
+        }
+
+        public void check() throws ContextException {
+            if (getNextCmd() != null) {
+                getNextCmd().check();
+            }
         }
     }
 
@@ -459,6 +699,12 @@ public class AbstractTree {
                 + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextCmd/>"))
                 + getHead("</OutputCmd>");
         }
+
+        public void check() throws ContextException {
+            if (getNextCmd() != null) {
+                getNextCmd().check();
+            }
+        }
     }
 
     public abstract static class TypedIdent<T> extends AbstractNode {
@@ -466,6 +712,10 @@ public class AbstractTree {
         public TypedIdent(int idendation) {
             super(idendation);
         }
+
+        public abstract Tokens.IdentifierToken getIdentifier();
+
+        public abstract Tokens.TypeToken.Type getType();
     }
 
     public static class TypedIdentIdent extends TypedIdent<Tokens.IdentifierToken> {
@@ -486,6 +736,16 @@ public class AbstractTree {
                 + getBody("<Ident Name='" + identifier1.getName() + "'/>")
                 + getBody("<Ident Name='" + identifier2.getName() + "'/>")
                 + getHead("</TypedIdentIdent>");
+        }
+
+        @Override
+        public Tokens.IdentifierToken getIdentifier() {
+            return identifier1;
+        }
+
+        @Override
+        public Tokens.TypeToken.Type getType() {
+            return null;
         }
     }
 
@@ -508,12 +768,26 @@ public class AbstractTree {
                 + getBody("<Type Type='" + type.getType() + "'/>")
                 + getHead("</TypedIdentType>");
         }
+
+        @Override
+        public Tokens.IdentifierToken getIdentifier() {
+            return identifier;
+        }
+
+        @Override
+        public Tokens.TypeToken.Type getType() {
+            return null;
+        }
     }
 
     public abstract static class Expression<T> extends AbstractNode {
 
         public Expression(int idendation) {
             super(idendation);
+        }
+
+        public ExpressionInfo check() throws ContextException {
+            return null;
         }
     }
 
@@ -531,6 +805,11 @@ public class AbstractTree {
             return getHead("<LiteralExpr>")
                 + getBody("<Literal Value='" + literal.getValue() + "'/>")
                 + getHead("</LiteralExpr>");
+        }
+
+        public ExpressionInfo check() {
+            //TODO
+            return null;
         }
     }
 
@@ -553,6 +832,27 @@ public class AbstractTree {
                 + getBody("<Initialized>" + initialized + "</Initialized>")
                 + getHead("</StoreExpr>");
         }
+
+        public ExpressionInfo check() throws ContextException {
+            //check if global scope applies
+            StoreTable storetable = null;
+            if (Compiler.getScope() == null) {
+                storetable = Compiler.getGlobalStoreTable();
+            } else {
+                storetable = Compiler.getScope().getStoreTable();
+            }
+
+            Store store = storetable.getStore(identifier.getName());
+            if (store == null) {
+                //check if store is declared on global scope
+                store = Compiler.getGlobalStoreTable().getStore(identifier.getName());
+                if (store == null) {
+                    throw new ContextException("Identifier " + identifier.getName() + " is not declared");
+                }
+
+            }
+            return new ExpressionInfo(store.getIdentifier(), store.getType());
+        }
     }
 
     public static class FunCallExpr extends Expression {
@@ -569,6 +869,11 @@ public class AbstractTree {
             return getHead("<FunCallExpr>")
                 + routinecall
                 + getHead("</FunCallExpr>");
+        }
+
+        public ExpressionInfo check() {
+            //TODO
+            return null;
         }
     }
 
@@ -590,6 +895,11 @@ public class AbstractTree {
                 + getBody("<Operation Operation='" + operation.getOperation() + "'/>")
                 + expression
                 + getHead("</MonadicExpr>");
+        }
+
+        public ExpressionInfo check() {
+            //TODO
+            return null;
         }
     }
 
@@ -616,6 +926,47 @@ public class AbstractTree {
                 + expression2
                 + getHead("</ExprDyadic>");
         }
+
+        public ExpressionInfo check() throws ContextException {
+            ExpressionInfo exprinfo1 = expression1.check();
+            ExpressionInfo exprinfo2 = expression2.check();
+            Tokens.OperationToken.Operation opr = operation.getOperation();
+
+            switch (opr) {
+                case PLUS:
+                case MINUS:
+                case AND:
+                case OR:
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.BOOL && exprinfo2.getType() == Tokens.TypeToken.Type.BOOL) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
+                    }
+                    throw new ContextException("Type error in operator " + opr + ".");
+                case CAND:
+                case COR:
+                case TIMES:
+                case DIVE:
+                case MODE:
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT64 && exprinfo2.getType() == Tokens.TypeToken.Type.INT64) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT64);
+                    }
+                    throw new ContextException("Type error in operator " + opr + ".");
+                case EQ:
+                case NE:
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.BOOL && exprinfo2.getType() == Tokens.TypeToken.Type.BOOL) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
+                    }
+                case LT:
+                case GT:
+                case LE:
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT64 && exprinfo2.getType() == Tokens.TypeToken.Type.INT64) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
+                    }
+                    throw new ContextException("Type error in operator " + opr + ".");
+                case GE:
+                default:
+                    throw new RuntimeException();
+            }
+        }
     }
 
     public static class RoutineCall extends AbstractNode {
@@ -636,6 +987,35 @@ public class AbstractTree {
                 + getBody("<Ident Name='" + identifier.getName() + "'/>")
                 + (expressionlist != null ? expressionlist : getBody("<NoNextExpressionList/>"))
                 + getHead("</RoutineCall>");
+        }
+
+        public ExpressionInfo check() throws ContextException {
+            Routine calledroutine = Compiler.getGlobalRoutineTable().lookup(identifier.getName());
+            if (calledroutine == null) {
+                throw new ContextException("Routine " + identifier.getName() + " is not declared.");
+            }
+
+            List<ExpressionInfo> exprinfos = new ArrayList<>();
+            if (expressionlist != null) {
+                expressionlist.check(exprinfos);
+            }
+            List<Parameter> parameters = calledroutine.getParameters();
+
+            //check number of arguments
+            if (parameters.size() != exprinfos.size()) {
+                throw new ContextException("Routine call: Number of arguments don't match: " + identifier.getName() + " expected: " +
+                    parameters.size() + ", call has " + exprinfos.size());
+            }
+
+            //check for type
+            for (int i = 0; i < parameters.size(); i++) {
+                if (parameters.get(i).getType() != exprinfos.get(i).getType()) {
+                    throw new ContextException("Routine call: Type of " + (i + 1) + ". Argument does not match. Expected: "
+                        + parameters.get(i).getType() + ", call has: " + exprinfos.get(i).getType());
+                }
+            }
+
+            return new ExpressionInfo(calledroutine.getIdentifier(), calledroutine.getReturnType());
         }
     }
 
@@ -658,6 +1038,13 @@ public class AbstractTree {
                 + (expressionlist != null ? expression : getBody("<NoNextExpressionList/>"))
                 + getHead("</ExpressionList>");
         }
+
+        public void check(List<ExpressionInfo> expressioninfos) throws ContextException {
+            expressioninfos.add(expression.check());
+            if (expressionlist != null) {
+                expressionlist.check(expressioninfos);
+            }
+        }
     }
 
     public static class GlobalInit extends AbstractNode {
@@ -678,6 +1065,12 @@ public class AbstractTree {
                 + getBody("<Ident Name='" + identifier.getName() + "'/>")
                 + (nextglobalinit != null ? nextglobalinit : getBody("<NoNextGlobalInit/>"))
                 + getHead("</GlobalInit>");
+        }
+
+        public void check() {
+            if (nextglobalinit != null) {
+                nextglobalinit.check();
+            }
         }
     }
 
@@ -708,5 +1101,10 @@ public class AbstractTree {
                 + (nextglobalimport != null ? nextglobalimport : getBody("<NoNextGlobalImport/>"))
                 + getHead("</GlobalImport>");
         }
+
+        public void check(Routine routine) {
+            //routine.addGlobalImport(new GlobalImport(identifier.getName(), changemode, Tokens.FlowModeToken.FlowMode.IN));
+        }
     }
+
 }

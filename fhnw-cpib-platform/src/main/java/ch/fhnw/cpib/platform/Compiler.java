@@ -5,6 +5,10 @@ import ch.fhnw.cpib.platform.generator.GeneratorException;
 import ch.fhnw.cpib.platform.parser.Parser;
 import ch.fhnw.cpib.platform.parser.abstracttree.AbstractTree;
 import ch.fhnw.cpib.platform.parser.concretetree.ConcreteTree;
+import ch.fhnw.cpib.platform.parser.context.RoutineTable;
+import ch.fhnw.cpib.platform.parser.context.Scope;
+import ch.fhnw.cpib.platform.parser.context.StoreTable;
+import ch.fhnw.cpib.platform.parser.context.SwitchTable;
 import ch.fhnw.cpib.platform.parser.exception.ParserException;
 import ch.fhnw.cpib.platform.scanner.Scanner;
 import ch.fhnw.cpib.platform.scanner.exception.ScannerException;
@@ -20,6 +24,34 @@ public class Compiler {
     private final Parser parser;
 
     private final Generator generator;
+
+    private static StoreTable globalStoreTable = new StoreTable();
+
+    public static StoreTable getGlobalStoreTable() {
+        return globalStoreTable;
+    }
+
+    private static RoutineTable globalRoutineTable = new RoutineTable();
+
+    public static RoutineTable getGlobalRoutineTable() {
+        return globalRoutineTable;
+    }
+
+    private static SwitchTable globalSwitchTable = new SwitchTable();
+
+    public static SwitchTable getGlobalSwitchTable() {
+        return globalSwitchTable;
+    }
+
+    private static Scope scope = null;
+
+    public static Scope getScope() {
+        return scope;
+    }
+
+    public static void setScope(Scope scope) {
+        Compiler.scope = scope;
+    }
 
     public Compiler() {
         this.scanner = new Scanner();
