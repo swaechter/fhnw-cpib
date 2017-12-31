@@ -5,9 +5,8 @@ target/
 .idea/
 fhnw-cpib.iml
 fhnw-cpib-compiler/fhnw-cpib-compiler.iml
-fhnw-cpib-interpreter/fhnw-cpib-interpreter.iml
+fhnw-cpib-jasmin/fhnw-cpib-jasmin.iml
 fhnw-cpib-platform/fhnw-cpib-platform.iml
-fhnw-cpib-vm/fhnw-cpib-vm.iml
 
 # Generated artifacts
 *.class
