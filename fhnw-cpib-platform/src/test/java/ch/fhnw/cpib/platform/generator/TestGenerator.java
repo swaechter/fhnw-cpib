@@ -1,5 +1,6 @@
 package ch.fhnw.cpib.platform.generator;
 
+import ch.fhnw.cpib.platform.TestFiles;
 import ch.fhnw.cpib.platform.parser.Parser;
 import ch.fhnw.cpib.platform.parser.abstracttree.AbstractTree;
 import ch.fhnw.cpib.platform.parser.concretetree.ConcreteTree;
@@ -12,14 +13,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
 
 public class TestGenerator {
-
-    private static final List<String> filenames = Arrays.asList(
-        "/Generator/SwitchCase.iml"
-    );
 
     @Test
     public void testGenerator() throws Exception {
@@ -29,7 +24,7 @@ public class TestGenerator {
         Generator generator = new Generator();
 
         // Parse the files
-        for (String filename : filenames) {
+        for (String filename : TestFiles.generatorfilenames) {
             // Load the program
             String content = ReaderUtils.getContentFromInputStream(getClass().getResourceAsStream(filename), StandardCharsets.UTF_8);
             Assert.assertFalse(content.isEmpty());
