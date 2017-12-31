@@ -5,12 +5,11 @@
 This is our IML compiler for the module cpib (Building a compiler) that
 is written in Java.
 
-| Module name           | Content and responsibilities                                                              |
-| ----------------------|------------------------------------------------------------------------------------------ |
-| fhnw-cpib-compiler    | Standalone application that can compile IML code to byte code                             |
-| fhnw-cpib-interpreter | Standalone application that can interpret byte code and execute it in the virtual machine |
-| fhnw-cpib-platform    | Platform that provides the whole compiler as a library                                    |
-| fhnw-cpib-vm          | Library that provides the virtual machine from Mr. Edgar Lederer (FHNW)                   |
+| Module name           | Content and responsibilities                                  |
+| ----------------------|-------------------------------------------------------------- |
+| fhnw-cpib-compiler    | Standalone application that can compile IML code to byte code |
+| fhnw-cpib-jasmin      | Jasmin assembler that will generate the Java byte code        |
+| fhnw-cpib-platform    | Platform that provides the whole compiler as a library        |
 
 ## Build
 
@@ -27,16 +26,19 @@ Build the project:
 
     mvn package
 
+Create an IML program `HiAndBye.iml`:
+
+    program HiAndBye()
+    global
+        x:int32
+    do
+        debugin x init;
+        debugout x
+    endprogram
+
 Execute some IML code:
 
-    java -jar fhnw-cpib-compiler/target/fhnw-cpib-compiler-0.1.0-jar-with-dependencies.jar fhnw-cpib-platform/src/test/resources/Team/Program1.iml
-
-Copy the result and run it in the interpreter:
-
-     java -jar fhnw-cpib-interpreter/target/fhnw-cpib-interpreter-0.1.0-jar-with-dependencies.jar
-
-    Enter code:
-     <Insert the byte code from the compiler>
+    java -jar fhnw-cpib-compiler/target/fhnw-cpib-compiler-0.1.0-jar-with-dependencies.jar HiAndBye.iml
  
 ## License
 

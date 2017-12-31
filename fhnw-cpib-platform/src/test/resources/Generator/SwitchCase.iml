@@ -1,0 +1,18 @@
+program SwitchCase()
+global
+    x:int32
+do
+    debugin x init;
+    debugout x;
+
+    switch x
+        case 0 then
+            debugout 1
+        case 42 then
+            debugout 43
+        case 100 then
+            debugout 101
+        default then
+            debugout x
+    endswitch
+endprogram

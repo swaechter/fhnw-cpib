@@ -1,11 +1,17 @@
 package ch.fhnw.cpib.platform;
 
+import ch.fhnw.cpib.platform.generator.Generator;
+import ch.fhnw.cpib.platform.generator.GeneratorException;
 import ch.fhnw.cpib.platform.parser.Parser;
+import ch.fhnw.cpib.platform.parser.abstracttree.AbstractTree;
 import ch.fhnw.cpib.platform.parser.concretetree.ConcreteTree;
 import ch.fhnw.cpib.platform.parser.exception.ParserException;
 import ch.fhnw.cpib.platform.scanner.Scanner;
 import ch.fhnw.cpib.platform.scanner.exception.ScannerException;
 import ch.fhnw.cpib.platform.scanner.tokens.TokenList;
+import org.javatuples.Pair;
+
+import java.io.File;
 
 public class Compiler {
 
@@ -13,9 +19,12 @@ public class Compiler {
 
     private final Parser parser;
 
+    private final Generator generator;
+
     public Compiler() {
         this.scanner = new Scanner();
         this.parser = new Parser();
+        this.generator = new Generator();
     }
 
     public void compileString(String content) {
@@ -26,22 +35,55 @@ public class Compiler {
             System.out.println();
 
             // Scan the source code and show the token list
-            TokenList tokenlist = scanner.scanString(content);
             System.out.println("===== Scanned token list =====");
+            TokenList tokenlist = scanner.scanString(content);
             System.out.println(tokenlist.toString());
             System.out.println();
 
             // Parse the concrete tree and show it
-            ConcreteTree.Program program = parser.parseTokenList(tokenlist);
             System.out.println("===== Concrete parsing tree =====");
-            System.out.println(program);
+            ConcreteTree.Program concreteprogram = parser.parseTokenList(tokenlist);
+            System.out.println(concreteprogram);
+            System.out.println();
 
+            // Parse the abstract tree and show it
+            System.out.println("===== Abstract parsing tree =====");
+            AbstractTree.Program abstractprogram = concreteprogram.toAbstract();
+            System.out.println(concreteprogram);
+            System.out.println();
+
+            // Check the abstract tree
+            System.out.println("===== Check abstract tree =====");
+            abstractprogram.check();
+            System.out.println("Done");
+            System.out.println();
+
+            // Generate the Jasmin file
+            System.out.println("===== Generate Jasmin assembler code =====");
+            String jasmincontent = generator.generateJasminContent(abstractprogram);
+            System.out.println(jasmincontent);
+            System.out.println();
+
+            // Generate the Java class file
+            File javaclassfile = generator.generateJavaClassFile(jasmincontent);
+
+            // Execute the Java byte code
+            System.out.println("===== Execute the byte code =====");
+            Pair<String, String> output = generator.executeJavaClassFile(javaclassfile);
+            System.out.println("Regular Output:");
+            System.out.println(output.getValue0());
+            System.out.println();
+            System.out.println("Error Output:");
+            System.out.println(output.getValue1());
             System.out.println();
         } catch (ScannerException exception) {
             System.out.println("During the scanning process, an error occurred: " + exception.getMessage());
             System.exit(1);
         } catch (ParserException exception) {
             System.out.println("During the parsing process, an error occurred: " + exception.getMessage());
+            System.exit(1);
+        } catch (GeneratorException exception) {
+            System.out.println("During the generation process, an error occurred: " + exception.getMessage());
             System.exit(1);
         }
     }

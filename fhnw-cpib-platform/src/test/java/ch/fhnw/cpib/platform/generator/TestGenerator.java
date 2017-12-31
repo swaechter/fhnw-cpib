@@ -1,33 +1,72 @@
 package ch.fhnw.cpib.platform.generator;
 
-import ch.fhnw.cpib.vm.IVirtualMachine;
-import ch.fhnw.cpib.vm.VirtualMachine;
+import ch.fhnw.cpib.platform.parser.Parser;
+import ch.fhnw.cpib.platform.parser.abstracttree.AbstractTree;
+import ch.fhnw.cpib.platform.parser.concretetree.ConcreteTree;
+import ch.fhnw.cpib.platform.scanner.Scanner;
+import ch.fhnw.cpib.platform.scanner.tokens.TokenList;
+import ch.fhnw.cpib.platform.utils.ReaderUtils;
+import org.javatuples.Pair;
+import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 
 public class TestGenerator {
 
+    private static final List<String> filenames = Arrays.asList(
+        "/Generator/SwitchCase.iml"
+    );
+
     @Test
     public void testGenerator() throws Exception {
-        // Fake the standard input and provide a value for debugin
-        ByteArrayInputStream in = new ByteArrayInputStream("42\n".getBytes());
-        System.setIn(in);
+        // Create the scanner, parser and generator
+        Scanner scanner = new Scanner();
+        Parser parser = new Parser();
+        Generator generator = new Generator();
 
-        // Create the virtual machine
-        int codesize = 1000;
-        int storesize = 1000;
-        IVirtualMachine machine = new VirtualMachine(codesize, storesize);
+        // Parse the files
+        for (String filename : filenames) {
+            // Load the program
+            String content = ReaderUtils.getContentFromInputStream(getClass().getResourceAsStream(filename), StandardCharsets.UTF_8);
+            Assert.assertFalse(content.isEmpty());
 
-        // Generate the code by hand
-        machine.IntLoad(0, 995);
-        machine.IntInput(1, "x");
-        machine.IntLoad(2, 995);
-        machine.Deref(3);
-        machine.IntOutput(4, "x");
-        machine.Stop(5);
+            // Scan the program
+            TokenList tokenlist = scanner.scanString(content);
+            Assert.assertTrue(tokenlist.getSize() > 0);
 
-        // Execute the code for the abstract tree
-        machine.execute();
+            // Parse the token list
+            ConcreteTree.Program concreteprogram = parser.parseTokenList(tokenlist);
+            Assert.assertTrue(concreteprogram.toString().length() > 0);
+
+            // Make the parse tree abstract
+            AbstractTree.Program abstractprogram = concreteprogram.toAbstract();
+
+            // Check the abstract tree
+            abstractprogram.check();
+
+            // Generate the Jasmin file
+            String jasmincontent = generator.generateJasminContent(abstractprogram);
+            Assert.assertTrue(jasmincontent.length() > 0);
+            //System.out.println(jasmincontent);
+
+            // Generate the Java class file
+            File javaclassfile = generator.generateJavaClassFile(jasmincontent);
+            Assert.assertTrue(javaclassfile.exists());
+
+            // Execute the Java byte code
+            Pair<String, String> output = generator.executeJavaClassFile(javaclassfile);
+            //System.out.println("Regular Output:");
+            //System.out.println(output.getValue0());
+            //System.out.println();
+            //System.out.println("Error Output:");
+            //System.out.println(output.getValue1());
+            //System.out.println();
+            Assert.assertTrue(output.getValue0().contains("42"));
+            Assert.assertTrue(output.getValue1().isEmpty());
+        }
     }
 }

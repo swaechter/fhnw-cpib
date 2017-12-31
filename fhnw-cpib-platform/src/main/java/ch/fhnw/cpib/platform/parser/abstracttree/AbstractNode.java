@@ -1,7 +1,8 @@
 package ch.fhnw.cpib.platform.parser.abstracttree;
 
+import ch.fhnw.cpib.platform.generator.Generator;
+import ch.fhnw.cpib.platform.generator.GeneratorException;
 import ch.fhnw.cpib.platform.parser.util.Node;
-import ch.fhnw.cpib.vm.IVirtualMachine;
 
 public abstract class AbstractNode extends Node {
 
@@ -13,7 +14,7 @@ public abstract class AbstractNode extends Node {
         // TODO: Implement checks
     }
 
-    public int code(IVirtualMachine machine, int location) throws IVirtualMachine.CodeTooSmallError {
+    public int generate(Generator generator) throws GeneratorException {
         throw new RuntimeException("Code not implemented yet!");
     }
 }
