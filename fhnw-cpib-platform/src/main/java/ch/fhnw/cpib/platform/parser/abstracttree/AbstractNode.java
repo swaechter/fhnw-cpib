@@ -10,11 +10,11 @@ public abstract class AbstractNode extends Node {
         super(idendation);
     }
 
-    public void check() {
+    public void checkCode() {
         // TODO: Implement checks
     }
 
-    public int generate(Generator generator) throws GeneratorException {
+    public void generateCode(Generator generator) throws GeneratorException {
         throw new RuntimeException("Code not implemented yet!");
     }
 }

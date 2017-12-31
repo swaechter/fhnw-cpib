@@ -21,7 +21,14 @@ public class ReaderUtilsTest {
     }
 
     @Test
-    public void testCreateTemporaryFileFromContent() throws IOException {
+    public void testCreateTemporaryFileFromContent1() throws IOException {
+        File file = ReaderUtils.createTemporaryFileFromContent("Message.txt", TEST_MESSAGE, StandardCharsets.UTF_8);
+        String content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+        Assert.assertEquals(TEST_MESSAGE, content);
+    }
+
+    @Test
+    public void testCreateTemporaryFileFromContent2() throws IOException {
         File file = ReaderUtils.createTemporaryFileFromContent(TEST_MESSAGE, StandardCharsets.UTF_8);
         Assert.assertTrue(file.exists());
     }

@@ -1,5 +1,6 @@
 package ch.fhnw.cpib.platform.parser.abstracttree;
 
+import ch.fhnw.cpib.platform.generator.Generator;
 import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
 public class AbstractTree {
@@ -22,6 +23,7 @@ public class AbstractTree {
             this.cmd = cmd;
         }
 
+        @Override
         public String toString() {
             return getHead("<Program>")
                 + getBody("<Ident Name='" + identifier.getName() + "'/>")
@@ -29,6 +31,24 @@ public class AbstractTree {
                 + (declaration != null ? declaration : getBody("<NoDeclarations/>"))
                 + (cmd != null ? cmd : getBody("<NoCmd/>"))
                 + ("</Program>");
+        }
+
+        @Override
+        public void generateCode(Generator generator) {
+            generator.appendLine(".class public " + identifier.getName());
+            generator.appendLine(".super java/lang/Object");
+            generator.appendLine(".method public static main([Ljava/lang/String;)V");
+            generator.appendLine(".limit stack 100");
+            generator.appendLine(".limit locals 100");
+            generator.appendLine("getstatic java/lang/System/out Ljava/io/PrintStream;");
+            generator.appendLine("ldc 42");
+            generator.appendLine("invokevirtual java/io/PrintStream/println(I)V");
+            generator.appendLine("return");
+            generator.appendLine(".end method");
+        }
+
+        public String getProgramName() {
+            return identifier.getName();
         }
     }
 

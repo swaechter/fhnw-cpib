@@ -39,7 +39,11 @@ Create an IML program `HiAndBye.iml`:
 Execute some IML code:
 
     java -jar fhnw-cpib-compiler/target/fhnw-cpib-compiler-0.1.0-jar-with-dependencies.jar HiAndBye.iml
- 
+
+The IML program is always executed, but can also be rerun as generated JAR file:
+
+    java -jar HiAndBye.jar
+
 ## License
 
 The project is licensed under the GNU LGPL v3 or later.

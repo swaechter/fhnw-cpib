@@ -3,10 +3,7 @@ package ch.fhnw.cpib.platform.utils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -14,6 +11,13 @@ public class ReaderUtils {
 
     public static String convertReaderToString(Reader reader) throws IOException {
         return IOUtils.toString(reader);
+    }
+
+    public static File createTemporaryFileFromContent(String filepath, String content, Charset charset) throws IOException{
+        File file = new File(filepath);
+        FileUtils.writeStringToFile(file, content, charset);
+        file.deleteOnExit();
+        return file;
     }
 
     public static File createTemporaryFileFromContent(String content, Charset charset) throws IOException {

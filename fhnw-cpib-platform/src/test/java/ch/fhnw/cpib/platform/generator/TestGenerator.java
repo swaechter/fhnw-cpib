@@ -41,19 +41,19 @@ public class TestGenerator {
             AbstractTree.Program abstractprogram = concreteprogram.toAbstract();
 
             // Check the abstract tree
-            abstractprogram.check();
+            abstractprogram.checkCode();
 
             // Generate the Jasmin file
             String jasmincontent = generator.generateJasminContent(abstractprogram);
             Assert.assertTrue(jasmincontent.length() > 0);
             //System.out.println(jasmincontent);
 
-            // Generate the Java class file
-            File javaclassfile = generator.generateJavaClassFile(jasmincontent);
+            // Generate the Java JAR file
+            File javaclassfile = generator.generateJarFile(abstractprogram, jasmincontent);
             Assert.assertTrue(javaclassfile.exists());
 
-            // Execute the Java byte code
-            Pair<String, String> output = generator.executeJavaClassFile(javaclassfile);
+            // Execute the Java JAR file
+            Pair<String, String> output = generator.executeJarFile(javaclassfile);
             //System.out.println("Regular Output:");
             //System.out.println(output.getValue0());
             //System.out.println();

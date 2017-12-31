@@ -60,7 +60,7 @@ public class ParserTest {
             //System.out.println(abstractprogram);
 
             // Check the abstract tree
-            abstractprogram.check();
+            abstractprogram.checkCode();
         }
     }
 }

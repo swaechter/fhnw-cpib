@@ -3,52 +3,63 @@ package ch.fhnw.cpib.platform.generator;
 import ch.fhnw.cpib.platform.parser.abstracttree.AbstractTree;
 import ch.fhnw.cpib.platform.utils.ReaderUtils;
 import jasmin.Main;
+import org.apache.commons.io.IOUtils;
 import org.javatuples.Pair;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 
 public class Generator {
 
     private final StringBuilder stringbuilder;
 
+    private int branchnumber;
+
     public Generator() {
         this.stringbuilder = new StringBuilder();
     }
 
-    public String generateJasminContent(AbstractTree.Program program) {
-        //appendLine(".source Program.j");
-        appendLine(".class public Program");
-        appendLine(".super java/lang/Object");
-        appendLine(".method public static main([Ljava/lang/String;)V");
-        appendLine(".limit stack 100");
-        appendLine(".limit locals 100");
-        appendLine("getstatic java/lang/System/out Ljava/io/PrintStream;");
-        appendLine("ldc 42");
-        appendLine("invokevirtual java/io/PrintStream/println(I)V");
-        appendLine("return");
-        appendLine(".end method");
+    public String generateJasminContent(AbstractTree.Program program) throws GeneratorException {
+        program.generateCode(this);
         return stringbuilder.toString();
     }
 
-    public File generateJavaClassFile(String jasmincontent) throws GeneratorException {
+    public File generateJarFile(AbstractTree.Program program, String jasmincontent) throws GeneratorException {
         try {
-            File inputfile = ReaderUtils.createTemporaryFileFromContent(jasmincontent, StandardCharsets.UTF_8);
-            String[] parameters = new String[]{inputfile.getAbsolutePath(), "-d", inputfile.getParent()};
+            File jasminfile = ReaderUtils.createTemporaryFileFromContent(program.getProgramName() + ".j", jasmincontent, StandardCharsets.UTF_8);
+            File classfile = new File(program.getProgramName() + ".class");
+            File jarfile = new File(program.getProgramName() + ".jar");
+
+            String[] parameters = new String[]{jasminfile.getAbsolutePath()};
             Main.main(parameters);
-            return new File(inputfile.getParent() + "/Program.class");
+
+            Manifest manifest = new Manifest();
+            manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
+            manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, program.getProgramName());
+            JarOutputStream outputstream = new JarOutputStream(new FileOutputStream(jarfile), manifest);
+
+            JarEntry entry = new JarEntry(classfile.getPath().replace("\\", "/"));
+            entry.setTime(classfile.lastModified());
+            outputstream.putNextEntry(entry);
+
+            BufferedInputStream jarinputstream = new BufferedInputStream(new FileInputStream(classfile));
+            IOUtils.copy(jarinputstream, outputstream);
+            outputstream.closeEntry();
+            outputstream.close();
+
+            return jarfile;
         } catch (Exception excetpion) {
-            throw new GeneratorException("Unable to temporary store the Jasmin file or read the compiled file", excetpion);
+            throw new GeneratorException("Unable to create the Java JAR file: " + excetpion.getMessage(), excetpion);
         }
     }
 
-    public Pair<String, String> executeJavaClassFile(File file) throws GeneratorException {
+    public Pair<String, String> executeJarFile(File file) throws GeneratorException {
         try {
-            ProcessBuilder processbuilder = new ProcessBuilder("java", "Program");
+            ProcessBuilder processbuilder = new ProcessBuilder("java", "-jar", file.getAbsolutePath());
             processbuilder.directory(file.getParentFile());
             Process process = processbuilder.start();
             process.waitFor();
@@ -59,17 +70,15 @@ public class Generator {
             String errorcontent = ReaderUtils.convertReaderToString(errorreader);
             return new Pair<>(inputcontent, errorcontent);
         } catch (Exception exception) {
-            throw new GeneratorException("Unable to execute the Java code", exception);
+            throw new GeneratorException("Unable to execute the Java JAR file: " + exception.getMessage(), exception);
         }
     }
 
     public void appendLine(String line) {
-        stringbuilder.append(line + '\n');
+        stringbuilder.append(line).append(System.lineSeparator());
     }
 
-    public String getRandomIdentifierName() {
-        String uuid = UUID.randomUUID().toString();
-        uuid = uuid.replace("-", "");
-        return uuid;
+    public int getNextFreeBranchNumber() {
+        return branchnumber++;
     }
 }

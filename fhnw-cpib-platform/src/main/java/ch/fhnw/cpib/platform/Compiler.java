@@ -54,7 +54,7 @@ public class Compiler {
 
             // Check the abstract tree
             System.out.println("===== Check abstract tree =====");
-            abstractprogram.check();
+            abstractprogram.checkCode();
             System.out.println("Done");
             System.out.println();
 
@@ -64,12 +64,15 @@ public class Compiler {
             System.out.println(jasmincontent);
             System.out.println();
 
-            // Generate the Java class file
-            File javaclassfile = generator.generateJavaClassFile(jasmincontent);
+            // Generate the Java JAR file
+            System.out.println("===== Generate Java JAR file =====");
+            File jarfile = generator.generateJarFile(abstractprogram, jasmincontent);
+            System.out.println("Done");
+            System.out.println();
 
-            // Execute the Java byte code
-            System.out.println("===== Execute the byte code =====");
-            Pair<String, String> output = generator.executeJavaClassFile(javaclassfile);
+            // Execute the Java JAR file
+            System.out.println("===== Execute Java JAR file =====");
+            Pair<String, String> output = generator.executeJarFile(jarfile);
             System.out.println("Regular Output:");
             System.out.println(output.getValue0());
             System.out.println();
