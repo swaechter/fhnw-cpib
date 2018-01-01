@@ -1,4 +1,4 @@
-package ch.fhnw.cpib.platform.parser.context;
+package ch.fhnw.cpib.platform.checker;
 
 import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 

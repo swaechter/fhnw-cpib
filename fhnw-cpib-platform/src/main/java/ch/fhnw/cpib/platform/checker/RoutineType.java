@@ -1,4 +1,4 @@
-package ch.fhnw.cpib.platform.parser.context;
+package ch.fhnw.cpib.platform.checker;
 
 public enum RoutineType {
     PROCEDURE,

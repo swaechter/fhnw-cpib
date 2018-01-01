@@ -1,12 +1,11 @@
-package ch.fhnw.cpib.platform.parser.context;
+package ch.fhnw.cpib.platform.checker;
 
 import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
-public class Store extends CSymbol {
+public class Store extends Symbol {
     private boolean writeable;
     private boolean initialized;
     private boolean isConst;
-    private int address;
     private boolean relative = false;
     private boolean reference = true;
 
@@ -37,14 +36,6 @@ public class Store extends CSymbol {
         if (isConst) {
             writeable = false;
         }
-    }
-
-    public int getAddress() {
-        return address;
-    }
-
-    public void setAddress(final int address) {
-        this.address = address;
     }
 
     public void setRelative(final boolean relative) {
