@@ -1,5 +1,6 @@
 package ch.fhnw.cpib.platform.scanner.dictionary;
 
+import ch.fhnw.cpib.platform.scanner.exception.ScannerException;
 import ch.fhnw.cpib.platform.scanner.tokens.Terminal;
 import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
