@@ -42,13 +42,24 @@ public class Tokens {
 
         private final String value;
 
+        private final TypeToken.Type type = null;
+
         public LiteralToken(String value, Terminal terminal) {
             super(terminal);
+            try {
+                Long.parseLong(value);
+            } catch (RuntimeException e) {
+                //throw new ScannerException(e.printStackTrace());
+            }
             this.value = value;
         }
 
         public String getValue() {
             return value;
+        }
+
+        public Tokens.TypeToken.Type getType() {
+            return type;
         }
 
         @Override
