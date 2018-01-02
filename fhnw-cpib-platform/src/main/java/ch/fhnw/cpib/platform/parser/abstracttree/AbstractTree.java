@@ -2,7 +2,6 @@ package ch.fhnw.cpib.platform.parser.abstracttree;
 
 import ch.fhnw.cpib.platform.checker.*;
 import ch.fhnw.cpib.platform.generator.Generator;
-import ch.fhnw.cpib.platform.checker.CheckerException;
 import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
 import java.util.ArrayList;
@@ -189,7 +188,7 @@ public class AbstractTree {
             return nextdeclaration;
         }
 
-        public abstract Tokens.TypeToken.Type check(Checker checker) throws CheckerException;
+        public abstract Tokens.TypeToken check(Checker checker) throws CheckerException;
     }
 
     public static class StoDecl extends Declaration {
@@ -214,7 +213,7 @@ public class AbstractTree {
         }
 
         @Override
-        public Tokens.TypeToken.Type check(Checker checker) throws CheckerException {
+        public Tokens.TypeToken check(Checker checker) throws CheckerException {
             //check if global scope applies
             StoreTable storetable;
             if (checker.getScope() == null) {
@@ -280,7 +279,7 @@ public class AbstractTree {
         }
 
         @Override
-        public Tokens.TypeToken.Type check(Checker checker) throws CheckerException {
+        public Tokens.TypeToken check(Checker checker) throws CheckerException {
             //check if function exist in global routine table
             Routine function = new Routine(identifier.getName(), RoutineType.FUNCTION);
             //store function in global routine table if not
@@ -342,7 +341,7 @@ public class AbstractTree {
         }
 
         @Override
-        public Tokens.TypeToken.Type check(Checker checker) throws CheckerException {
+        public Tokens.TypeToken check(Checker checker) throws CheckerException {
             //store function in global procedure table
             Routine procedure = new Routine(identifier.getName(), RoutineType.PROCEDURE);
             checker.getGlobalRoutineTable().insert(procedure);
@@ -491,7 +490,7 @@ public class AbstractTree {
             checker.getGlobalSwitchTable().insert(exprinfo.getName(), switchSave);
             //check if switch expr and case literal have the same data type
             List<SwitchCase> switchCheck = checker.getGlobalSwitchTable().getEntry(exprinfo.getName());
-            if (exprinfo.getType() != switchCheck.get(0).getLiteraltoken().getType()) {
+            if (exprinfo.getType().equals(switchCheck.get(0).getLiteraltoken().getType())) {
                 throw new CheckerException("SwitchCase expr and case literal are not from the same type. " +
                     "Current switch expr type: " + exprinfo.getType() +
                     "Current case literal type: " + switchCheck.get(0).getLiteraltoken().getType());
@@ -566,7 +565,7 @@ public class AbstractTree {
         public void check(Checker checker) throws CheckerException {
             //check expr return type is from type BOOL
             ExpressionInfo exprinfo = expression.check(checker);
-            if (exprinfo.getType() != Tokens.TypeToken.Type.BOOL) {
+            if (exprinfo.getType().equals(Tokens.TypeToken.Type.BOOL)) {
                 throw new CheckerException("IF condition needs to be BOOL. Current type: " + exprinfo.getType());
             }
             if (repcondcmd != null) {
@@ -609,7 +608,7 @@ public class AbstractTree {
         public void check(Checker checker) throws CheckerException {
             //check expr return type is from type BOOL
             ExpressionInfo exprinfo = expression.check(checker);
-            if (exprinfo.getType() != Tokens.TypeToken.Type.BOOL) {
+            if (exprinfo.getType().equals(Tokens.TypeToken.Type.BOOL)) {
                 throw new CheckerException("ELSEIF condition needs to be BOOL. Current type: " + exprinfo.getType());
             }
             if (repcondcmd != null) {
@@ -644,7 +643,7 @@ public class AbstractTree {
             //check expr return type is from type BOOL
             // TODO: Fix nullpointer
             ExpressionInfo exprinfo = expression.check(checker);
-            if (exprinfo != null && exprinfo.getType() != Tokens.TypeToken.Type.BOOL) {
+            if (exprinfo != null && exprinfo.getType().equals(Tokens.TypeToken.Type.BOOL)) {
                 throw new CheckerException("WHILE condition needs to be BOOL. Current type: " + exprinfo.getType());
             }
             if (getNextCmd() != null) {
@@ -743,7 +742,7 @@ public class AbstractTree {
 
         public abstract Tokens.IdentifierToken getIdentifier();
 
-        public abstract Tokens.TypeToken.Type getType();
+        public abstract Tokens.TypeToken getType();
     }
 
     public static class TypedIdentIdent extends TypedIdent<Tokens.IdentifierToken> {
@@ -772,7 +771,7 @@ public class AbstractTree {
         }
 
         @Override
-        public Tokens.TypeToken.Type getType() {
+        public Tokens.TypeToken getType() {
             return null;
         }
     }
@@ -781,9 +780,9 @@ public class AbstractTree {
 
         public final Tokens.IdentifierToken identifier;
 
-        public final Tokens.TypeToken.Type type;
+        public final Tokens.TypeToken type;
 
-        public TypedIdentType(Tokens.IdentifierToken identifier, Tokens.TypeToken.Type type, int idendation) {
+        public TypedIdentType(Tokens.IdentifierToken identifier, Tokens.TypeToken type, int idendation) {
             super(idendation);
             this.identifier = identifier;
             this.type = type;
@@ -803,7 +802,7 @@ public class AbstractTree {
         }
 
         @Override
-        public Tokens.TypeToken.Type getType() {
+        public Tokens.TypeToken getType() {
             return type;
         }
     }
