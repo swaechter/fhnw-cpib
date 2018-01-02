@@ -4,7 +4,7 @@ import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
 public class Parameter {
 
-    private Tokens.TypeToken.Type type;
+    private Tokens.TypeToken type;
 
     private Tokens.FlowModeToken flowmode;
 
@@ -12,14 +12,14 @@ public class Parameter {
 
     private Tokens.ChangeModeToken changemode;
 
-    public Parameter(Tokens.TypeToken.Type type, Tokens.FlowModeToken flowmode, Tokens.MechModeToken mechmode, Tokens.ChangeModeToken changemode) {
+    public Parameter(Tokens.TypeToken type, Tokens.FlowModeToken flowmode, Tokens.MechModeToken mechmode, Tokens.ChangeModeToken changemode) {
         this.type = type;
         this.flowmode = flowmode;
         this.mechmode = mechmode;
         this.changemode = changemode;
     }
 
-    public Tokens.TypeToken.Type getType() {
+    public Tokens.TypeToken getType() {
         return type;
     }
 
