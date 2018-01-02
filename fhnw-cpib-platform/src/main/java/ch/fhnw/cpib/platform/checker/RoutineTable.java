@@ -3,7 +3,8 @@ package ch.fhnw.cpib.platform.checker;
 import java.util.HashMap;
 
 public class RoutineTable {
-    private HashMap<String, Routine> map = new HashMap<String, Routine>();
+
+    private HashMap<String, Routine> map = new HashMap<>();
 
     public boolean insert(Routine r) {
         if (!map.containsKey(r.getIdentifier())) {

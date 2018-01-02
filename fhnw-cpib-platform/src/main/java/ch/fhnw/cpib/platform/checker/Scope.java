@@ -3,13 +3,14 @@ package ch.fhnw.cpib.platform.checker;
 import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
 public class Scope {
+
     private final StoreTable storeTable;
 
     public Scope() {
         this(new StoreTable());
     }
 
-    public Scope(StoreTable storeTable){
+    public Scope(StoreTable storeTable) {
         this.storeTable = storeTable;
     }
 

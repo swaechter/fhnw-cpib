@@ -1,6 +1,7 @@
 package ch.fhnw.cpib.platform.generator;
 
 import ch.fhnw.cpib.platform.TestFiles;
+import ch.fhnw.cpib.platform.checker.Checker;
 import ch.fhnw.cpib.platform.parser.Parser;
 import ch.fhnw.cpib.platform.parser.abstracttree.AbstractTree;
 import ch.fhnw.cpib.platform.parser.concretetree.ConcreteTree;
@@ -41,7 +42,7 @@ public class TestGenerator {
             AbstractTree.Program abstractprogram = concreteprogram.toAbstract();
 
             // Check the abstract tree
-            abstractprogram.checkCode();
+            abstractprogram.check(new Checker());
 
             // Generate the Jasmin file
             String jasmincontent = generator.generateJasminContent(abstractprogram);

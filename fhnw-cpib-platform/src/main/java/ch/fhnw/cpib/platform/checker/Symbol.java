@@ -3,7 +3,9 @@ package ch.fhnw.cpib.platform.checker;
 import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
 public class Symbol {
+
     private String identifier;
+
     private Tokens.TypeToken.Type type;
 
     public Symbol(String identifier, Tokens.TypeToken.Type type) {

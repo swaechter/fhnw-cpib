@@ -3,7 +3,9 @@ package ch.fhnw.cpib.platform.checker;
 import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
 public class ExpressionInfo {
+
     private String name;
+
     private Tokens.TypeToken.Type type;
 
     public ExpressionInfo(String name, Tokens.TypeToken.Type type) {

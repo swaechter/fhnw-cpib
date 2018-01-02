@@ -1,9 +1,11 @@
 program SwitchCase()
 global
-    x:int32
+    const x:int32
 do
     debugin x init;
     debugout x;
+
+    x := 42;
 
     switch x
         case 0 then

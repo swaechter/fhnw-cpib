@@ -3,10 +3,15 @@ package ch.fhnw.cpib.platform.checker;
 import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
 public class Store extends Symbol {
+
     private boolean writeable;
+
     private boolean initialized;
+
     private boolean isConst;
+
     private boolean relative = false;
+
     private boolean reference = true;
 
     public Store(

@@ -1,6 +1,5 @@
 package ch.fhnw.cpib.platform.parser.abstracttree;
 
-import ch.fhnw.cpib.platform.Compiler;
 import ch.fhnw.cpib.platform.checker.*;
 import ch.fhnw.cpib.platform.generator.Generator;
 import ch.fhnw.cpib.platform.parser.exception.ContextException;
@@ -14,13 +13,13 @@ public class AbstractTree {
 
     public static class Program extends AbstractNode {
 
-        private final Tokens.IdentifierToken identifier;
+        public final Tokens.IdentifierToken identifier;
 
-        private final ProgParam progparam;
+        public final ProgParam progparam;
 
-        private final Declaration declaration;
+        public final Declaration declaration;
 
-        private final Cmd cmd;
+        public final Cmd cmd;
 
         public Program(Tokens.IdentifierToken identifier, ProgParam progparam, Declaration declaration, Cmd cmd) {
             super(0);
@@ -40,9 +39,9 @@ public class AbstractTree {
                 + ("</Program>");
         }
 
-        public void check(Compiler compiler) throws ContextException {
+        public void check(Checker checker) throws ContextException {
             if (progparam != null) {
-                progparam.check(compiler);
+                progparam.check(checker);
             }
             if (declaration != null) {
                 declaration.check();
@@ -73,13 +72,13 @@ public class AbstractTree {
 
     public static class ProgParam extends AbstractNode {
 
-        private final Tokens.FlowModeToken flowmode;
+        public final Tokens.FlowModeToken flowmode;
 
-        private final Tokens.ChangeModeToken changemode;
+        public final Tokens.ChangeModeToken changemode;
 
-        private final TypedIdent typedident;
+        public final TypedIdent typedident;
 
-        private final ProgParam nextprogparam;
+        public final ProgParam nextprogparam;
 
         public ProgParam(Tokens.FlowModeToken flowmode, Tokens.ChangeModeToken changemode, TypedIdent typedident, ProgParam nextprogparam, int idendation) {
             super(idendation);
@@ -99,30 +98,30 @@ public class AbstractTree {
                 + getHead("</ProgParam>");
         }
 
-        public void check(Compiler compiler) throws ContextException {
+        public void check(Checker checker) throws ContextException {
             //check if identifier exist in global store table
-            if (compiler.getGlobalStoreTable().getStore(typedident.getIdentifier().getName()) != null) {
+            if (checker.getGlobalStoreTable().getStore(typedident.getIdentifier().getName()) != null) {
                 throw new ContextException("Identifier " + typedident.getIdentifier().getName() + " is already declared");
             }
             //store identifier in global store table
-            compiler.getGlobalStoreTable().addStore(new Store(typedident.getIdentifier().getName(), typedident.getType(), changemode.getChangeMode() == Tokens.ChangeModeToken.ChangeMode.CONST));
+            checker.getGlobalStoreTable().addStore(new Store(typedident.getIdentifier().getName(), typedident.getType(), changemode.getChangeMode() == Tokens.ChangeModeToken.ChangeMode.CONST));
             if (nextprogparam != null) {
-                nextprogparam.check(compiler);
+                nextprogparam.check(checker);
             }
         }
     }
 
     public static class Param extends AbstractNode {
 
-        private final Tokens.FlowModeToken flowmode;
+        public final Tokens.FlowModeToken flowmode;
 
-        private final Tokens.MechModeToken mechmode;
+        public final Tokens.MechModeToken mechmode;
 
-        private final Tokens.ChangeModeToken changemode;
+        public final Tokens.ChangeModeToken changemode;
 
-        private final TypedIdent typedident;
+        public final TypedIdent typedident;
 
-        private final Param nextparam;
+        public final Param nextparam;
 
         public Param(Tokens.FlowModeToken flowmode, Tokens.MechModeToken mechmode, Tokens.ChangeModeToken changemode, TypedIdent typedident, Param nextparam, int idendation) {
             super(idendation);
@@ -179,7 +178,7 @@ public class AbstractTree {
 
     public abstract static class Declaration extends AbstractNode {
 
-        private final Declaration nextdeclaration;
+        public final Declaration nextdeclaration;
 
         public Declaration(Declaration nextdeclaration, int idendation) {
             super(idendation);
@@ -196,9 +195,9 @@ public class AbstractTree {
 
     public static class StoDecl extends Declaration {
 
-        private final Tokens.ChangeModeToken changemode;
+        public final Tokens.ChangeModeToken changemode;
 
-        private final TypedIdent typedident;
+        public final TypedIdent typedident;
 
         public StoDecl(Tokens.ChangeModeToken changemode, TypedIdent typedident, Declaration nextdeclaration, int idendation) {
             super(nextdeclaration, idendation);
@@ -215,13 +214,13 @@ public class AbstractTree {
                 + getHead("</StoDecl>");
         }
 
-        public void check(Compiler compiler) throws ContextException {
+        public void check(Checker checker) throws ContextException {
             //check if global scope applies
             StoreTable storetable = null;
-            if (compiler.getScope() == null) {
-                storetable = compiler.getGlobalStoreTable();
+            if (checker.getScope() == null) {
+                storetable = checker.getGlobalStoreTable();
             } else {
-                storetable = compiler.getScope().getStoreTable();
+                storetable = checker.getScope().getStoreTable();
             }
 
             //check if identifier exist in global store table
@@ -244,17 +243,17 @@ public class AbstractTree {
 
     public static class FunDecl extends Declaration {
 
-        private final Tokens.IdentifierToken identifier;
+        public final Tokens.IdentifierToken identifier;
 
-        private final Param param;
+        public final Param param;
 
-        private final Declaration storedeclaration;
+        public final Declaration storedeclaration;
 
-        private final GlobalImport globalimport;
+        public final GlobalImport globalimport;
 
-        private final Declaration declaration;
+        public final Declaration declaration;
 
-        private final Cmd cmd;
+        public final Cmd cmd;
 
         public FunDecl(Tokens.IdentifierToken identifier, Param param, Declaration storedeclaration, GlobalImport globalimport, Declaration declaration, Cmd cmd, Declaration nextdeclaration, int idendation) {
             super(nextdeclaration, idendation);
@@ -279,14 +278,14 @@ public class AbstractTree {
                 + getHead("</FunDecl>");
         }
 
-        public void check(Compiler compiler) throws ContextException {
+        public void check(Checker checker) throws ContextException {
             //check if function exist in global routine table
             Routine function = new Routine(identifier.getName(), RoutineType.FUNCTION);
             //store function in global routine table if not
-            if (!compiler.getGlobalRoutineTable().insert(function)) {
+            if (!checker.getGlobalRoutineTable().insert(function)) {
                 throw new ContextException("Function " + identifier.getName() + " is already declared.");
             }
-            Compiler.setScope(function.getScope());
+            checker.setScope(function.getScope());
             if (param != null) {
                 param.check(function);
             }
@@ -299,7 +298,7 @@ public class AbstractTree {
             if (cmd != null) {
                 cmd.check();
             }
-            Compiler.setScope(null);
+            checker.setScope(null);
             if (getNextDeclaration() != null) {
                 getNextDeclaration().check();
             }
@@ -308,15 +307,15 @@ public class AbstractTree {
 
     public static class ProcDecl extends Declaration {
 
-        private final Tokens.IdentifierToken identifier;
+        public final Tokens.IdentifierToken identifier;
 
-        private final Param param;
+        public final Param param;
 
-        private final GlobalImport globalimport;
+        public final GlobalImport globalimport;
 
-        private final Declaration declaration;
+        public final Declaration declaration;
 
-        private final Cmd cmd;
+        public final Cmd cmd;
 
         public ProcDecl(Tokens.IdentifierToken identifier, Param param, GlobalImport globalimport, Declaration declaration, Declaration nextdeclaration, Cmd cmd, int idendation) {
             super(nextdeclaration, idendation);
@@ -339,11 +338,11 @@ public class AbstractTree {
                 + getHead("</ProcDecl>");
         }
 
-        public void check(Compiler compiler) throws ContextException {
+        public void check(Checker checker) throws ContextException {
             //store function in global procedure table
             Routine procedure = new Routine(identifier.getName(), RoutineType.PROCEDURE);
-            compiler.getGlobalRoutineTable().insert(procedure);
-            compiler.setScope(procedure.getScope());
+            checker.getGlobalRoutineTable().insert(procedure);
+            checker.setScope(procedure.getScope());
             if (param != null) {
                 param.check(procedure);
             }
@@ -356,7 +355,7 @@ public class AbstractTree {
             if (declaration != null) {
                 declaration.check();
             }
-            compiler.setScope(null);
+            checker.setScope(null);
             if (getNextDeclaration() != null) {
                 getNextDeclaration().check();
             }
@@ -365,7 +364,7 @@ public class AbstractTree {
 
     public abstract static class Cmd extends AbstractNode {
 
-        private final Cmd nextcmd;
+        public final Cmd nextcmd;
 
         public Cmd(Cmd nextcmd, int idendation) {
             super(idendation);
@@ -402,13 +401,13 @@ public class AbstractTree {
 
     public static class AssiCmd extends Cmd {
 
-        private final Expression expression1;
+        public final Expression expression1;
 
-        private final ExpressionList expressionlist1;
+        public final ExpressionList expressionlist1;
 
-        private final Expression expression2;
+        public final Expression expression2;
 
-        private final ExpressionList expressionlist2;
+        public final ExpressionList expressionlist2;
 
         public AssiCmd(Expression expression1, ExpressionList expressionlist1, Expression expression2, ExpressionList expressionlist2, Cmd nextcmd, int idendation) {
             super(nextcmd, idendation);
@@ -455,11 +454,11 @@ public class AbstractTree {
 
     public static class SwitchCmd extends Cmd {
 
-        private final Expression expression;
+        public final Expression expression;
 
-        private final RepCaseCmd repcasecmd;
+        public final RepCaseCmd repcasecmd;
 
-        private final Cmd cmd;
+        public final Cmd cmd;
 
         public SwitchCmd(Expression expression, RepCaseCmd repcasecmd, Cmd cmd, Cmd nextcmd, int idendation) {
             super(nextcmd, idendation);
@@ -477,14 +476,14 @@ public class AbstractTree {
                 + getHead("</SwitchCmd>");
         }
 
-        public void check(Compiler compiler) throws ContextException {
+        public void check(Checker checker) throws ContextException {
             ExpressionInfo exprinfo = expression.check();
             SwitchCase switchSave = new SwitchCase(exprinfo.getType(), repcasecmd.literal);
             //store switch expr name as key (first argument)
             //and switch object with switch expr type and case literal token with value and type (second argument)
-            compiler.getGlobalSwitchTable().insert(exprinfo.getName(), switchSave);
+            checker.getGlobalSwitchTable().insert(exprinfo.getName(), switchSave);
             //check if switch expr and case literal have the same data type
-            List<SwitchCase> switchCheck = compiler.getGlobalSwitchTable().getEntry(exprinfo.getName());
+            List<SwitchCase> switchCheck = checker.getGlobalSwitchTable().getEntry(exprinfo.getName());
             if (exprinfo.getType() != switchCheck.get(0).getLiteraltoken().getType()) {
                 throw new ContextException("SwitchCase expr and case literal are not from the same type. " +
                     "Current switch expr type: " + exprinfo.getType() +
@@ -495,9 +494,9 @@ public class AbstractTree {
 
     public static class RepCaseCmd extends Cmd {
 
-        private final Tokens.LiteralToken literal;
+        public final Tokens.LiteralToken literal;
 
-        private final Cmd cmd;
+        public final Cmd cmd;
 
         public RepCaseCmd(Tokens.LiteralToken literal, Cmd cmd, RepCaseCmd nextcmd, int idendation) {
             super(nextcmd, idendation);
@@ -514,8 +513,8 @@ public class AbstractTree {
                 + getHead("</RepCaseCmd>");
         }
 
-        public void check(Compiler compiler, String exprName) throws ContextException {
-            HashMap<String, List<SwitchCase>> map = compiler.getGlobalSwitchTable().getTable();
+        public void check(Checker checker, String exprName) throws ContextException {
+            HashMap<String, List<SwitchCase>> map = checker.getGlobalSwitchTable().getTable();
             //check if case literal vales are different
             List<SwitchCase> cases = map.get(exprName);
             for (SwitchCase c : cases) {
@@ -528,13 +527,13 @@ public class AbstractTree {
 
     public static class CondCmd extends Cmd {
 
-        private final Expression expression;
+        public final Expression expression;
 
-        private final Cmd cmd;
+        public final Cmd cmd;
 
-        private final RepCondCmd repcondcmd;
+        public final RepCondCmd repcondcmd;
 
-        private final Cmd othercmd;
+        public final Cmd othercmd;
 
         public CondCmd(Expression expression, Cmd cmd, RepCondCmd repcondcmd, Cmd othercmd, Cmd nextcmd, int idendation) {
             super(nextcmd, idendation);
@@ -575,11 +574,11 @@ public class AbstractTree {
 
     public static class RepCondCmd extends Cmd {
 
-        private final Expression expression;
+        public final Expression expression;
 
-        private final Cmd cmd;
+        public final Cmd cmd;
 
-        private final RepCondCmd repcondcmd;
+        public final RepCondCmd repcondcmd;
 
         public RepCondCmd(Expression expression, Cmd cmd, RepCondCmd repCondCmd, int idendation) {
             super(null, idendation);
@@ -611,9 +610,9 @@ public class AbstractTree {
 
     public static class WhileCmd extends Cmd {
 
-        private final Expression expression;
+        public final Expression expression;
 
-        private final Cmd cmd;
+        public final Cmd cmd;
 
         public WhileCmd(Expression expression, Cmd cmd, Cmd nextcmd, int idendation) {
             super(nextcmd, idendation);
@@ -632,8 +631,9 @@ public class AbstractTree {
 
         public void check() throws ContextException {
             //check expr return type is from type BOOL
+            // TODO: Fix nullpointer
             ExpressionInfo exprinfo = expression.check();
-            if (exprinfo.getType() != Tokens.TypeToken.Type.BOOL) {
+            if (exprinfo != null && exprinfo.getType() != Tokens.TypeToken.Type.BOOL) {
                 throw new ContextException("WHILE condition needs to be BOOL. Current type: " + exprinfo.getType());
             }
 
@@ -645,9 +645,9 @@ public class AbstractTree {
 
     public static class ProcCallCmd extends Cmd {
 
-        private final RoutineCall routinecall;
+        public final RoutineCall routinecall;
 
-        private final GlobalInit globalinit;
+        public final GlobalInit globalinit;
 
         public ProcCallCmd(RoutineCall routinecall, GlobalInit globalinit, Cmd nextcmd, int idendation) {
             super(nextcmd, idendation);
@@ -676,7 +676,7 @@ public class AbstractTree {
 
     public static class InputCmd extends Cmd {
 
-        private final Expression expression;
+        public final Expression expression;
 
         public InputCmd(Expression expression, Cmd nextcmd, int idendation) {
             super(nextcmd, idendation);
@@ -700,7 +700,7 @@ public class AbstractTree {
 
     public static class OutputCmd extends Cmd {
 
-        private final Expression expression;
+        public final Expression expression;
 
         public OutputCmd(Expression expression, Cmd nextcmd, int idendation) {
             super(nextcmd, idendation);
@@ -735,9 +735,9 @@ public class AbstractTree {
 
     public static class TypedIdentIdent extends TypedIdent<Tokens.IdentifierToken> {
 
-        private final Tokens.IdentifierToken identifier1;
+        public final Tokens.IdentifierToken identifier1;
 
-        private final Tokens.IdentifierToken identifier2;
+        public final Tokens.IdentifierToken identifier2;
 
         public TypedIdentIdent(Tokens.IdentifierToken identifier1, Tokens.IdentifierToken identifier2, int idendation) {
             super(idendation);
@@ -766,9 +766,9 @@ public class AbstractTree {
 
     public static class TypedIdentType extends TypedIdent<Tokens.IdentifierToken> {
 
-        private final Tokens.IdentifierToken identifier;
+        public final Tokens.IdentifierToken identifier;
 
-        private final Tokens.TypeToken type;
+        public final Tokens.TypeToken type;
 
         public TypedIdentType(Tokens.IdentifierToken identifier, Tokens.TypeToken type, int idendation) {
             super(idendation);
@@ -802,13 +802,13 @@ public class AbstractTree {
         }
 
         public ExpressionInfo check() throws ContextException {
-            return null;
+            throw new ContextException("Code checking is not implemented yet!");
         }
     }
 
     public static class LiteralExpr extends Expression {
 
-        private final Tokens.LiteralToken literal;
+        public final Tokens.LiteralToken literal;
 
         public LiteralExpr(Tokens.LiteralToken literal, int idendation) {
             super(idendation);
@@ -831,9 +831,9 @@ public class AbstractTree {
 
     public static class StoreExpr extends Expression {
 
-        private final Tokens.IdentifierToken identifier;
+        public final Tokens.IdentifierToken identifier;
 
-        private final boolean initialized;
+        public final boolean initialized;
 
         public StoreExpr(Tokens.IdentifierToken identifier, boolean initialized, int idendation) {
             super(idendation);
@@ -849,19 +849,19 @@ public class AbstractTree {
                 + getHead("</StoreExpr>");
         }
 
-        public ExpressionInfo check(Compiler compiler) throws ContextException {
+        public ExpressionInfo check(Checker checker) throws ContextException {
             //check if global scope applies
-            StoreTable storetable = null;
-            if (compiler.getScope() == null) {
-                storetable = compiler.getGlobalStoreTable();
+            StoreTable storetable;
+            if (checker.getScope() == null) {
+                storetable = checker.getGlobalStoreTable();
             } else {
-                storetable = compiler.getScope().getStoreTable();
+                storetable = checker.getScope().getStoreTable();
             }
 
             Store store = storetable.getStore(identifier.getName());
             if (store == null) {
                 //check if store is declared on global scope
-                store = compiler.getGlobalStoreTable().getStore(identifier.getName());
+                store = checker.getGlobalStoreTable().getStore(identifier.getName());
                 if (store == null) {
                     throw new ContextException("Identifier " + identifier.getName() + " is not declared");
                 }
@@ -873,7 +873,7 @@ public class AbstractTree {
 
     public static class FunCallExpr extends Expression {
 
-        private final RoutineCall routinecall;
+        public final RoutineCall routinecall;
 
         public FunCallExpr(RoutineCall routinecall, int idendation) {
             super(idendation);
@@ -887,16 +887,16 @@ public class AbstractTree {
                 + getHead("</FunCallExpr>");
         }
 
-        public ExpressionInfo check() throws ContextException {
-            return routinecall.check();
+        public ExpressionInfo check(Checker checker) throws ContextException {
+            return routinecall.check(checker);
         }
     }
 
     public static class MonadicExpr extends Expression {
 
-        private final Tokens.OperationToken operation;
+        public final Tokens.OperationToken operation;
 
-        private final Expression expression;
+        public final Expression expression;
 
         public MonadicExpr(Tokens.OperationToken operation, Expression expression, int idendation) {
             super(idendation);
@@ -919,11 +919,11 @@ public class AbstractTree {
 
     public static class DyadicExpr extends Expression {
 
-        private final Tokens.OperationToken operation;
+        public final Tokens.OperationToken operation;
 
-        private final Expression expression1;
+        public final Expression expression1;
 
-        private final Expression expression2;
+        public final Expression expression2;
 
         public DyadicExpr(Tokens.OperationToken operation, Expression expression1, Expression expression2, int idendation) {
             super(idendation);
@@ -942,11 +942,14 @@ public class AbstractTree {
         }
 
         public ExpressionInfo check() throws ContextException {
-            ExpressionInfo exprinfo1 = expression1.check();
+            // TODO: Implement all expressions
+            /*ExpressionInfo exprinfo1 = expression1.check();
             ExpressionInfo exprinfo2 = expression2.check();
-            Tokens.OperationToken.Operation opr = operation.getOperation();
+            Tokens.OperationToken.Operation opr = operation.getOperation();*/
 
-            switch (opr) {
+            return null;
+            // TODO: Fix this shit
+            /*switch (opr) {
                 case PLUS:
                     break;
                 case MINUS:
@@ -990,17 +993,16 @@ public class AbstractTree {
                 case GE:
                     break;
                 default:
-                    throw new RuntimeException();
-            }
-            return null;
+                    throw new ContextException("Unhandled operation");
+            }*/
         }
     }
 
     public static class RoutineCall extends AbstractNode {
 
-        private final Tokens.IdentifierToken identifier;
+        public final Tokens.IdentifierToken identifier;
 
-        private final ExpressionList expressionlist;
+        public final ExpressionList expressionlist;
 
         public RoutineCall(Tokens.IdentifierToken identifier, ExpressionList expressionlist, int idendation) {
             super(idendation);
@@ -1016,8 +1018,8 @@ public class AbstractTree {
                 + getHead("</RoutineCall>");
         }
 
-        public ExpressionInfo check() throws ContextException {
-            Routine calledroutine = Compiler.getGlobalRoutineTable().lookup(identifier.getName());
+        public ExpressionInfo check(Checker checker) throws ContextException {
+            Routine calledroutine = checker.getGlobalRoutineTable().lookup(identifier.getName());
             if (calledroutine == null) {
                 throw new ContextException("Routine " + identifier.getName() + " is not declared.");
             }
@@ -1048,9 +1050,9 @@ public class AbstractTree {
 
     public static class ExpressionList extends AbstractNode {
 
-        private final Expression expression;
+        public final Expression expression;
 
-        private final ExpressionList expressionlist;
+        public final ExpressionList expressionlist;
 
         public ExpressionList(Expression expression, ExpressionList expressionlist, int idendation) {
             super(idendation);
@@ -1076,9 +1078,9 @@ public class AbstractTree {
 
     public static class GlobalInit extends AbstractNode {
 
-        private final Tokens.IdentifierToken identifier;
+        public final Tokens.IdentifierToken identifier;
 
-        private final GlobalInit nextglobalinit;
+        public final GlobalInit nextglobalinit;
 
         public GlobalInit(Tokens.IdentifierToken identifier, GlobalInit nextglobalinit, int idendation) {
             super(idendation);
@@ -1103,13 +1105,13 @@ public class AbstractTree {
 
     public static class GlobalImport extends AbstractNode {
 
-        private final Tokens.FlowModeToken flowmode;
+        public final Tokens.FlowModeToken flowmode;
 
-        private final Tokens.ChangeModeToken changemode;
+        public final Tokens.ChangeModeToken changemode;
 
-        private final Tokens.IdentifierToken identifier;
+        public final Tokens.IdentifierToken identifier;
 
-        private final GlobalImport nextglobalimport;
+        public final GlobalImport nextglobalimport;
 
         public GlobalImport(Tokens.FlowModeToken flowmode, Tokens.ChangeModeToken changemode, Tokens.IdentifierToken identifier, GlobalImport nextglobalimport, int idendation) {
             super(idendation);
@@ -1130,8 +1132,7 @@ public class AbstractTree {
         }
 
         public void check(Routine routine) {
-            routine.addGlobalImport(new ch.fhnw.cpib.platform.checker.GlobalImport(identifier.getName(), flowmode, changemode));
+            routine.addGlobalImport(this);
         }
     }
-
 }

@@ -1,14 +1,12 @@
 package ch.fhnw.cpib.platform;
 
-import ch.fhnw.cpib.platform.checker.RoutineTable;
-import ch.fhnw.cpib.platform.checker.Scope;
-import ch.fhnw.cpib.platform.checker.StoreTable;
-import ch.fhnw.cpib.platform.checker.SwitchTable;
+import ch.fhnw.cpib.platform.checker.Checker;
 import ch.fhnw.cpib.platform.generator.Generator;
 import ch.fhnw.cpib.platform.generator.GeneratorException;
 import ch.fhnw.cpib.platform.parser.Parser;
 import ch.fhnw.cpib.platform.parser.abstracttree.AbstractTree;
 import ch.fhnw.cpib.platform.parser.concretetree.ConcreteTree;
+import ch.fhnw.cpib.platform.parser.exception.ContextException;
 import ch.fhnw.cpib.platform.parser.exception.ParserException;
 import ch.fhnw.cpib.platform.scanner.Scanner;
 import ch.fhnw.cpib.platform.scanner.exception.ScannerException;
@@ -25,34 +23,6 @@ public class Compiler {
 
     private final Generator generator;
 
-    private static StoreTable globalStoreTable = new StoreTable();
-
-    public static StoreTable getGlobalStoreTable() {
-        return globalStoreTable;
-    }
-
-    private static RoutineTable globalRoutineTable = new RoutineTable();
-
-    public static RoutineTable getGlobalRoutineTable() {
-        return globalRoutineTable;
-    }
-
-    private static SwitchTable globalSwitchTable = new SwitchTable();
-
-    public static SwitchTable getGlobalSwitchTable() {
-        return globalSwitchTable;
-    }
-
-    private static Scope scope = null;
-
-    public static Scope getScope() {
-        return scope;
-    }
-
-    public static void setScope(Scope scope) {
-        Compiler.scope = scope;
-    }
-
     public Compiler() {
         this.scanner = new Scanner();
         this.parser = new Parser();
@@ -61,6 +31,9 @@ public class Compiler {
 
     public void compileString(String content) {
         try {
+            // Create the checker
+            Checker checker = new Checker();
+
             // Show the content
             System.out.println("===== Scanning content =====");
             System.out.println(content);
@@ -86,7 +59,7 @@ public class Compiler {
 
             // Check the abstract tree
             System.out.println("===== Check abstract tree =====");
-            abstractprogram.checkCode();
+            abstractprogram.check(checker);
             System.out.println("Done");
             System.out.println();
 
@@ -116,6 +89,9 @@ public class Compiler {
             System.exit(1);
         } catch (ParserException exception) {
             System.out.println("During the parsing process, an error occurred: " + exception.getMessage());
+            System.exit(1);
+        } catch (ContextException exception) {
+            System.out.println("During the checking process, an error occurred: " + exception.getMessage());
             System.exit(1);
         } catch (GeneratorException exception) {
             System.out.println("During the generation process, an error occurred: " + exception.getMessage());

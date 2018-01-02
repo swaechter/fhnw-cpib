@@ -1,6 +1,7 @@
 package ch.fhnw.cpib.platform.parser;
 
 import ch.fhnw.cpib.platform.TestFiles;
+import ch.fhnw.cpib.platform.checker.Checker;
 import ch.fhnw.cpib.platform.parser.abstracttree.AbstractTree;
 import ch.fhnw.cpib.platform.parser.concretetree.ConcreteTree;
 import ch.fhnw.cpib.platform.scanner.Scanner;
@@ -60,7 +61,7 @@ public class ParserTest {
             //System.out.println(abstractprogram);
 
             // Check the abstract tree
-            abstractprogram.checkCode();
+            abstractprogram.check(new Checker());
         }
     }
 }

@@ -1,17 +1,24 @@
 package ch.fhnw.cpib.platform.checker;
 
+import ch.fhnw.cpib.platform.parser.abstracttree.AbstractTree;
 import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Routine {
+
     private Scope scope;
+
     private String identifier;
+
     private RoutineType routinetype;
+
     private Tokens.TypeToken.Type returntype;
+
     private List<Parameter> param = new ArrayList<>();
-    private List<GlobalImport> globalimports = new ArrayList<>();
+
+    private List<AbstractTree.GlobalImport> globalimports = new ArrayList<>();
 
     public Routine(String identifier, RoutineType routinetype) {
         this.identifier = identifier;
@@ -40,11 +47,11 @@ public class Routine {
         return returntype;
     }
 
-    public void addGlobalImport(GlobalImport g) {
-        globalimports.add(g);
+    public void addGlobalImport(AbstractTree.GlobalImport globalimport) {
+        globalimports.add(globalimport);
     }
 
-    public List<Parameter> getParameters(){
+    public List<Parameter> getParameters() {
         return this.param;
     }
 

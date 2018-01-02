@@ -3,9 +3,13 @@ package ch.fhnw.cpib.platform.checker;
 import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
 public class Parameter {
+
     private Tokens.TypeToken.Type type;
+
     private Tokens.FlowModeToken flowmode;
+
     private Tokens.MechModeToken mechmode;
+
     private Tokens.ChangeModeToken changemode;
 
     public Parameter(Tokens.TypeToken.Type type, Tokens.FlowModeToken flowmode, Tokens.MechModeToken mechmode, Tokens.ChangeModeToken changemode) {

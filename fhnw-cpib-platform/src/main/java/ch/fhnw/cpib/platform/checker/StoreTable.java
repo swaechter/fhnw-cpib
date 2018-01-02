@@ -6,10 +6,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class StoreTable {
+
     private Map<String, Store> storeMap;
 
     public StoreTable() {
-        storeMap = new TreeMap<String, Store>();
+        storeMap = new TreeMap<>();
     }
 
     public boolean addStore(final Store store) {
