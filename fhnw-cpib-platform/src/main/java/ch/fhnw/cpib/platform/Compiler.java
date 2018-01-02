@@ -6,7 +6,7 @@ import ch.fhnw.cpib.platform.generator.GeneratorException;
 import ch.fhnw.cpib.platform.parser.Parser;
 import ch.fhnw.cpib.platform.parser.abstracttree.AbstractTree;
 import ch.fhnw.cpib.platform.parser.concretetree.ConcreteTree;
-import ch.fhnw.cpib.platform.parser.exception.ContextException;
+import ch.fhnw.cpib.platform.checker.CheckerException;
 import ch.fhnw.cpib.platform.parser.exception.ParserException;
 import ch.fhnw.cpib.platform.scanner.Scanner;
 import ch.fhnw.cpib.platform.scanner.exception.ScannerException;
@@ -90,7 +90,7 @@ public class Compiler {
         } catch (ParserException exception) {
             System.out.println("During the parsing process, an error occurred: " + exception.getMessage());
             System.exit(1);
-        } catch (ContextException exception) {
+        } catch (CheckerException exception) {
             System.out.println("During the checking process, an error occurred: " + exception.getMessage());
             System.exit(1);
         } catch (GeneratorException exception) {
