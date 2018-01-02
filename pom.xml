@@ -8,7 +8,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>fhnw-cpib-compiler</module>
-        <module>fhnw-cpib-jasmin</module>
         <module>fhnw-cpib-platform</module>
     </modules>
     <build>

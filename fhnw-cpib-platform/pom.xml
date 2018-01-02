@@ -10,11 +10,6 @@
     <artifactId>fhnw-cpib-platform</artifactId>
     <dependencies>
         <dependency>
-            <groupId>ch.fhnw</groupId>
-            <artifactId>fhnw-cpib-jasmin</artifactId>
-            <version>0.1.0</version>
-        </dependency>
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.6</version>
@@ -23,6 +18,11 @@
             <groupId>org.javatuples</groupId>
             <artifactId>javatuples</artifactId>
             <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup</groupId>
+            <artifactId>javapoet</artifactId>
+            <version>1.9.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

@@ -1,12 +1,17 @@
 package ch.fhnw.cpib.platform.parser.abstracttree;
 
 import ch.fhnw.cpib.platform.checker.*;
-import ch.fhnw.cpib.platform.generator.Generator;
 import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeSpec;
 
+import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
 
 public class AbstractTree {
 
@@ -50,18 +55,33 @@ public class AbstractTree {
             }
         }
 
-        @Override
-        public void generateCode(Generator generator) {
-            generator.appendLine(".class public " + identifier.getName());
-            generator.appendLine(".super java/lang/Object");
-            generator.appendLine(".method public static main([Ljava/lang/String;)V");
-            generator.appendLine(".limit stack 100");
-            generator.appendLine(".limit locals 100");
-            generator.appendLine("getstatic java/lang/System/out Ljava/io/PrintStream;");
-            generator.appendLine("ldc 42");
-            generator.appendLine("invokevirtual java/io/PrintStream/println(I)V");
-            generator.appendLine("return");
-            generator.appendLine(".end method");
+        public JavaFile generateCode() {
+            TypeSpec.Builder typescpecbuilder = TypeSpec.classBuilder(getProgramName());
+            typescpecbuilder.addModifiers(Modifier.PUBLIC, Modifier.FINAL);
+
+            FieldSpec.Builder fieldspecbuilder = FieldSpec.builder(Scanner.class, "scanner");
+            fieldspecbuilder.addModifiers(Modifier.PRIVATE, Modifier.FINAL);
+            fieldspecbuilder.initializer("new Scanner(System.in)");
+
+            MethodSpec.Builder methodspecbuilder = MethodSpec.methodBuilder("main");
+            methodspecbuilder.addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+            methodspecbuilder.returns(void.class);
+            methodspecbuilder.addParameter(String[].class, "args");
+
+            /*if (progparam != null) {
+                progparam.generateCode(methodspecbuilder);
+            }
+
+            if (declaration != null) {
+                declaration.generateCode(typescpecbuilder);
+            }
+
+            cmd.generateCode(methodspecbuilder);*/
+
+            typescpecbuilder.addField(fieldspecbuilder.build());
+            typescpecbuilder.addMethod(methodspecbuilder.build());
+
+            return JavaFile.builder("fhnw", typescpecbuilder.build()).build();
         }
 
         public String getProgramName() {

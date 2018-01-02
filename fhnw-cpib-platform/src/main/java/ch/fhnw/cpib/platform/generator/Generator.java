@@ -2,41 +2,45 @@ package ch.fhnw.cpib.platform.generator;
 
 import ch.fhnw.cpib.platform.parser.abstracttree.AbstractTree;
 import ch.fhnw.cpib.platform.utils.ReaderUtils;
-import jasmin.Main;
-import org.apache.commons.io.IOUtils;
+import com.squareup.javapoet.JavaFile;
 import org.javatuples.Pair;
 
-import java.io.*;
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.util.jar.Attributes;
-import java.util.jar.JarEntry;
-import java.util.jar.JarOutputStream;
-import java.util.jar.Manifest;
+import java.nio.file.Files;
 
 public class Generator {
 
-    private final StringBuilder stringbuilder;
-
-    private int branchnumber;
-
-    public Generator() {
-        this.stringbuilder = new StringBuilder();
+    public JavaFile generateJavaFile(AbstractTree.Program program) throws GeneratorException {
+        return program.generateCode();
     }
 
-    public String generateJasminContent(AbstractTree.Program program) throws GeneratorException {
-        program.generateCode(this);
-        return stringbuilder.toString();
-    }
-
-    public File generateJarFile(AbstractTree.Program program, String jasmincontent) throws GeneratorException {
+    public File generateJarFile(JavaFile javafile, AbstractTree.Program program) throws GeneratorException {
         try {
-            File jasminfile = ReaderUtils.createTemporaryFileFromContent(program.getProgramName() + ".j", jasmincontent, StandardCharsets.UTF_8);
-            File classfile = new File(program.getProgramName() + ".class");
-            File jarfile = new File(program.getProgramName() + ".jar");
+            // Create the package directory
+            File directory = new File("fhnw");
+            directory.mkdir();
 
-            String[] parameters = new String[]{jasminfile.getAbsolutePath()};
-            Main.main(parameters);
+            // Create the Java source file
+            File javasourcefile = new File(directory.getAbsolutePath() + "/" + program.getProgramName() + ".java");
+            Files.write(javasourcefile.toPath(), javafile.toString().getBytes(StandardCharsets.UTF_8));
 
+            // Compile Java source file
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            compiler.run(null, null, null, javasourcefile.getPath());
+
+            return new File("Meh");
+            // Move the class file
+            /*File jarfile = new File(program.getProgramName() + ".jar");
+            String classcode = ReaderUtils.getContentFromFile(new File(program.getProgramName() + ".class"), StandardCharsets.UTF_8);
+            File classfile = new File("default/" + program.getProgramName() + ".class");
+
+            //ReaderUtils.
             Manifest manifest = new Manifest();
             manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
             manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, program.getProgramName());
@@ -50,8 +54,37 @@ public class Generator {
             IOUtils.copy(jarinputstream, outputstream);
             outputstream.closeEntry();
             outputstream.close();
-
             return jarfile;
+
+/*            // Load and instantiate compiled class.
+            File root = new File(sourceFile.getParent());
+            URL url = root.toURI().toURL();
+            URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{url});
+            Class<?> cls = Class.forName("Test", true, classLoader); // Should print "hello".
+            Object instance = cls.newInstance(); // Should print "world".
+            System.out.println("Name: " + instance.getClass().getCanonicalName());
+
+
+            File jasminfile = ReaderUtils.createTemporaryFileFromContent(program.getProgramName() + ".j", program.toString(), StandardCharsets.UTF_8);
+            File classfile = new File(program.getProgramName() + ".class");
+            File jarfile = new File(program.getProgramName() + ".jar");
+
+            String[] parameters = new String[]{jasminfile.getAbsolutePath()};
+            Main.main(parameters);
+
+            Manifest manifest = new Manifest();
+            manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
+            manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, jvmcompiler.getProgramName());
+            JarOutputStream outputstream = new JarOutputStream(new FileOutputStream(jarfile), manifest);
+
+            JarEntry entry = new JarEntry(classfile.getPath().replace("\\", "/"));
+            entry.setTime(classfile.lastModified());
+            outputstream.putNextEntry(entry);
+
+            BufferedInputStream jarinputstream = new BufferedInputStream(new FileInputStream(classfile));
+            IOUtils.copy(jarinputstream, outputstream);
+            outputstream.closeEntry();
+            outputstream.close();*/
         } catch (Exception excetpion) {
             throw new GeneratorException("Unable to create the Java JAR file: " + excetpion.getMessage(), excetpion);
         }
@@ -72,13 +105,5 @@ public class Generator {
         } catch (Exception exception) {
             throw new GeneratorException("Unable to execute the Java JAR file: " + exception.getMessage(), exception);
         }
-    }
-
-    public void appendLine(String line) {
-        stringbuilder.append(line).append(System.lineSeparator());
-    }
-
-    public int getNextFreeBranchNumber() {
-        return branchnumber++;
     }
 }

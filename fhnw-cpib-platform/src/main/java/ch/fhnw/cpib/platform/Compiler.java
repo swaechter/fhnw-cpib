@@ -1,16 +1,17 @@
 package ch.fhnw.cpib.platform;
 
 import ch.fhnw.cpib.platform.checker.Checker;
+import ch.fhnw.cpib.platform.checker.CheckerException;
 import ch.fhnw.cpib.platform.generator.Generator;
 import ch.fhnw.cpib.platform.generator.GeneratorException;
 import ch.fhnw.cpib.platform.parser.Parser;
 import ch.fhnw.cpib.platform.parser.abstracttree.AbstractTree;
 import ch.fhnw.cpib.platform.parser.concretetree.ConcreteTree;
-import ch.fhnw.cpib.platform.checker.CheckerException;
 import ch.fhnw.cpib.platform.parser.exception.ParserException;
 import ch.fhnw.cpib.platform.scanner.Scanner;
 import ch.fhnw.cpib.platform.scanner.exception.ScannerException;
 import ch.fhnw.cpib.platform.scanner.tokens.TokenList;
+import com.squareup.javapoet.JavaFile;
 import org.javatuples.Pair;
 
 import java.io.File;
@@ -31,9 +32,6 @@ public class Compiler {
 
     public void compileString(String content) {
         try {
-            // Create the checker
-            Checker checker = new Checker();
-
             // Show the content
             System.out.println("===== Scanning content =====");
             System.out.println(content);
@@ -59,19 +57,19 @@ public class Compiler {
 
             // Check the abstract tree
             System.out.println("===== Check abstract tree =====");
-            abstractprogram.check(checker);
+            abstractprogram.check(new Checker());
             System.out.println("Done");
             System.out.println();
 
-            // Generate the Jasmin file
-            System.out.println("===== Generate Jasmin assembler code =====");
-            String jasmincontent = generator.generateJasminContent(abstractprogram);
-            System.out.println(jasmincontent);
+            // Generate the Java code
+            System.out.println("===== Generate Java code =====");
+            JavaFile javafile = generator.generateJavaFile(abstractprogram);
+            System.out.println(javafile);
             System.out.println();
 
             // Generate the Java JAR file
             System.out.println("===== Generate Java JAR file =====");
-            File jarfile = generator.generateJarFile(abstractprogram, jasmincontent);
+            File jarfile = generator.generateJarFile(javafile, abstractprogram);
             System.out.println("Done");
             System.out.println();
 

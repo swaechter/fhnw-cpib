@@ -8,7 +8,6 @@ is written in Java.
 | Module name           | Content and responsibilities                                  |
 | ----------------------|-------------------------------------------------------------- |
 | fhnw-cpib-compiler    | Standalone application that can compile IML code to byte code |
-| fhnw-cpib-jasmin      | Jasmin assembler that will generate the Java byte code        |
 | fhnw-cpib-platform    | Platform that provides the whole compiler as a library        |
 
 ## Build
