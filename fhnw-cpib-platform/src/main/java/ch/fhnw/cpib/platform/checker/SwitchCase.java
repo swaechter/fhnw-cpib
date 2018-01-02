@@ -4,16 +4,16 @@ import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
 public class SwitchCase {
 
-    private Tokens.TypeToken.Type switchType;
+    private Tokens.TypeToken switchType;
 
     private Tokens.LiteralToken literalToken;
 
-    public SwitchCase(Tokens.TypeToken.Type switchType, Tokens.LiteralToken literalToken) {
+    public SwitchCase(Tokens.TypeToken switchType, Tokens.LiteralToken literalToken) {
         this.switchType = switchType;
         this.literalToken = literalToken;
     }
 
-    public Tokens.TypeToken.Type getSwitchtype() {
+    public Tokens.TypeToken getSwitchtype() {
         return switchType;
     }
 
