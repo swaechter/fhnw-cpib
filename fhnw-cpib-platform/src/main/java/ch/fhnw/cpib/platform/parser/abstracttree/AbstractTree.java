@@ -1,6 +1,7 @@
 package ch.fhnw.cpib.platform.parser.abstracttree;
 
 import ch.fhnw.cpib.platform.checker.*;
+import ch.fhnw.cpib.platform.scanner.tokens.Terminal;
 import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -60,7 +61,7 @@ public class AbstractTree {
             typescpecbuilder.addModifiers(Modifier.PUBLIC, Modifier.FINAL);
 
             FieldSpec.Builder fieldspecbuilder = FieldSpec.builder(Scanner.class, "scanner");
-            fieldspecbuilder.addModifiers(Modifier.PRIVATE, Modifier.FINAL);
+            fieldspecbuilder.addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL);
             fieldspecbuilder.initializer("new Scanner(System.in)");
 
             MethodSpec.Builder methodspecbuilder = MethodSpec.methodBuilder("main");
@@ -68,7 +69,7 @@ public class AbstractTree {
             methodspecbuilder.returns(void.class);
             methodspecbuilder.addParameter(String[].class, "args");
 
-            /*if (progparam != null) {
+            if (progparam != null) {
                 progparam.generateCode(methodspecbuilder);
             }
 
@@ -76,7 +77,7 @@ public class AbstractTree {
                 declaration.generateCode(typescpecbuilder);
             }
 
-            cmd.generateCode(methodspecbuilder);*/
+            cmd.generateCode(methodspecbuilder);
 
             typescpecbuilder.addField(fieldspecbuilder.build());
             typescpecbuilder.addMethod(methodspecbuilder.build());
@@ -126,6 +127,27 @@ public class AbstractTree {
             checker.getGlobalStoreTable().addStore(new Store(typedident.getIdentifier().getName(), typedident.getType(), changemode.getChangeMode() == Tokens.ChangeModeToken.ChangeMode.CONST));
             if (nextprogparam != null) {
                 nextprogparam.check(checker);
+            }
+        }
+
+        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
+            typedident.generateCode(methodscpecbuilder);
+            TypedIdentType typedidenttype = (TypedIdentType) typedident;
+            switch (typedidenttype.getParameterType()) {
+                case BOOL:
+                    methodscpecbuilder.addCode(" = false;" + System.lineSeparator());
+                    break;
+                case INT:
+                    methodscpecbuilder.addCode(" = 0;" + System.lineSeparator());
+                    break;
+                case INT64:
+                default:
+                    methodscpecbuilder.addCode(" = 0L;" + System.lineSeparator());
+                    break;
+            }
+
+            if (nextprogparam != null) {
+                nextprogparam.generateCode(methodscpecbuilder);
             }
         }
     }
@@ -193,6 +215,26 @@ public class AbstractTree {
                 nextparam.check(routine);
             }*/
         }
+
+        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
+            TypedIdentType typedidenttype = (TypedIdentType) typedident;
+            switch (typedidenttype.getParameterType()) {
+                case BOOL:
+                    methodscpecbuilder.addParameter(boolean.class, typedidenttype.getParameterName());
+                    break;
+                case INT:
+                    methodscpecbuilder.addParameter(int.class, typedidenttype.getParameterName());
+                    break;
+                case INT64:
+                default:
+                    methodscpecbuilder.addParameter(long.class, typedidenttype.getParameterName());
+                    break;
+            }
+
+            if (nextparam != null) {
+                nextparam.generateCode(methodscpecbuilder);
+            }
+        }
     }
 
     public abstract static class Declaration extends AbstractNode {
@@ -209,6 +251,8 @@ public class AbstractTree {
         }
 
         public abstract Tokens.TypeToken check(Checker checker) throws CheckerException;
+
+        public abstract void generateCode(MethodSpec.Builder methodscpecbuilder);
     }
 
     public static class StoDecl extends Declaration {
@@ -258,6 +302,27 @@ public class AbstractTree {
                 getNextDeclaration().check(checker);
             }
             return typedident.getType();
+        }
+
+        @Override
+        public void generateCode(MethodSpec.Builder methodspecbuilder) {
+            TypedIdentType typedidenttype = (TypedIdentType) typedident;
+            switch (typedidenttype.getParameterType()) {
+                case BOOL:
+                    methodspecbuilder.addStatement("boolean " + typedidenttype.getParameterName() + " = false");
+                    break;
+                case INT:
+                    methodspecbuilder.addStatement("int " + typedidenttype.getParameterName() + " = 0");
+                    break;
+                case INT64:
+                default:
+                    methodspecbuilder.addStatement("long " + typedidenttype.getParameterName() + " = 0L");
+                    break;
+            }
+
+            if (getNextDeclaration() != null) {
+                getNextDeclaration().generateCode(methodspecbuilder);
+            }
         }
     }
 
@@ -325,6 +390,51 @@ public class AbstractTree {
             }
             return null; //TODO
         }
+
+        @Override
+        public void generateCode(TypeSpec.Builder typescpecbuilder) {
+            MethodSpec.Builder methodspecbuilder = MethodSpec.methodBuilder(identifier.getName());
+            methodspecbuilder.addModifiers(Modifier.PRIVATE, Modifier.STATIC);
+
+            if (param != null) {
+                param.generateCode(methodspecbuilder);
+            }
+
+            storedeclaration.generateCode(methodspecbuilder);
+            StoDecl stodecl = (StoDecl) storedeclaration;
+            TypedIdentType typedidenttype = (TypedIdentType) stodecl.typedident;
+            switch (typedidenttype.getParameterType()) {
+                case BOOL:
+                    methodspecbuilder.returns(boolean.class);
+                    break;
+                case INT:
+                    methodspecbuilder.returns(int.class);
+                    break;
+                case INT64:
+                default:
+                    methodspecbuilder.returns(long.class);
+                    break;
+            }
+
+            if (declaration != null) {
+                declaration.generateCode(methodspecbuilder);
+            }
+
+            cmd.generateCode(methodspecbuilder);
+
+            methodspecbuilder.addStatement("return " + typedidenttype.getParameterName());
+
+            if (getNextDeclaration() != null) {
+                getNextDeclaration().generateCode(typescpecbuilder);
+            }
+
+            typescpecbuilder.addMethod(methodspecbuilder.build());
+        }
+
+        @Override
+        public void generateCode(MethodSpec.Builder methodspecbuilder) {
+            // Just make the compiler happy
+        }
     }
 
     public static class ProcDecl extends Declaration {
@@ -384,6 +494,33 @@ public class AbstractTree {
             }
             return null; //TODO
         }
+
+        @Override
+        public void generateCode(TypeSpec.Builder typescpecbuilder) {
+            MethodSpec.Builder methodspecbuilder = MethodSpec.methodBuilder(identifier.getName());
+            methodspecbuilder.addModifiers(Modifier.PRIVATE, Modifier.STATIC);
+
+            if (param != null) {
+                param.generateCode(methodspecbuilder);
+            }
+
+            if (declaration != null) {
+                declaration.generateCode(methodspecbuilder);
+            }
+
+            cmd.generateCode(methodspecbuilder);
+
+            if (getNextDeclaration() != null) {
+                getNextDeclaration().generateCode(typescpecbuilder);
+            }
+
+            typescpecbuilder.addMethod(methodspecbuilder.build());
+        }
+
+        @Override
+        public void generateCode(MethodSpec.Builder methodspecbuilder) {
+            // Just make the compiler happy
+        }
     }
 
     public abstract static class Cmd extends AbstractNode {
@@ -419,6 +556,13 @@ public class AbstractTree {
         public void check(Checker checker) throws CheckerException {
             if (getNextCmd() != null) {
                 getNextCmd().check(checker);
+            }
+        }
+
+        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
+            methodscpecbuilder.addStatement("");
+            if (getNextCmd() != null) {
+                getNextCmd().generateCode(methodscpecbuilder);
             }
         }
     }
@@ -475,6 +619,24 @@ public class AbstractTree {
                 }
             }
         }
+
+        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
+            expression1.generateCode(methodscpecbuilder);
+            methodscpecbuilder.addCode(" = ");
+            expression2.generateCode(methodscpecbuilder);
+            methodscpecbuilder.addCode(";" + System.lineSeparator());
+
+            if (expressionlist1 != null && expressionlist2 != null) {
+                expressionlist1.generateCode(methodscpecbuilder);
+                methodscpecbuilder.addCode(" = ");
+                expressionlist2.generateCode(methodscpecbuilder);
+                methodscpecbuilder.addCode(";" + System.lineSeparator());
+            }
+
+            if (getNextCmd() != null) {
+                getNextCmd().generateCode(methodscpecbuilder);
+            }
+        }
     }
 
     public static class SwitchCmd extends Cmd {
@@ -516,6 +678,28 @@ public class AbstractTree {
                     "Current case literal type: " + switchCheck.get(0).getLiteraltoken().getType());
             }
         }
+
+        @Override
+        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
+            methodscpecbuilder.addCode("switch(");
+            expression.generateCode(methodscpecbuilder);
+            methodscpecbuilder.addCode(") {" + System.lineSeparator());
+
+            repcasecmd.generateCode(methodscpecbuilder);
+
+            if (cmd != null) {
+                methodscpecbuilder.beginControlFlow("default: ");
+                cmd.generateCode(methodscpecbuilder);
+                methodscpecbuilder.addStatement("break");
+                methodscpecbuilder.endControlFlow();
+            }
+
+            methodscpecbuilder.addCode("}" + System.lineSeparator());
+
+            if (getNextCmd() != null) {
+                getNextCmd().generateCode(methodscpecbuilder);
+            }
+        }
     }
 
     public static class RepCaseCmd extends Cmd {
@@ -548,6 +732,17 @@ public class AbstractTree {
                 if (c.getLiteraltoken().getValue().equals(literal.getValue())) {
                     throw new CheckerException("Case literal values have the same value.");
                 }
+            }
+        }
+
+        @Override
+        public void generateCode(MethodSpec.Builder methodspecbuilder) {
+            methodspecbuilder.beginControlFlow("case " + literal.getValue() + " :");
+            cmd.generateCode(methodspecbuilder);
+            methodspecbuilder.addStatement("break");
+            methodspecbuilder.endControlFlow();
+            if (getNextCmd() != null) {
+                getNextCmd().generateCode(methodspecbuilder);
             }
         }
     }
@@ -598,6 +793,31 @@ public class AbstractTree {
                 getNextCmd().check(checker);
             }
         }
+
+        @Override
+        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
+            methodscpecbuilder.addCode("if(");
+            expression.generateCode(methodscpecbuilder);
+            methodscpecbuilder.addCode(") {" + System.lineSeparator());
+
+            cmd.generateCode(methodscpecbuilder);
+
+            methodscpecbuilder.addCode("}" + System.lineSeparator());
+
+            if (repcondcmd != null) {
+                repcondcmd.generateCode(methodscpecbuilder);
+            }
+
+            if (othercmd != null) {
+                methodscpecbuilder.beginControlFlow("else");
+                othercmd.generateCode(methodscpecbuilder);
+                methodscpecbuilder.endControlFlow();
+
+            }
+            if (getNextCmd() != null) {
+                getNextCmd().generateCode(methodscpecbuilder);
+            }
+        }
     }
 
     public static class RepCondCmd extends Cmd {
@@ -606,13 +826,10 @@ public class AbstractTree {
 
         public final Cmd cmd;
 
-        public final RepCondCmd repcondcmd;
-
         public RepCondCmd(Expression expression, Cmd cmd, RepCondCmd repCondCmd, int idendation) {
-            super(null, idendation);
+            super(repCondCmd, idendation);
             this.expression = expression;
             this.cmd = cmd;
-            this.repcondcmd = repCondCmd;
         }
 
         @Override
@@ -620,7 +837,7 @@ public class AbstractTree {
             return getHead("<RepCondCmd>")
                 + expression
                 + cmd
-                + (repcondcmd != null ? repcondcmd : getBody("<NoNextRepCondCmd/>"))
+                + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextRepCondCmd/>"))
                 + getHead("</RepCondCmd>");
         }
 
@@ -631,8 +848,23 @@ public class AbstractTree {
             if (exprinfo.getType().equals(Tokens.TypeToken.Type.BOOL)) {
                 throw new CheckerException("ELSEIF condition needs to be BOOL. Current type: " + exprinfo.getType());
             }
-            if (repcondcmd != null) {
-                repcondcmd.check(checker);
+            if (getNextCmd() != null) {
+                getNextCmd().check(checker);
+            }
+        }
+
+        @Override
+        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
+            methodscpecbuilder.addCode("else if(");
+            expression.generateCode(methodscpecbuilder);
+            methodscpecbuilder.addCode(") {" + System.lineSeparator());
+
+            cmd.generateCode(methodscpecbuilder);
+
+            methodscpecbuilder.addCode("}" + System.lineSeparator());
+
+            if (getNextCmd() != null) {
+                getNextCmd().generateCode(methodscpecbuilder);
             }
         }
     }
@@ -670,6 +902,12 @@ public class AbstractTree {
                 getNextCmd().check(checker);
             }
         }
+
+        @Override
+        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
+            // FIXME: Implement code generation
+            throw new RuntimeException("Code generation not implemented yet!");
+        }
     }
 
     public static class ProcCallCmd extends Cmd {
@@ -702,6 +940,14 @@ public class AbstractTree {
                 getNextCmd().check(checker);
             }
         }
+
+        @Override
+        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
+            routinecall.generateCode(methodscpecbuilder);
+            if (getNextCmd() != null) {
+                getNextCmd().generateCode(methodscpecbuilder);
+            }
+        }
     }
 
     public static class InputCmd extends Cmd {
@@ -725,6 +971,25 @@ public class AbstractTree {
         public void check(Checker checker) throws CheckerException {
             if (getNextCmd() != null) {
                 getNextCmd().check(checker);
+            }
+        }
+
+        @Override
+        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
+            // FIXME: Fix known errata
+            methodscpecbuilder.addStatement("System.out.println(\"Input a value:\")");
+            expression.generateCode(methodscpecbuilder);
+            methodscpecbuilder.addCode(" = scanner.nextInt();" + System.lineSeparator());
+/*            if (expression instanceof StoreExpr) {
+                StoreExpr storeexpr = (StoreExpr) expression;
+//                TypedIdentType typedidenttype = (TypedIdentType) storeexpr.identifier.
+                // TODO: Read value
+            } else {
+                // FIXME: Implement code generation
+                throw new RuntimeException("Code generation not implemented yet!");
+            }*/
+            if (getNextCmd() != null) {
+                getNextCmd().generateCode(methodscpecbuilder);
             }
         }
     }
@@ -752,6 +1017,18 @@ public class AbstractTree {
                 getNextCmd().check(checker);
             }
         }
+
+        @Override
+        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
+            methodscpecbuilder.addStatement("System.out.println(\"Output of value is:\")");
+            methodscpecbuilder.addCode("System.out.println(");
+            expression.generateCode(methodscpecbuilder);
+            methodscpecbuilder.addCode(");" + System.lineSeparator());
+
+            if (getNextCmd() != null) {
+                getNextCmd().generateCode(methodscpecbuilder);
+            }
+        }
     }
 
     public abstract static class TypedIdent<T> extends AbstractNode {
@@ -763,37 +1040,6 @@ public class AbstractTree {
         public abstract Tokens.IdentifierToken getIdentifier();
 
         public abstract Tokens.TypeToken getType();
-    }
-
-    public static class TypedIdentIdent extends TypedIdent<Tokens.IdentifierToken> {
-
-        public final Tokens.IdentifierToken identifier1;
-
-        public final Tokens.IdentifierToken identifier2;
-
-        public TypedIdentIdent(Tokens.IdentifierToken identifier1, Tokens.IdentifierToken identifier2, int idendation) {
-            super(idendation);
-            this.identifier1 = identifier1;
-            this.identifier2 = identifier2;
-        }
-
-        @Override
-        public String toString() {
-            return getHead("<TypedIdentIdent>")
-                + getBody("<Ident Name='" + identifier1.getName() + "'/>")
-                + getBody("<Ident Name='" + identifier2.getName() + "'/>")
-                + getHead("</TypedIdentIdent>");
-        }
-
-        @Override
-        public Tokens.IdentifierToken getIdentifier() {
-            return identifier1;
-        }
-
-        @Override
-        public Tokens.TypeToken getType() {
-            return null;
-        }
     }
 
     public static class TypedIdentType extends TypedIdent<Tokens.IdentifierToken> {
@@ -814,6 +1060,31 @@ public class AbstractTree {
                 + getBody("<Ident Name='" + identifier.getName() + "'/>")
                 + getBody("<Type Type='" + type + "'/>")
                 + getHead("</TypedIdentType>");
+        }
+
+        @Override
+        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
+            switch (type.getType()) {
+                case BOOL:
+                    methodscpecbuilder.addCode("boolean");
+                    break;
+                case INT:
+                    methodscpecbuilder.addCode("int");
+                    break;
+                case INT64:
+                default:
+                    methodscpecbuilder.addCode("long");
+                    break;
+            }
+            methodscpecbuilder.addCode(" " + identifier.getName());
+        }
+
+        public String getParameterName() {
+            return identifier.getName();
+        }
+
+        public Tokens.TypeToken.Type getParameterType() {
+            return type.getType();
         }
 
         @Override
@@ -856,6 +1127,10 @@ public class AbstractTree {
         public ExpressionInfo check(Checker checker) throws CheckerException {
             //check Lvalue
             throw new CheckerException("Found literal " + literal.getValue() + "in the left part of an assignement");
+        }
+
+        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
+            methodscpecbuilder.addCode(literal.getValue());
         }
     }
 
@@ -900,6 +1175,10 @@ public class AbstractTree {
             }
             return new ExpressionInfo(store.getIdentifier(), store.getType());
         }
+
+        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
+            methodscpecbuilder.addCode(identifier.getName());
+        }
     }
 
     public static class FunCallExpr extends Expression {
@@ -920,6 +1199,10 @@ public class AbstractTree {
 
         public ExpressionInfo check(Checker checker) throws CheckerException {
             return routinecall.check(checker);
+        }
+
+        public void generateCode(MethodSpec.Builder methodspecbuilder) {
+            routinecall.generateCode(methodspecbuilder);
         }
     }
 
@@ -946,6 +1229,16 @@ public class AbstractTree {
         @Override
         public ExpressionInfo check(Checker checker) throws CheckerException {
             return expression.check(checker);
+        }
+
+        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
+            if (operation.getOperation() == Tokens.OperationToken.Operation.MINUS) {
+                methodscpecbuilder.addCode(" -");
+                expression.generateCode(methodscpecbuilder);
+            } else if (operation.getTerminal() == Terminal.NOT) {
+                // FIXME: Fix known errata
+                throw new RuntimeException("The generator just hit a known errata in the monadic expression");
+            }
         }
     }
 
@@ -1029,6 +1322,63 @@ public class AbstractTree {
                     throw new ContextException("Unhandled operation");
             }*/
         }
+
+        public void generateCode(MethodSpec.Builder methodspecbuilder) {
+            methodspecbuilder.addCode("(");
+            expression1.generateCode(methodspecbuilder);
+            switch (operation.getOperation()) {
+                case PLUS:
+                    methodspecbuilder.addCode(" + ");
+                    break;
+                case MINUS:
+                    methodspecbuilder.addCode(" - ");
+                    break;
+                case AND:
+                    methodspecbuilder.addCode(" && ");
+                    break;
+                case OR:
+                    methodspecbuilder.addCode(" || ");
+                    break;
+                case CAND:
+                    methodspecbuilder.addCode(" & ");
+                    break;
+                case COR:
+                    methodspecbuilder.addCode(" | ");
+                    break;
+                case TIMES:
+                    methodspecbuilder.addCode(" * ");
+                    break;
+                case DIVE:
+                    methodspecbuilder.addCode(" / ");
+                    break;
+                case MODE:
+                    methodspecbuilder.addCode(" % ");
+                    break;
+                case EQ:
+                    methodspecbuilder.addCode(" == ");
+                    break;
+                case NE:
+                    methodspecbuilder.addCode(" != ");
+                    break;
+                case LT:
+                    methodspecbuilder.addCode(" < ");
+                    break;
+                case GT:
+                    methodspecbuilder.addCode(" > ");
+                    break;
+                case LE:
+                    methodspecbuilder.addCode(" <= ");
+                    break;
+                case GE:
+                    methodspecbuilder.addCode(" >= ");
+                    break;
+                default:
+                    throw new RuntimeException("Invalid operation found!");
+
+            }
+            expression2.generateCode(methodspecbuilder);
+            methodspecbuilder.addCode(")");
+        }
     }
 
     public static class RoutineCall extends AbstractNode {
@@ -1079,6 +1429,14 @@ public class AbstractTree {
 
             return new ExpressionInfo(calledroutine.getIdentifier(), calledroutine.getReturnType());
         }
+
+        public void generateCode(MethodSpec.Builder methodspecbuilder) {
+            methodspecbuilder.addCode(identifier.getName() + "(");
+            if (expressionlist != null) {
+                expressionlist.generateCode(methodspecbuilder);
+            }
+            methodspecbuilder.addCode(");" + System.lineSeparator());
+        }
     }
 
     public static class ExpressionList extends AbstractNode {
@@ -1107,6 +1465,14 @@ public class AbstractTree {
                 expressionlist.check(checker, expressioninfos);
             }
         }
+
+        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
+            expression.generateCode(methodscpecbuilder);
+            if (expressionlist != null) {
+                methodscpecbuilder.addCode(", ");
+                expressionlist.generateCode(methodscpecbuilder);
+            }
+        }
     }
 
     public static class GlobalInit extends AbstractNode {
@@ -1133,6 +1499,11 @@ public class AbstractTree {
             if (nextglobalinit != null) {
                 nextglobalinit.check();
             }
+        }
+
+        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
+            // FIXME: Implement code generation
+            throw new RuntimeException("Code generation not implemented yet!");
         }
     }
 
@@ -1166,6 +1537,11 @@ public class AbstractTree {
 
         public void check(Routine routine) {
             routine.addGlobalImport(this);
+        }
+
+        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
+            // FIXME: Implement code generation
+            throw new RuntimeException("Code generation not implemented yet!");
         }
     }
 }

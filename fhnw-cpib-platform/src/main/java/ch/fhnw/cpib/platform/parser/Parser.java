@@ -823,6 +823,7 @@ public class Parser {
     private ConcreteTree.MonadicOpr parseMonadicOpr(Context context, int idendation) throws ParserException {
         switch (context.getTerminal()) {
             case NOT:
+                // FIXME: Fix known errata
                 Tokens.BoolOprToken boolopr = (Tokens.BoolOprToken) consumeTerminal(context, Terminal.NOT);
                 return new ConcreteTree.MonadicOprNot(boolopr, idendation);
             case ADDOPR:

@@ -1,0 +1,57 @@
+program Factorial(out myfunvalue:int32, out f:int32)
+global
+    fun factorial(value:int32) returns var result:int32
+    do
+        if value = 1 then
+            result := 1
+        else
+            result := factorial(value - 1) * value
+        endif
+    endfun;
+
+    fun myfun(a:int32, b:bool, c:int32, d:int32, e:bool) returns var retval:int32
+    do
+        skip
+    endfun;
+
+    fun rfactorial(n:int32) returns var fact:int32
+    local
+        var i:int32;
+        var j:int32
+    do
+        fact, i init := 42,20;
+        fact := 100
+    endfun;
+
+    proc f(l:int32)
+    do
+        skip
+    endproc
+do
+    myfunvalue init := myfun(10, true, 20, 30, false);
+    f init := rfactorial(10);
+
+    debugin f;
+
+    debugout myfunvalue;
+    debugout f;
+
+    switch f
+        case 1 then
+            debugout 1
+        case 2 then
+            debugout 4
+        case 3 then
+            debugout 9
+        default then
+            debugout 100
+    endswitch;
+
+    if f = 2 then
+        debugout 2
+    elseif f = 3 then
+        debugout 3
+    else
+        debugout 100
+    endif
+endprogram

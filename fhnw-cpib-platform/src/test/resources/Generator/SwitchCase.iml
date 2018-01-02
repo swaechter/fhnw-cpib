@@ -1,20 +1,56 @@
-program SwitchCase()
+program Factorial(out myfunvalue:int32, out f:int32, flag:bool)
 global
-    const x:int32
+
+    proc printValue(value:int32)
+    do
+        debugout value;
+        skip
+    endproc
+
 do
-    debugin x init;
-    debugout x;
 
-    x := 42;
+    debugin myfunvalue;
+    debugout myfunvalue;
 
-    switch x
-        case 0 then
-            debugout 1
-        case 42 then
-            debugout 43
+    f := 40 + -2;
+    debugout f;
+
+    //flag:= true && not false;
+    //debugout flag
+
+    f := myfunvalue;
+    f := 5 + 6 + 7 + 8 + 9 * 10;
+    debugout f + 1;
+    call printValue(5 + 7);
+
+    flag := (5 + 10) = (5 * 3);
+    debugout flag;
+
+    switch 2 + 3 * 5
         case 100 then
             debugout 101
+        case 1000 then
+            debugout 1001
         default then
-            debugout x
-    endswitch
+            debugout 42
+    endswitch;
+
+    if 2 + 2 = 4 then
+        debugout 42
+    endif;
+
+    if 2 + 2 = 5 then
+        debugout 4
+    else
+        debugout 42
+    endif;
+
+    if 2 + 2 = 5 then
+        debugout 4
+    elseif 42 == 2 * 21 then
+        debugout 42
+    else
+        debugout 999
+    endif
+
 endprogram
