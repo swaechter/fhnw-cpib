@@ -1,0 +1,37 @@
+program Factorial(program_value_bool:bool, program_value_int32:int32, program_value_int64:int64)
+global
+
+    global_testval_bool:bool;
+
+    global_testval_int:int32;
+
+    global_testval_int64:int64;
+
+    proc test_proc(procval1:int32, procval2:bool)
+    local
+        localprocval1:int64;
+        localprocval2:bool
+    do
+        if procval1 > 0 then
+            debugout procval1;
+            debugout procval2;
+            call test_proc(procval1 - 1, procval2)
+        endif
+    endproc;
+
+    global_testval_trailing_1_int64:int64;
+
+    fun test_fun(funval1:int32, funval2:bool) returns funreturn:int32
+    local
+        localfunval1:int64;
+        localfunval2:bool
+    do
+        skip
+    endfun;
+
+    global_testval_trailing_2_int64:int64
+
+do
+    call test_proc(42, true);
+    skip
+endprogram
