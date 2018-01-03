@@ -1157,7 +1157,7 @@ public class ConcreteTree {
 
         @Override
         public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd, int idendation) {
-            return new AbstractTree.AssiCmd(expr1.toAbstract(idendation + 1), repexprlist1.toAbstract(idendation + 1), expr2.toAbstract(idendation + 1), repexprlist2.toAbstract(idendation + 1), repcpscmd.toAbstract(idendation), idendation);
+            return new AbstractTree.AssiCmd(expr1.toAbstract(idendation), repexprlist1.toAbstract(idendation + 1), expr2.toAbstract(idendation), repexprlist2.toAbstract(idendation + 1), repcpscmd.toAbstract(idendation + 1), idendation);
         }
     }
 
@@ -1186,7 +1186,7 @@ public class ConcreteTree {
 
         @Override
         public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd, int idendation) {
-            return new AbstractTree.CondCmd(expr.toAbstract(idendation + 1), cpscmd.toAbstract(idendation + 1), repelseif.toAbstract(idendation + 1), optelse.toAbstract(idendation), repcpscmd.toAbstract(idendation + 1), idendation);
+            return new AbstractTree.CondCmd(expr.toAbstract(idendation), cpscmd.toAbstract(idendation + 1), repelseif.toAbstract(idendation + 1), optelse.toAbstract(idendation), repcpscmd.toAbstract(idendation + 1), idendation);
         }
     }
 
@@ -1268,7 +1268,7 @@ public class ConcreteTree {
 
         @Override
         public AbstractTree.Cmd toAbstract(RepCpsCmd repcpscmd, int idendation) {
-            return new AbstractTree.ProcCallCmd(new AbstractTree.RoutineCall(identifier, exprlist.toAbstract(idendation + 1), idendation), optglobinits.toAbstract(idendation + 1), repcpscmd.toAbstract(idendation + 1), idendation);
+            return new AbstractTree.ProcCallCmd(new AbstractTree.RoutineCall(identifier, exprlist.toAbstract(idendation + 2), idendation + 1), optglobinits.toAbstract(idendation + 1), repcpscmd.toAbstract(idendation + 1), idendation);
         }
     }
 
@@ -2027,7 +2027,7 @@ public class ConcreteTree {
 
         @Override
         public AbstractTree.ExpressionList toAbstract(int idendation) {
-            return new AbstractTree.ExpressionList(expr.toAbstract(idendation + 1), repexprlist.toAbstract(idendation), idendation);
+            return new AbstractTree.ExpressionList(expr.toAbstract(idendation), repexprlist.toAbstract(idendation), idendation);
         }
     }
 
@@ -2265,7 +2265,7 @@ public class ConcreteTree {
         }
 
         public AbstractTree.RepCondCmd toAbstract(int idendation) {
-            return new AbstractTree.RepCondCmd(expr.toAbstract(idendation + 1), cpscmd.toAbstract(idendation + 1), repelseif.toAbstract(idendation + 1), idendation);
+            return new AbstractTree.RepCondCmd(expr.toAbstract(idendation), cpscmd.toAbstract(idendation + 1), repelseif.toAbstract(idendation), idendation);
         }
     }
 

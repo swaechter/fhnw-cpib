@@ -1281,11 +1281,11 @@ public class AbstractTree {
 
         @Override
         public String toString() {
-            return getHead("<ExprDyadic>")
+            return getHead("<DyadicExpr>")
                 + getBody("<Operation Operation='" + operation.getOperation() + "'/>")
                 + expression1
                 + expression2
-                + getHead("</ExprDyadic>");
+                + getHead("</DyadicExpr>");
         }
 
         @Override
