@@ -1,0 +1,51 @@
+program Factorial(inputvalue:int32, outputvalue:int32)
+global
+
+    fun fast_factorial_elseif(value:int32) returns result:int32
+    local
+        tempresult:int32
+    do
+        if value = 1 then
+            result := 1
+        elseif value = 2 then
+            result := 2
+        elseif value = 3 then
+            result := 6
+        elseif value = 4 then
+            result := 24
+        else
+            tempresult := fast_factorial_elseif(value - 1);
+            result :=  value * tempresult
+        endif
+    endfun;
+
+    fun fast_factorial_switch(value:int32) returns result:int32
+    local
+        tempresult:int32
+    do
+        switch value
+            case 1 then
+                result := 1
+            case 2 then
+                result := 2
+            case 3 then
+                result := 6
+            case 4 then
+                result := 24
+            default then
+                tempresult := fast_factorial_elseif(value - 1);
+                result :=  value * tempresult
+        endswitch
+    endfun
+
+do
+    debugin inputvalue;
+
+    outputvalue := fast_factorial_elseif(inputvalue);
+    debugout outputvalue;
+
+    outputvalue := fast_factorial_switch(inputvalue);
+    debugout outputvalue;
+
+    skip
+endprogram

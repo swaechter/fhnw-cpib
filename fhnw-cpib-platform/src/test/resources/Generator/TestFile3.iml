@@ -1,11 +1,14 @@
 program Factorial(out myfunvalue:int32, out f:int32)
 global
     fun factorial(value:int32) returns var result:int32
+    local
+        temp:int32
     do
         if value = 1 then
             result := 1
         else
-            result := factorial(value - 1) * value
+            temp :=  factorial(value - 1);
+            result := value * temp
         endif
     endfun;
 

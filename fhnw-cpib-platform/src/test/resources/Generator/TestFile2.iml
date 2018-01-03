@@ -1,11 +1,11 @@
 program Factorial(program_value_bool:bool, program_value_int32:int32, program_value_int64:int64)
 global
 
-    global_testval_bool:bool;
+    var global_testval_bool:bool;
 
-    global_testval_int:int32;
+    var global_testval_int:int32;
 
-    global_testval_int64:int64;
+    var global_testval_int64:int64;
 
     proc test_proc(procval1:int32, procval2:bool)
     local
@@ -23,15 +23,27 @@ global
 
     fun test_fun(funval1:int32, funval2:bool) returns funreturn:int32
     local
-        localfunval1:int64;
+        localfunval1:int32;
         localfunval2:bool
     do
-        skip
+        if funval1 = 1 then
+            funreturn := 1
+        else
+            localfunval1 := test_fun(funval1 - 1, funval2);
+            funreturn :=  localfunval1 * funval1
+        endif
     endfun;
 
     global_testval_trailing_2_int64:int64
 
 do
     call test_proc(42, true);
+
+    debugin program_value_int32;
+    debugout program_value_int32;
+
+    global_testval_int := test_fun(program_value_int32, true);
+    debugout global_testval_int;
+
     skip
 endprogram

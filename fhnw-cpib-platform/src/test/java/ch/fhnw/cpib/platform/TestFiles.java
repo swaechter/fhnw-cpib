@@ -53,6 +53,9 @@ public class TestFiles {
 
     // A few selected files for generating code
     public static final List<String> generatorfilenames = Arrays.asList(
-        "/Generator/SwitchCase.iml"
+        "/Generator/TestFile1.iml",
+        "/Generator/TestFile2.iml",
+        "/Generator/TestFile3.iml",
+        "/Generator/TestFile4.iml"
     );
 }
