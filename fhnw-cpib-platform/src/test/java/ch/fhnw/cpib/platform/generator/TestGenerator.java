@@ -50,17 +50,53 @@ public class TestGenerator {
 
             // Generate the Java JAR file
             File javaclassfile = generator.generateJarFile(javafile, abstractprogram);
-            /*Assert.assertTrue(javaclassfile.exists());
-
-            // Execute the Java JAR file
-            Pair<String, String> output = generator.executeJarFile(javaclassfile);
-            System.out.println("Regular Output:");
-            System.out.println(output.getValue0());
-            System.out.println();
-            System.out.println("Error Output:");
-            System.out.println(output.getValue1());
-            System.out.println();
-            Assert.assertTrue(output.getValue0().contains("42"));*/
+            Assert.assertNotNull(javaclassfile);
         }
+    }
+
+    @Test
+    public void testSingleGenerator() throws Exception {
+        // Create the scanner, parser and generator
+        Scanner scanner = new Scanner();
+        Parser parser = new Parser();
+        Generator generator = new Generator();
+
+        // Load the program
+        String filename = "/Generator/SwitchCase.iml";
+        String content = ReaderUtils.getContentFromInputStream(getClass().getResourceAsStream(filename), StandardCharsets.UTF_8);
+        Assert.assertFalse(content.isEmpty());
+
+        // Scan the program
+        TokenList tokenlist = scanner.scanString(content);
+        Assert.assertTrue(tokenlist.getSize() > 0);
+
+        // Parse the token list
+        ConcreteTree.Program concreteprogram = parser.parseTokenList(tokenlist);
+        Assert.assertTrue(concreteprogram.toString().length() > 0);
+
+        // Make the parse tree abstract
+        AbstractTree.Program abstractprogram = concreteprogram.toAbstract();
+
+        // Check the abstract tree
+        //abstractprogram.check(new Checker());
+
+        // Generate the Java code
+        JavaFile javafile = generator.generateJavaFile(abstractprogram);
+        Assert.assertTrue(javafile.toString().length() > 0);
+        System.out.println(javafile);
+
+        // Generate the Java JAR file
+        File javaclassfile = generator.generateJarFile(javafile, abstractprogram);
+        /*Assert.assertTrue(javaclassfile.exists());
+
+        // Execute the Java JAR file
+        Pair<String, String> output = generator.executeJarFile(javaclassfile);
+        System.out.println("Regular Output:");
+        System.out.println(output.getValue0());
+        System.out.println();
+        System.out.println("Error Output:");
+        System.out.println(output.getValue1());
+        System.out.println();
+        Assert.assertTrue(output.getValue0().contains("42"));*/
     }
 }

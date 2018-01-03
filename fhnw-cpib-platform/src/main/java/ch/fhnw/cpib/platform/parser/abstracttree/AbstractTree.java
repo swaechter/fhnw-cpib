@@ -324,6 +324,35 @@ public class AbstractTree {
                 getNextDeclaration().generateCode(methodspecbuilder);
             }
         }
+
+        @Override
+        public void generateCode(TypeSpec.Builder typespecbuilder) {
+            TypedIdentType typedidenttype = (TypedIdentType) typedident;
+            switch (typedidenttype.getParameterType()) {
+                case BOOL:
+                    FieldSpec.Builder fieldspecbuilder1 = FieldSpec.builder(boolean.class, typedidenttype.getParameterName());
+                    fieldspecbuilder1.addModifiers(Modifier.PRIVATE, Modifier.STATIC);
+                    fieldspecbuilder1.initializer("false");
+                    typespecbuilder.addField(fieldspecbuilder1.build());
+                    break;
+                case INT:
+                    FieldSpec.Builder fieldspecbuilder2 = FieldSpec.builder(int.class, typedidenttype.getParameterName());
+                    fieldspecbuilder2.addModifiers(Modifier.PRIVATE, Modifier.STATIC);
+                    fieldspecbuilder2.initializer("0");
+                    typespecbuilder.addField(fieldspecbuilder2.build());
+                    break;
+                case INT64:
+                default:
+                    FieldSpec.Builder fieldspecbuilder3 = FieldSpec.builder(long.class, typedidenttype.getParameterName());
+                    fieldspecbuilder3.addModifiers(Modifier.PRIVATE, Modifier.STATIC);
+                    fieldspecbuilder3.initializer("0L");
+                    typespecbuilder.addField(fieldspecbuilder3.build());
+                    break;
+            }
+            if (getNextDeclaration() != null) {
+                getNextDeclaration().generateCode(typespecbuilder);
+            }
+        }
     }
 
     public static class FunDecl extends Declaration {
@@ -980,14 +1009,6 @@ public class AbstractTree {
             methodscpecbuilder.addStatement("System.out.println(\"Input a value:\")");
             expression.generateCode(methodscpecbuilder);
             methodscpecbuilder.addCode(" = scanner.nextInt();" + System.lineSeparator());
-/*            if (expression instanceof StoreExpr) {
-                StoreExpr storeexpr = (StoreExpr) expression;
-//                TypedIdentType typedidenttype = (TypedIdentType) storeexpr.identifier.
-                // TODO: Read value
-            } else {
-                // FIXME: Implement code generation
-                throw new RuntimeException("Code generation not implemented yet!");
-            }*/
             if (getNextCmd() != null) {
                 getNextCmd().generateCode(methodscpecbuilder);
             }
