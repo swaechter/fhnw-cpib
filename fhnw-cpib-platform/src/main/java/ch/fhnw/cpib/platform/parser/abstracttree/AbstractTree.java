@@ -621,6 +621,7 @@ public class AbstractTree {
                 + (expressionlist1 != null ? expressionlist1 : getBody("<NoNextExpressionList/>"))
                 + expression2
                 + (expressionlist2 != null ? expressionlist2 : getBody("<NoNextExpressionList/>"))
+                + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextCmd/>"))
                 + getHead("</AssiCmd>");
         }
 
