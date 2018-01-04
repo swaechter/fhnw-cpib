@@ -1,5 +1,6 @@
 program Factorial(inputvalue:int32, outputvalue:int32)
 global
+    //test:bool;
 
     fun fast_factorial_if(value:int32) returns result:int32
     local
@@ -17,7 +18,7 @@ global
                     if value = 3 then
                         result := 24
                     else
-                        tempresult := fast_factorial_elseif(value - 1);
+                        tempresult := fast_factorial_if(value - 1);
                         result := value * tempresult
                     endif
                 endif
@@ -47,17 +48,17 @@ global
     local
         tempresult:int32
     do
-        switch value
+        switch value //value zu test -> exception
             case 1 then
                 result := 1
-            case 2 then
+            case 2 then //2 zu 1 -> exception
                 result := 2
             case 3 then
                 result := 6
             case 4 then
                 result := 24
             default then
-                tempresult := fast_factorial_elseif(value - 1);
+                tempresult := fast_factorial_switch(value - 1);
                 result :=  value * tempresult
         endswitch
     endfun

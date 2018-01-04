@@ -19,7 +19,8 @@ import java.util.jar.Manifest;
 public class Generator {
 
     public JavaFile generateJavaFile(AbstractTree.Program program) throws GeneratorException {
-        return program.generateCode();
+        //return program.generateCode();
+        return null;
     }
 
     public File generateJarFile(JavaFile javaobject, AbstractTree.Program program) throws GeneratorException {

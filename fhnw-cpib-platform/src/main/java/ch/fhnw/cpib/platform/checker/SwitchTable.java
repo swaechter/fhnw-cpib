@@ -1,31 +1,24 @@
 package ch.fhnw.cpib.platform.checker;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class SwitchTable {
 
-    private HashMap<String, List<SwitchCase>> map = new HashMap<>();
+    private HashMap<String, Switch> map = new HashMap<>();
 
-    public boolean insert(String exprName, SwitchCase s) {
-        List<SwitchCase> itemsList = map.get(exprName);
-        if(itemsList == null) {
-            itemsList = new ArrayList<>();
-            itemsList.add(s);
-            //first argument key switch expr name
-            //second argument switch object with switch expr type and case literal token with value and type
-            map.put(exprName, itemsList);
+    public boolean insert(Switch s) {
+        if (!map.containsKey(s.getName())) {
+            map.put(s.getName(), s);
+            return true;
         }
-        return true;
+        return false;
     }
 
-    public List<SwitchCase> getEntry(String exprName) {
-        return map.get(exprName);
+    public Switch lookup(String name) {
+        return map.get(name);
     }
 
-    public HashMap<String, List<SwitchCase>> getTable() {
+    public HashMap<String, Switch> getTable() {
         return map;
     }
-
 }

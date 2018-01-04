@@ -1,18 +1,9 @@
 package ch.fhnw.cpib.platform.parser.abstracttree;
 
 import ch.fhnw.cpib.platform.checker.*;
-import ch.fhnw.cpib.platform.scanner.tokens.Terminal;
 import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeSpec;
 
-import javax.lang.model.element.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class AbstractTree {
 
@@ -56,34 +47,19 @@ public class AbstractTree {
             }
         }
 
-        public JavaFile generateCode() {
-            TypeSpec.Builder typescpecbuilder = TypeSpec.classBuilder(getProgramName());
-            typescpecbuilder.addModifiers(Modifier.PUBLIC, Modifier.FINAL);
-
-            FieldSpec.Builder fieldspecbuilder = FieldSpec.builder(Scanner.class, "scanner");
-            fieldspecbuilder.addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL);
-            fieldspecbuilder.initializer("new Scanner(System.in)");
-
-            MethodSpec.Builder methodspecbuilder = MethodSpec.methodBuilder("main");
-            methodspecbuilder.addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-            methodspecbuilder.returns(void.class);
-            methodspecbuilder.addParameter(String[].class, "args");
-
-            if (progparam != null) {
-                progparam.generateCode(methodspecbuilder);
-            }
-
-            if (declaration != null) {
-                declaration.generateCode(typescpecbuilder);
-            }
-
-            cmd.generateCode(methodspecbuilder);
-
-            typescpecbuilder.addField(fieldspecbuilder.build());
-            typescpecbuilder.addMethod(methodspecbuilder.build());
-
-            return JavaFile.builder("fhnw", typescpecbuilder.build()).build();
-        }
+        /*@Override
+        public void generateCode(Generator generator) {
+            generator.appendLine(".class public " + identifier.getName());
+            generator.appendLine(".super java/lang/Object");
+            generator.appendLine(".method public static main([Ljava/lang/String;)V");
+            generator.appendLine(".limit stack 100");
+            generator.appendLine(".limit locals 100");
+            generator.appendLine("getstatic java/lang/System/out Ljava/io/PrintStream;");
+            generator.appendLine("ldc 42");
+            generator.appendLine("invokevirtual java/io/PrintStream/println(I)V");
+            generator.appendLine("return");
+            generator.appendLine(".end method");
+        }*/
 
         public String getProgramName() {
             return identifier.getName();
@@ -129,27 +105,6 @@ public class AbstractTree {
                 nextprogparam.check(checker);
             }
         }
-
-        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            typedident.generateCode(methodscpecbuilder);
-            TypedIdentType typedidenttype = (TypedIdentType) typedident;
-            switch (typedidenttype.getParameterType()) {
-                case BOOL:
-                    methodscpecbuilder.addCode(" = false;" + System.lineSeparator());
-                    break;
-                case INT:
-                    methodscpecbuilder.addCode(" = 0;" + System.lineSeparator());
-                    break;
-                case INT64:
-                default:
-                    methodscpecbuilder.addCode(" = 0L;" + System.lineSeparator());
-                    break;
-            }
-
-            if (nextprogparam != null) {
-                nextprogparam.generateCode(methodscpecbuilder);
-            }
-        }
     }
 
     public static class Param extends AbstractNode {
@@ -184,55 +139,36 @@ public class AbstractTree {
                 + getHead("</Param>");
         }
 
-        public void check(Routine routine) throws CheckerException {
-            /*Store store = new Store(typedident.getIdentifier().getName(), typedident.getType(), true); //TODO
+        public void check(Checker checker, Routine routine) throws CheckerException {
+            Store store = checker.getGlobalStoreTable().getStore(typedident.getIdentifier().getName());
             switch (flowmode.getFlowMode()) {
                 case IN:
                     //passing parameter must be constant
-                    if (mechmode.getMechMode() == Tokens.MechModeToken.MechMode.REF && !store.isConst()) {
+                    if (store != null && mechmode.getMechMode() == Tokens.MechModeToken.MechMode.REF && !store.isConst()) {
                         throw new CheckerException("IN reference parameter can not be var! Ident: " + store.getIdentifier());
                     }
-                    store.initialize();
+                    routine.addParameter(new Parameter(typedident.getIdentifier().getName(), typedident.getType(), flowmode.getFlowMode(), mechmode.getMechMode(), changemode.getChangeMode()));
                     break;
                 case INOUT:
                     if (routine.getRoutineType() != RoutineType.PROCEDURE) {
                         throw new CheckerException("INOUT parameter in function declaration! Ident: " + store.getIdentifier());
                     }
-                    if (store.isConst()) {
+                    if (store != null && store.isConst()) {
                         throw new CheckerException("INOUT parameter can not be constant! Ident: " + store.getIdentifier());
                     }
-                    store.initialize();
+                    routine.addParameter(new Parameter(typedident.getIdentifier().getName(), typedident.getType(), flowmode.getFlowMode(), mechmode.getMechMode(), changemode.getChangeMode()));
                     break;
                 case OUT:
                     if (routine.getRoutineType() != RoutineType.PROCEDURE) {
                         throw new CheckerException("OUT parameter in function declaration! Ident: " + store.getIdentifier());
                     }
+                    routine.addParameter(new Parameter(typedident.getIdentifier().getName(), typedident.getType(), flowmode.getFlowMode(), mechmode.getMechMode(), changemode.getChangeMode()));
                     break;
                 default:
                     break;
             }
             if (nextparam != null) {
-                nextparam.check(routine);
-            }*/
-        }
-
-        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            TypedIdentType typedidenttype = (TypedIdentType) typedident;
-            switch (typedidenttype.getParameterType()) {
-                case BOOL:
-                    methodscpecbuilder.addParameter(boolean.class, typedidenttype.getParameterName());
-                    break;
-                case INT:
-                    methodscpecbuilder.addParameter(int.class, typedidenttype.getParameterName());
-                    break;
-                case INT64:
-                default:
-                    methodscpecbuilder.addParameter(long.class, typedidenttype.getParameterName());
-                    break;
-            }
-
-            if (nextparam != null) {
-                nextparam.generateCode(methodscpecbuilder);
+                nextparam.check(checker, routine);
             }
         }
     }
@@ -250,9 +186,7 @@ public class AbstractTree {
             return nextdeclaration;
         }
 
-        public abstract Tokens.TypeToken check(Checker checker) throws CheckerException;
-
-        public abstract void generateCode(MethodSpec.Builder methodscpecbuilder);
+        public abstract Tokens.TypeToken.Type check(Checker checker) throws CheckerException;
     }
 
     public static class StoDecl extends Declaration {
@@ -277,7 +211,7 @@ public class AbstractTree {
         }
 
         @Override
-        public Tokens.TypeToken check(Checker checker) throws CheckerException {
+        public Tokens.TypeToken.Type check(Checker checker) throws CheckerException {
             //check if global scope applies
             StoreTable storetable;
             if (checker.getScope() == null) {
@@ -301,57 +235,7 @@ public class AbstractTree {
             if (getNextDeclaration() != null) {
                 getNextDeclaration().check(checker);
             }
-            return typedident.getType();
-        }
-
-        @Override
-        public void generateCode(MethodSpec.Builder methodspecbuilder) {
-            TypedIdentType typedidenttype = (TypedIdentType) typedident;
-            switch (typedidenttype.getParameterType()) {
-                case BOOL:
-                    methodspecbuilder.addStatement("boolean " + typedidenttype.getParameterName() + " = false");
-                    break;
-                case INT:
-                    methodspecbuilder.addStatement("int " + typedidenttype.getParameterName() + " = 0");
-                    break;
-                case INT64:
-                default:
-                    methodspecbuilder.addStatement("long " + typedidenttype.getParameterName() + " = 0L");
-                    break;
-            }
-
-            if (getNextDeclaration() != null) {
-                getNextDeclaration().generateCode(methodspecbuilder);
-            }
-        }
-
-        @Override
-        public void generateCode(TypeSpec.Builder typespecbuilder) {
-            TypedIdentType typedidenttype = (TypedIdentType) typedident;
-            switch (typedidenttype.getParameterType()) {
-                case BOOL:
-                    FieldSpec.Builder fieldspecbuilder1 = FieldSpec.builder(boolean.class, typedidenttype.getParameterName());
-                    fieldspecbuilder1.addModifiers(Modifier.PRIVATE, Modifier.STATIC);
-                    fieldspecbuilder1.initializer("false");
-                    typespecbuilder.addField(fieldspecbuilder1.build());
-                    break;
-                case INT:
-                    FieldSpec.Builder fieldspecbuilder2 = FieldSpec.builder(int.class, typedidenttype.getParameterName());
-                    fieldspecbuilder2.addModifiers(Modifier.PRIVATE, Modifier.STATIC);
-                    fieldspecbuilder2.initializer("0");
-                    typespecbuilder.addField(fieldspecbuilder2.build());
-                    break;
-                case INT64:
-                default:
-                    FieldSpec.Builder fieldspecbuilder3 = FieldSpec.builder(long.class, typedidenttype.getParameterName());
-                    fieldspecbuilder3.addModifiers(Modifier.PRIVATE, Modifier.STATIC);
-                    fieldspecbuilder3.initializer("0L");
-                    typespecbuilder.addField(fieldspecbuilder3.build());
-                    break;
-            }
-            if (getNextDeclaration() != null) {
-                getNextDeclaration().generateCode(typespecbuilder);
-            }
+            return null;
         }
     }
 
@@ -393,7 +277,7 @@ public class AbstractTree {
         }
 
         @Override
-        public Tokens.TypeToken check(Checker checker) throws CheckerException {
+        public Tokens.TypeToken.Type check(Checker checker) throws CheckerException {
             //check if function exist in global routine table
             Routine function = new Routine(identifier.getName(), RoutineType.FUNCTION);
             //store function in global routine table if not
@@ -402,7 +286,7 @@ public class AbstractTree {
             }
             checker.setScope(function.getScope());
             if (param != null) {
-                param.check(function);
+                param.check(checker, function);
             }
             if (storedeclaration != null) {
                 storedeclaration.check(checker);
@@ -417,52 +301,7 @@ public class AbstractTree {
             if (getNextDeclaration() != null) {
                 getNextDeclaration().check(checker);
             }
-            return null; //TODO
-        }
-
-        @Override
-        public void generateCode(TypeSpec.Builder typescpecbuilder) {
-            MethodSpec.Builder methodspecbuilder = MethodSpec.methodBuilder(identifier.getName());
-            methodspecbuilder.addModifiers(Modifier.PRIVATE, Modifier.STATIC);
-
-            if (param != null) {
-                param.generateCode(methodspecbuilder);
-            }
-
-            storedeclaration.generateCode(methodspecbuilder);
-            StoDecl stodecl = (StoDecl) storedeclaration;
-            TypedIdentType typedidenttype = (TypedIdentType) stodecl.typedident;
-            switch (typedidenttype.getParameterType()) {
-                case BOOL:
-                    methodspecbuilder.returns(boolean.class);
-                    break;
-                case INT:
-                    methodspecbuilder.returns(int.class);
-                    break;
-                case INT64:
-                default:
-                    methodspecbuilder.returns(long.class);
-                    break;
-            }
-
-            if (declaration != null) {
-                declaration.generateCode(methodspecbuilder);
-            }
-
-            cmd.generateCode(methodspecbuilder);
-
-            methodspecbuilder.addStatement("return " + typedidenttype.getParameterName());
-
-            if (getNextDeclaration() != null) {
-                getNextDeclaration().generateCode(typescpecbuilder);
-            }
-
-            typescpecbuilder.addMethod(methodspecbuilder.build());
-        }
-
-        @Override
-        public void generateCode(MethodSpec.Builder methodspecbuilder) {
-            // Just make the compiler happy
+            return null;
         }
     }
 
@@ -500,13 +339,13 @@ public class AbstractTree {
         }
 
         @Override
-        public Tokens.TypeToken check(Checker checker) throws CheckerException {
+        public Tokens.TypeToken.Type check(Checker checker) throws CheckerException {
             //store function in global procedure table
             Routine procedure = new Routine(identifier.getName(), RoutineType.PROCEDURE);
             checker.getGlobalRoutineTable().insert(procedure);
             checker.setScope(procedure.getScope());
             if (param != null) {
-                param.check(procedure);
+                param.check(checker, procedure);
             }
             if (globalimport != null) {
                 globalimport.check(procedure);
@@ -521,34 +360,7 @@ public class AbstractTree {
             if (getNextDeclaration() != null) {
                 getNextDeclaration().check(checker);
             }
-            return null; //TODO
-        }
-
-        @Override
-        public void generateCode(TypeSpec.Builder typescpecbuilder) {
-            MethodSpec.Builder methodspecbuilder = MethodSpec.methodBuilder(identifier.getName());
-            methodspecbuilder.addModifiers(Modifier.PRIVATE, Modifier.STATIC);
-
-            if (param != null) {
-                param.generateCode(methodspecbuilder);
-            }
-
-            if (declaration != null) {
-                declaration.generateCode(methodspecbuilder);
-            }
-
-            cmd.generateCode(methodspecbuilder);
-
-            if (getNextDeclaration() != null) {
-                getNextDeclaration().generateCode(typescpecbuilder);
-            }
-
-            typescpecbuilder.addMethod(methodspecbuilder.build());
-        }
-
-        @Override
-        public void generateCode(MethodSpec.Builder methodspecbuilder) {
-            // Just make the compiler happy
+            return null;
         }
     }
 
@@ -587,84 +399,68 @@ public class AbstractTree {
                 getNextCmd().check(checker);
             }
         }
-
-        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            methodscpecbuilder.addStatement("");
-            if (getNextCmd() != null) {
-                getNextCmd().generateCode(methodscpecbuilder);
-            }
-        }
     }
 
     public static class AssiCmd extends Cmd {
 
-        public final Expression expression1;
+        public final Expression targetExpression;
 
-        public final ExpressionList expressionlist1;
+        public final ExpressionList targetExpressionList;
 
-        public final Expression expression2;
+        public final Expression sourceExpression;
 
-        public final ExpressionList expressionlist2;
+        public final ExpressionList sourceExpressionList;
 
-        public AssiCmd(Expression expression1, ExpressionList expressionlist1, Expression expression2, ExpressionList expressionlist2, Cmd nextcmd, int idendation) {
+        public AssiCmd(Expression targetExpression, ExpressionList targetExpressionList, Expression sourceExpression, ExpressionList sourceExpressionList, Cmd nextcmd, int idendation) {
             super(nextcmd, idendation);
-            this.expression1 = expression1;
-            this.expressionlist1 = expressionlist1;
-            this.expression2 = expression2;
-            this.expressionlist2 = expressionlist2;
+            this.targetExpression = targetExpression;
+            this.targetExpressionList = targetExpressionList;
+            this.sourceExpression = sourceExpression;
+            this.sourceExpressionList = sourceExpressionList;
         }
 
         @Override
         public String toString() {
             return getHead("<AssiCmd>")
-                + expression1
-                + (expressionlist1 != null ? expressionlist1 : getBody("<NoNextExpressionList/>"))
-                + expression2
-                + (expressionlist2 != null ? expressionlist2 : getBody("<NoNextExpressionList/>"))
+                + targetExpression
+                + (targetExpressionList != null ? targetExpressionList : getBody("<NoNextExpressionList/>"))
+                + sourceExpression
+                + (sourceExpressionList != null ? sourceExpressionList : getBody("<NoNextExpressionList/>"))
                 + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextCmd/>"))
                 + getHead("</AssiCmd>");
         }
 
         @Override
         public void check(Checker checker) throws CheckerException {
-            List<ExpressionInfo> targetexprinfos = new ArrayList<>();
-            List<ExpressionInfo> sourceexprinfos = new ArrayList<>();
-            ExpressionInfo targetexprinfo = expression1.check(checker);
-            ExpressionInfo sourceexprinfo = expression2.check(checker);
-            if (expressionlist1 != null) {
-                expressionlist1.check(checker, targetexprinfos);
+            List<ExpressionInfo> targetExprInfos = new ArrayList<>();
+            List<ExpressionInfo> sourceExprInfos = new ArrayList<>();
+
+            ExpressionInfo sourceExprInfo = sourceExpression.check(checker);
+            ExpressionInfo targetExprInfo = targetExpression.check(checker);
+
+            if (targetExpressionList != null) {
+                targetExpressionList.check(checker, targetExprInfos);
             }
-            if (expressionlist2 != null) {
-                expressionlist2.check(checker, sourceexprinfos);
+            if (sourceExpressionList != null) {
+                sourceExpressionList.check(checker, sourceExprInfos);
             }
 
             //check if first type on each side has same type
-            boolean normalassignmentvalid = targetexprinfo.getType() == sourceexprinfo.getType();
+            boolean normalassignmentvalid = targetExprInfo.getType() == sourceExprInfo.getType();
 
             //normal assignment
-            if (expressionlist1 == null && expressionlist2 == null) {
-                if (!normalassignmentvalid) {
-                    throw new CheckerException("Assignment not possible due different datatypes: " +
-                        targetexprinfo.getType() + " = " + sourceexprinfo.getType());
+            if (targetExpressionList == null && sourceExpressionList == null) {
+                //check if null because variable can be used without initialisation
+                if (!normalassignmentvalid && targetExprInfo.getType() != null && sourceExprInfo.getType() != null) {
+                    //allow assignment INT to INT64
+                    if (targetExprInfo.getType() != Tokens.TypeToken.Type.INT64 && sourceExprInfo.getType() != Tokens.TypeToken.Type.INT) {
+                        throw new CheckerException("Assignment not possible due different datatypes: " +
+                            targetExprInfo.getType() + " = " + sourceExprInfo.getType());
+                    }
                 }
             }
-        }
-
-        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            expression1.generateCode(methodscpecbuilder);
-            methodscpecbuilder.addCode(" = ");
-            expression2.generateCode(methodscpecbuilder);
-            methodscpecbuilder.addCode(";" + System.lineSeparator());
-
-            if (expressionlist1 != null && expressionlist2 != null) {
-                expressionlist1.generateCode(methodscpecbuilder);
-                methodscpecbuilder.addCode(" = ");
-                expressionlist2.generateCode(methodscpecbuilder);
-                methodscpecbuilder.addCode(";" + System.lineSeparator());
-            }
-
             if (getNextCmd() != null) {
-                getNextCmd().generateCode(methodscpecbuilder);
+                getNextCmd().check(checker);
             }
         }
     }
@@ -690,44 +486,22 @@ public class AbstractTree {
                 + expression
                 + repcasecmd
                 + (cmd != null ? cmd : getBody("<NoDefaultCmd/>"))
+                + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextCmd/>"))
                 + getHead("</SwitchCmd>");
         }
 
         @Override
         public void check(Checker checker) throws CheckerException {
             ExpressionInfo exprinfo = expression.check(checker);
-            SwitchCase switchSave = new SwitchCase(exprinfo.getType(), repcasecmd.literal);
-            //store switch expr name as key (first argument)
-            //and switch object with switch expr type and case literal token with value and type (second argument)
-            checker.getGlobalSwitchTable().insert(exprinfo.getName(), switchSave);
-            //check if switch expr and case literal have the same data type
-            List<SwitchCase> switchCheck = checker.getGlobalSwitchTable().getEntry(exprinfo.getName());
-            if (exprinfo.getType().equals(switchCheck.get(0).getLiteraltoken().getType())) {
-                throw new CheckerException("SwitchCase expr and case literal are not from the same type. " +
-                    "Current switch expr type: " + exprinfo.getType() +
-                    "Current case literal type: " + switchCheck.get(0).getLiteraltoken().getType());
-            }
-        }
-
-        @Override
-        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            methodscpecbuilder.addCode("switch(");
-            expression.generateCode(methodscpecbuilder);
-            methodscpecbuilder.addCode(") {" + System.lineSeparator());
-
-            repcasecmd.generateCode(methodscpecbuilder);
-
+            Switch s = new Switch(exprinfo.getName(), exprinfo.getType());
+            //store switch with name and type
+            checker.getGlobalSwitchTable().insert(s);
+            repcasecmd.check(checker);
             if (cmd != null) {
-                methodscpecbuilder.beginControlFlow("default: ");
-                cmd.generateCode(methodscpecbuilder);
-                methodscpecbuilder.addStatement("break");
-                methodscpecbuilder.endControlFlow();
+                cmd.check(checker);
             }
-
-            methodscpecbuilder.addCode("}" + System.lineSeparator());
-
             if (getNextCmd() != null) {
-                getNextCmd().generateCode(methodscpecbuilder);
+                getNextCmd().check(checker);
             }
         }
     }
@@ -755,24 +529,39 @@ public class AbstractTree {
 
         @Override
         public void check(Checker checker) throws CheckerException {
-            HashMap<String, List<SwitchCase>> map = checker.getGlobalSwitchTable().getTable();
-            //check if case literal vales are different
-            List<SwitchCase> cases = map.get(0); //TODO String exprName
-            for (SwitchCase c : cases) {
-                if (c.getLiteraltoken().getValue().equals(literal.getValue())) {
-                    throw new CheckerException("Case literal values have the same value.");
+            HashMap<String, Switch> map = checker.getGlobalSwitchTable().getTable();
+            Iterator it = map.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                Switch s = (Switch) pair.getValue();
+                //check if case literal vales are different
+                if (!s.getSwitchCaseList().isEmpty()) {
+                    for (SwitchCase c : s.getSwitchCaseList()) {
+                        if (c.getLiteraltoken().getValue().equals(literal.getValue())) {
+                            throw new CheckerException("Case literal values have the same value.");
+                        }
+                    }
                 }
-            }
-        }
 
-        @Override
-        public void generateCode(MethodSpec.Builder methodspecbuilder) {
-            methodspecbuilder.beginControlFlow("case " + literal.getValue() + " :");
-            cmd.generateCode(methodspecbuilder);
-            methodspecbuilder.addStatement("break");
-            methodspecbuilder.endControlFlow();
+                //check if switch type and case literal type have the same type
+                if (!s.getSwitchCaseList().isEmpty()) {
+                    for (SwitchCase c : s.getSwitchCaseList()) {
+                        if (s.getType() != literal.getType()) {
+                            throw new CheckerException("SwitchCase expr and case literal are not from the same type. " +
+                                "Current switch expr type: " + s.getType() +
+                                "Current case literal type: " + literal.getType());
+                        }
+                    }
+                }
+
+                //add case literal with value and type
+                SwitchCase switchCase = new SwitchCase(literal);
+                //store case to switch
+                s.addSwitchCase(switchCase);
+                checker.getGlobalSwitchTable().insert(s);
+            }
             if (getNextCmd() != null) {
-                getNextCmd().generateCode(methodspecbuilder);
+                getNextCmd().check(checker);
             }
         }
     }
@@ -810,7 +599,7 @@ public class AbstractTree {
         public void check(Checker checker) throws CheckerException {
             //check expr return type is from type BOOL
             ExpressionInfo exprinfo = expression.check(checker);
-            if (exprinfo.getType().equals(Tokens.TypeToken.Type.BOOL)) {
+            if (exprinfo.getType() != Tokens.TypeToken.Type.BOOL) {
                 throw new CheckerException("IF condition needs to be BOOL. Current type: " + exprinfo.getType());
             }
             if (repcondcmd != null) {
@@ -823,31 +612,6 @@ public class AbstractTree {
                 getNextCmd().check(checker);
             }
         }
-
-        @Override
-        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            methodscpecbuilder.addCode("if(");
-            expression.generateCode(methodscpecbuilder);
-            methodscpecbuilder.addCode(") {" + System.lineSeparator());
-
-            cmd.generateCode(methodscpecbuilder);
-
-            methodscpecbuilder.addCode("}" + System.lineSeparator());
-
-            if (repcondcmd != null) {
-                repcondcmd.generateCode(methodscpecbuilder);
-            }
-
-            if (othercmd != null) {
-                methodscpecbuilder.beginControlFlow("else");
-                othercmd.generateCode(methodscpecbuilder);
-                methodscpecbuilder.endControlFlow();
-
-            }
-            if (getNextCmd() != null) {
-                getNextCmd().generateCode(methodscpecbuilder);
-            }
-        }
     }
 
     public static class RepCondCmd extends Cmd {
@@ -856,10 +620,13 @@ public class AbstractTree {
 
         public final Cmd cmd;
 
+        public final RepCondCmd repcondcmd;
+
         public RepCondCmd(Expression expression, Cmd cmd, RepCondCmd repCondCmd, int idendation) {
-            super(repCondCmd, idendation);
+            super(null, idendation);
             this.expression = expression;
             this.cmd = cmd;
+            this.repcondcmd = repCondCmd;
         }
 
         @Override
@@ -867,7 +634,8 @@ public class AbstractTree {
             return getHead("<RepCondCmd>")
                 + expression
                 + cmd
-                + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextRepCondCmd/>"))
+                + (repcondcmd != null ? repcondcmd : getBody("<NoNextRepCondCmd/>"))
+                + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextCmd/>"))
                 + getHead("</RepCondCmd>");
         }
 
@@ -875,26 +643,14 @@ public class AbstractTree {
         public void check(Checker checker) throws CheckerException {
             //check expr return type is from type BOOL
             ExpressionInfo exprinfo = expression.check(checker);
-            if (exprinfo.getType().equals(Tokens.TypeToken.Type.BOOL)) {
+            if (exprinfo.getType() != Tokens.TypeToken.Type.BOOL) {
                 throw new CheckerException("ELSEIF condition needs to be BOOL. Current type: " + exprinfo.getType());
+            }
+            if (repcondcmd != null) {
+                repcondcmd.check(checker);
             }
             if (getNextCmd() != null) {
                 getNextCmd().check(checker);
-            }
-        }
-
-        @Override
-        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            methodscpecbuilder.addCode("else if(");
-            expression.generateCode(methodscpecbuilder);
-            methodscpecbuilder.addCode(") {" + System.lineSeparator());
-
-            cmd.generateCode(methodscpecbuilder);
-
-            methodscpecbuilder.addCode("}" + System.lineSeparator());
-
-            if (getNextCmd() != null) {
-                getNextCmd().generateCode(methodscpecbuilder);
             }
         }
     }
@@ -923,20 +679,13 @@ public class AbstractTree {
         @Override
         public void check(Checker checker) throws CheckerException {
             //check expr return type is from type BOOL
-            // TODO: Fix nullpointer
             ExpressionInfo exprinfo = expression.check(checker);
-            if (exprinfo != null && exprinfo.getType().equals(Tokens.TypeToken.Type.BOOL)) {
+            if (exprinfo.getType() != Tokens.TypeToken.Type.BOOL && exprinfo.getType() != null) {
                 throw new CheckerException("WHILE condition needs to be BOOL. Current type: " + exprinfo.getType());
             }
             if (getNextCmd() != null) {
                 getNextCmd().check(checker);
             }
-        }
-
-        @Override
-        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            // FIXME: Implement code generation
-            throw new RuntimeException("Code generation not implemented yet!");
         }
     }
 
@@ -970,14 +719,6 @@ public class AbstractTree {
                 getNextCmd().check(checker);
             }
         }
-
-        @Override
-        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            routinecall.generateCode(methodscpecbuilder);
-            if (getNextCmd() != null) {
-                getNextCmd().generateCode(methodscpecbuilder);
-            }
-        }
     }
 
     public static class InputCmd extends Cmd {
@@ -1001,17 +742,6 @@ public class AbstractTree {
         public void check(Checker checker) throws CheckerException {
             if (getNextCmd() != null) {
                 getNextCmd().check(checker);
-            }
-        }
-
-        @Override
-        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            // FIXME: Fix known errata
-            methodscpecbuilder.addStatement("System.out.println(\"Input a value:\")");
-            expression.generateCode(methodscpecbuilder);
-            methodscpecbuilder.addCode(" = scanner.nextInt();" + System.lineSeparator());
-            if (getNextCmd() != null) {
-                getNextCmd().generateCode(methodscpecbuilder);
             }
         }
     }
@@ -1039,18 +769,6 @@ public class AbstractTree {
                 getNextCmd().check(checker);
             }
         }
-
-        @Override
-        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            methodscpecbuilder.addStatement("System.out.println(\"Output of value is:\")");
-            methodscpecbuilder.addCode("System.out.println(");
-            expression.generateCode(methodscpecbuilder);
-            methodscpecbuilder.addCode(");" + System.lineSeparator());
-
-            if (getNextCmd() != null) {
-                getNextCmd().generateCode(methodscpecbuilder);
-            }
-        }
     }
 
     public abstract static class TypedIdent<T> extends AbstractNode {
@@ -1061,16 +779,47 @@ public class AbstractTree {
 
         public abstract Tokens.IdentifierToken getIdentifier();
 
-        public abstract Tokens.TypeToken getType();
+        public abstract Tokens.TypeToken.Type getType();
+    }
+
+    public static class TypedIdentIdent extends TypedIdent<Tokens.IdentifierToken> {
+
+        public final Tokens.IdentifierToken identifier1;
+
+        public final Tokens.IdentifierToken identifier2;
+
+        public TypedIdentIdent(Tokens.IdentifierToken identifier1, Tokens.IdentifierToken identifier2, int idendation) {
+            super(idendation);
+            this.identifier1 = identifier1;
+            this.identifier2 = identifier2;
+        }
+
+        @Override
+        public String toString() {
+            return getHead("<TypedIdentIdent>")
+                + getBody("<Ident Name='" + identifier1.getName() + "'/>")
+                + getBody("<Ident Name='" + identifier2.getName() + "'/>")
+                + getHead("</TypedIdentIdent>");
+        }
+
+        @Override
+        public Tokens.IdentifierToken getIdentifier() {
+            return identifier1;
+        }
+
+        @Override
+        public Tokens.TypeToken.Type getType() {
+            return null;
+        }
     }
 
     public static class TypedIdentType extends TypedIdent<Tokens.IdentifierToken> {
 
         public final Tokens.IdentifierToken identifier;
 
-        public final Tokens.TypeToken type;
+        public final Tokens.TypeToken.Type type;
 
-        public TypedIdentType(Tokens.IdentifierToken identifier, Tokens.TypeToken type, int idendation) {
+        public TypedIdentType(Tokens.IdentifierToken identifier, Tokens.TypeToken.Type type, int idendation) {
             super(idendation);
             this.identifier = identifier;
             this.type = type;
@@ -1085,37 +834,12 @@ public class AbstractTree {
         }
 
         @Override
-        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            switch (type.getType()) {
-                case BOOL:
-                    methodscpecbuilder.addCode("boolean");
-                    break;
-                case INT:
-                    methodscpecbuilder.addCode("int");
-                    break;
-                case INT64:
-                default:
-                    methodscpecbuilder.addCode("long");
-                    break;
-            }
-            methodscpecbuilder.addCode(" " + identifier.getName());
-        }
-
-        public String getParameterName() {
-            return identifier.getName();
-        }
-
-        public Tokens.TypeToken.Type getParameterType() {
-            return type.getType();
-        }
-
-        @Override
         public Tokens.IdentifierToken getIdentifier() {
             return identifier;
         }
 
         @Override
-        public Tokens.TypeToken getType() {
+        public Tokens.TypeToken.Type getType() {
             return type;
         }
     }
@@ -1145,14 +869,21 @@ public class AbstractTree {
                 + getHead("</LiteralExpr>");
         }
 
-        @Override
-        public ExpressionInfo check(Checker checker) throws CheckerException {
+        public ExpressionInfo check() throws CheckerException {
             //check Lvalue
             throw new CheckerException("Found literal " + literal.getValue() + "in the left part of an assignement");
         }
 
-        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            methodscpecbuilder.addCode(literal.getValue());
+        @Override
+        public ExpressionInfo check(Checker checker) throws CheckerException {
+            if (literal.getType() == Tokens.TypeToken.Type.BOOL) {
+                return new ExpressionInfo(String.valueOf(literal.getValue()), Tokens.TypeToken.Type.BOOL);
+            } else if (literal.getType() == Tokens.TypeToken.Type.INT) {
+                return new ExpressionInfo(String.valueOf(literal.getValue()), Tokens.TypeToken.Type.INT);
+            } else if (literal.getType() == Tokens.TypeToken.Type.INT64) {
+                return new ExpressionInfo(String.valueOf(literal.getValue()), Tokens.TypeToken.Type.INT64);
+            }
+            throw new CheckerException("Invalid literal type");
         }
     }
 
@@ -1190,16 +921,31 @@ public class AbstractTree {
             if (store == null) {
                 //check if store is declared on global scope
                 store = checker.getGlobalStoreTable().getStore(identifier.getName());
-                if (store == null) {
-                    throw new CheckerException("Identifier " + identifier.getName() + " is not declared");
+                //check if identifier in routine defined
+                HashMap map = checker.getGlobalRoutineTable().getTable();
+                Routine routine = null;
+                Iterator it = map.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry) it.next();
+                    routine = (Routine) pair.getValue();
+                    List<Parameter> parameters = routine.getParameters();
+                    for (Parameter parameter : parameters) {
+                        if (parameter.getName().equals(identifier.getName())) {
+                            return new ExpressionInfo(parameter.getName(), parameter.getType());
+                        }
+                    }
                 }
-
+                //store not initialized variable because before a initialisation of a variable i can be used
+                if (checker.getGlobalStoreTable().getStore(identifier.getName()) == null) {
+                    checker.getGlobalStoreTable().addStore(new Store(identifier.getName(), null, false));
+                    return new ExpressionInfo(identifier.getName(), null);
+                }
+                //throw exception in the end
+                //if (store == null) {
+                //    throw new CheckerException("Identifier " + identifier.getName() + " is not declared");
+                //}
             }
             return new ExpressionInfo(store.getIdentifier(), store.getType());
-        }
-
-        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            methodscpecbuilder.addCode(identifier.getName());
         }
     }
 
@@ -1221,10 +967,6 @@ public class AbstractTree {
 
         public ExpressionInfo check(Checker checker) throws CheckerException {
             return routinecall.check(checker);
-        }
-
-        public void generateCode(MethodSpec.Builder methodspecbuilder) {
-            routinecall.generateCode(methodspecbuilder);
         }
     }
 
@@ -1251,16 +993,6 @@ public class AbstractTree {
         @Override
         public ExpressionInfo check(Checker checker) throws CheckerException {
             return expression.check(checker);
-        }
-
-        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            if (operation.getOperation() == Tokens.OperationToken.Operation.MINUS) {
-                methodscpecbuilder.addCode(" -");
-                expression.generateCode(methodscpecbuilder);
-            } else if (operation.getTerminal() == Terminal.NOT) {
-                // FIXME: Fix known errata
-                throw new RuntimeException("The generator just hit a known errata in the monadic expression");
-            }
         }
     }
 
@@ -1290,116 +1022,77 @@ public class AbstractTree {
 
         @Override
         public ExpressionInfo check(Checker checker) throws CheckerException {
-            // TODO: Implement all expressions
             ExpressionInfo exprinfo1 = expression1.check(checker);
             ExpressionInfo exprinfo2 = expression2.check(checker);
             Tokens.OperationToken.Operation opr = operation.getOperation();
 
-            return null;
-            // TODO
-            /*switch (opr) {
+            switch (opr) {
                 case PLUS:
-                    break;
-                case MINUS:
-                    break;
-                case AND:
-                    break;
-                case OR:
-                    if (exprinfo1.getType() == Tokens.TypeToken.Type.BOOL && exprinfo2.getType() == Tokens.TypeToken.Type.BOOL) {
-                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT64 && exprinfo2.getType() == Tokens.TypeToken.Type.INT64) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT64);
                     }
-                    throw new ContextException("Type error in operator " + opr + ".");
-                case CAND:
-                    break;
-                case COR:
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT && exprinfo2.getType() == Tokens.TypeToken.Type.INT) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT);
+                    }
                     break;
                 case TIMES:
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT64 && exprinfo2.getType() == Tokens.TypeToken.Type.INT64) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT64);
+                    }
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT && exprinfo2.getType() == Tokens.TypeToken.Type.INT) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT);
+                    }
                     break;
                 case DIVE:
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT64 && exprinfo2.getType() == Tokens.TypeToken.Type.INT64) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT64);
+                    }
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT && exprinfo2.getType() == Tokens.TypeToken.Type.INT) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT);
+                    }
                     break;
                 case MODE:
                     if (exprinfo1.getType() == Tokens.TypeToken.Type.INT64 && exprinfo2.getType() == Tokens.TypeToken.Type.INT64) {
                         return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT64);
                     }
-                    throw new ContextException("Type error in operator " + opr + ".");
-                case EQ:
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT && exprinfo2.getType() == Tokens.TypeToken.Type.INT) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT);
+                    }
                     break;
+                case EQ:
+                    return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
                 case NE:
+                    // Also booleans possible, no Exception thrown
                     if (exprinfo1.getType() == Tokens.TypeToken.Type.BOOL && exprinfo2.getType() == Tokens.TypeToken.Type.BOOL) {
                         return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
                     }
                     break;
-                case LT:
-                    break;
                 case GT:
-                    break;
+                    return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
+                case LT:
+                    return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
+                case GE:
+                    return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
                 case LE:
                     if (exprinfo1.getType() == Tokens.TypeToken.Type.INT64 && exprinfo2.getType() == Tokens.TypeToken.Type.INT64) {
-                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT64);
                     }
-                    throw new ContextException("Type error in operator " + opr + ".");
-                case GE:
-                    break;
-                default:
-                    throw new ContextException("Unhandled operation");
-            }*/
-        }
-
-        public void generateCode(MethodSpec.Builder methodspecbuilder) {
-            methodspecbuilder.addCode("(");
-            expression1.generateCode(methodspecbuilder);
-            switch (operation.getOperation()) {
-                case PLUS:
-                    methodspecbuilder.addCode(" + ");
-                    break;
-                case MINUS:
-                    methodspecbuilder.addCode(" - ");
-                    break;
-                case AND:
-                    methodspecbuilder.addCode(" && ");
-                    break;
-                case OR:
-                    methodspecbuilder.addCode(" || ");
-                    break;
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT && exprinfo2.getType() == Tokens.TypeToken.Type.INT) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT);
+                    }
                 case CAND:
-                    methodspecbuilder.addCode(" & ");
                     break;
                 case COR:
-                    methodspecbuilder.addCode(" | ");
                     break;
-                case TIMES:
-                    methodspecbuilder.addCode(" * ");
+                case AND:
                     break;
-                case DIVE:
-                    methodspecbuilder.addCode(" / ");
+                case OR:
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.BOOL && exprinfo2.getType() == Tokens.TypeToken.Type.BOOL) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
+                    }
                     break;
-                case MODE:
-                    methodspecbuilder.addCode(" % ");
-                    break;
-                case EQ:
-                    methodspecbuilder.addCode(" == ");
-                    break;
-                case NE:
-                    methodspecbuilder.addCode(" != ");
-                    break;
-                case LT:
-                    methodspecbuilder.addCode(" < ");
-                    break;
-                case GT:
-                    methodspecbuilder.addCode(" > ");
-                    break;
-                case LE:
-                    methodspecbuilder.addCode(" <= ");
-                    break;
-                case GE:
-                    methodspecbuilder.addCode(" >= ");
-                    break;
-                default:
-                    throw new RuntimeException("Invalid operation found!");
-
             }
-            expression2.generateCode(methodspecbuilder);
-            methodspecbuilder.addCode(")");
+            return new ExpressionInfo(exprinfo1.getName(), exprinfo1.getType());
         }
     }
 
@@ -1443,21 +1136,12 @@ public class AbstractTree {
 
             //check for type
             for (int i = 0; i < parameters.size(); i++) {
-                if (parameters.get(i).getType() != exprinfos.get(i).getType()) {
+                if (parameters.get(i).getType() != exprinfos.get(i).getType() && exprinfos.get(i).getType() != null) {
                     throw new CheckerException("Routine call: Type of " + (i + 1) + ". Argument does not match. Expected: "
                         + parameters.get(i).getType() + ", call has: " + exprinfos.get(i).getType());
                 }
             }
-
             return new ExpressionInfo(calledroutine.getIdentifier(), calledroutine.getReturnType());
-        }
-
-        public void generateCode(MethodSpec.Builder methodspecbuilder) {
-            methodspecbuilder.addCode(identifier.getName() + "(");
-            if (expressionlist != null) {
-                expressionlist.generateCode(methodspecbuilder);
-            }
-            methodspecbuilder.addCode(");" + System.lineSeparator());
         }
     }
 
@@ -1487,14 +1171,6 @@ public class AbstractTree {
                 expressionlist.check(checker, expressioninfos);
             }
         }
-
-        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            expression.generateCode(methodscpecbuilder);
-            if (expressionlist != null) {
-                methodscpecbuilder.addCode(", ");
-                expressionlist.generateCode(methodscpecbuilder);
-            }
-        }
     }
 
     public static class GlobalInit extends AbstractNode {
@@ -1521,11 +1197,6 @@ public class AbstractTree {
             if (nextglobalinit != null) {
                 nextglobalinit.check();
             }
-        }
-
-        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            // FIXME: Implement code generation
-            throw new RuntimeException("Code generation not implemented yet!");
         }
     }
 
@@ -1559,11 +1230,6 @@ public class AbstractTree {
 
         public void check(Routine routine) {
             routine.addGlobalImport(this);
-        }
-
-        public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            // FIXME: Implement code generation
-            throw new RuntimeException("Code generation not implemented yet!");
         }
     }
 }

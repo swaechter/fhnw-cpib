@@ -18,7 +18,7 @@ public class Scope {
         return storeTable;
     }
 
-    public Tokens.TypeToken getType(final String identifier) {
+    public Tokens.TypeToken.Type getType(final String identifier) {
         return storeTable.getType(identifier);
     }
 

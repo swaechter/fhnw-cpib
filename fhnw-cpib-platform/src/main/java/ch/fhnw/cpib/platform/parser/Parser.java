@@ -419,7 +419,7 @@ public class Parser {
                 Tokens.IdentifierToken identifier = (Tokens.IdentifierToken) consumeTerminal(context, Terminal.IDENT);
                 consumeTerminal(context, Terminal.COLON);
                 Tokens.TypeToken type = (Tokens.TypeToken) consumeTerminal(context, Terminal.TYPE);
-                return new ConcreteTree.TypedIdent(identifier, type, idendation);
+                return new ConcreteTree.TypedIdent(identifier, type.getType(), idendation);
             default:
                 throw new ParserException("Invalid terminal in typedIdent: " + context.getTerminal());
         }
@@ -823,7 +823,6 @@ public class Parser {
     private ConcreteTree.MonadicOpr parseMonadicOpr(Context context, int idendation) throws ParserException {
         switch (context.getTerminal()) {
             case NOT:
-                // FIXME: Fix known errata
                 Tokens.BoolOprToken boolopr = (Tokens.BoolOprToken) consumeTerminal(context, Terminal.NOT);
                 return new ConcreteTree.MonadicOprNot(boolopr, idendation);
             case ADDOPR:

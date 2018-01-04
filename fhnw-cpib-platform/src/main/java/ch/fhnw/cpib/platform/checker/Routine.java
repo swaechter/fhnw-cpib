@@ -14,7 +14,7 @@ public class Routine {
 
     private RoutineType routinetype;
 
-    private Tokens.TypeToken returntype;
+    private Tokens.TypeToken.Type returntype;
 
     private List<Parameter> param = new ArrayList<>();
 
@@ -26,7 +26,7 @@ public class Routine {
         this.scope = new Scope();
     }
 
-    public Routine(String identifier, RoutineType routinetype, Tokens.TypeToken returntype) {
+    public Routine(String identifier, RoutineType routinetype, Tokens.TypeToken.Type returntype) {
         this(identifier, routinetype);
         this.returntype = returntype;
     }
@@ -43,7 +43,7 @@ public class Routine {
         return routinetype;
     }
 
-    public Tokens.TypeToken getReturnType() {
+    public Tokens.TypeToken.Type getReturnType() {
         return returntype;
     }
 
@@ -53,6 +53,10 @@ public class Routine {
 
     public List<Parameter> getParameters() {
         return this.param;
+    }
+
+    public void addParameter(Parameter p) {
+        param.add(p);
     }
 
 }
