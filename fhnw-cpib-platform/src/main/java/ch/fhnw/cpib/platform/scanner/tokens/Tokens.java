@@ -42,14 +42,23 @@ public class Tokens {
 
         private final String value;
 
-        private final TypeToken.Type type = null;
+        private final TypeToken.Type type;
 
         public LiteralToken(String value, Terminal terminal) {
             super(terminal);
             try {
-                Long.parseLong(value);
+                long v = Long.parseLong(value);
+                if (v > Integer.MAX_VALUE && v < Long.MAX_VALUE) {
+                    type = TypeToken.Type.INT64;
+                } else if (v < Integer.MAX_VALUE && v > Integer.MIN_VALUE) {
+                    type = TypeToken.Type.INT;
+                } else if ("true".equals(value) || "false".equals(value)) {
+                    type = TypeToken.Type.BOOL;
+                } else {
+                    type = null;
+                }
             } catch (RuntimeException e) {
-                //throw new ScannerException(e.printStackTrace());
+                throw new RuntimeException("Invalid number " + value);
             }
             this.value = value;
         }

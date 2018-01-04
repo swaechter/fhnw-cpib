@@ -22,7 +22,7 @@ public class StoreTable {
         }
     }
 
-    public Tokens.TypeToken getType(final String identifier) {
+    public Tokens.TypeToken.Type getType(final String identifier) {
         if (storeMap.containsKey(identifier)) {
             return storeMap.get(identifier).getType();
         } else {

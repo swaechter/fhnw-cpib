@@ -1088,9 +1088,9 @@ public class ConcreteTree {
 
         private final Tokens.IdentifierToken identifier;
 
-        private final Tokens.TypeToken type;
+        private final Tokens.TypeToken.Type type;
 
-        public TypedIdent(Tokens.IdentifierToken identifier, Tokens.TypeToken type, int idendation) {
+        public TypedIdent(Tokens.IdentifierToken identifier, Tokens.TypeToken.Type type, int idendation) {
             super(idendation);
             this.identifier = identifier;
             this.type = type;
@@ -1098,7 +1098,7 @@ public class ConcreteTree {
 
         @Override
         public String toString() {
-            return getHead("<TypedIdent Name='" + identifier.getName() + "' Type='" + type.getType() + "'/>");
+            return getHead("<TypedIdent Name='" + identifier.getName() + "' Type='" + type + "'/>");
         }
 
         public AbstractTree.TypedIdent toAbstract(int idendation) {

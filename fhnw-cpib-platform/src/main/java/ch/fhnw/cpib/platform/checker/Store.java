@@ -16,7 +16,7 @@ public class Store extends Symbol {
 
     public Store(
         final String identifier,
-        final Tokens.TypeToken type,
+        final Tokens.TypeToken.Type type,
         final boolean isConst) {
         super(identifier, type);
         this.writeable = true;

@@ -39,7 +39,11 @@ public class CheckerTest {
             Assert.assertTrue(abstractprogram.toString().length() > 0);
 
             // Check the tree
-            abstractprogram.check(new Checker());
+            //try {
+                abstractprogram.checkCode(new Checker());
+            //} catch (Exception e) {
+            //    System.out.println(filename);
+            //}
         }
     }
 }

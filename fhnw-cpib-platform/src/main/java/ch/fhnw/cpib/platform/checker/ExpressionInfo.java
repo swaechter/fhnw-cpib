@@ -6,9 +6,9 @@ public class ExpressionInfo {
 
     private String name;
 
-    private Tokens.TypeToken type;
+    private Tokens.TypeToken.Type type;
 
-    public ExpressionInfo(String name, Tokens.TypeToken type) {
+    public ExpressionInfo(String name, Tokens.TypeToken.Type type) {
         this.name = name;
         this.type = type;
     }
@@ -17,7 +17,7 @@ public class ExpressionInfo {
         return name;
     }
 
-    public Tokens.TypeToken getType() {
+    public Tokens.TypeToken.Type getType() {
         return type;
     }
 }

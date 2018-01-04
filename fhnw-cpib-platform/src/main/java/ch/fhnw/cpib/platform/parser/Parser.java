@@ -419,7 +419,7 @@ public class Parser {
                 Tokens.IdentifierToken identifier = (Tokens.IdentifierToken) consumeTerminal(context, Terminal.IDENT);
                 consumeTerminal(context, Terminal.COLON);
                 Tokens.TypeToken type = (Tokens.TypeToken) consumeTerminal(context, Terminal.TYPE);
-                return new ConcreteTree.TypedIdent(identifier, type, idendation);
+                return new ConcreteTree.TypedIdent(identifier, type.getType(), idendation);
             default:
                 throw new ParserException("Invalid terminal in typedIdent: " + context.getTerminal());
         }

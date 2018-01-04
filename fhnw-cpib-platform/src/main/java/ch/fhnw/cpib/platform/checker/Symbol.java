@@ -6,9 +6,9 @@ public class Symbol {
 
     private String identifier;
 
-    private Tokens.TypeToken type;
+    private Tokens.TypeToken.Type type;
 
-    public Symbol(String identifier, Tokens.TypeToken type) {
+    public Symbol(String identifier, Tokens.TypeToken.Type type) {
         this.identifier = identifier;
         this.type = type;
     }
@@ -17,7 +17,7 @@ public class Symbol {
         return identifier;
     }
 
-    public Tokens.TypeToken getType() {
+    public Tokens.TypeToken.Type getType() {
         return type;
     }
 }
