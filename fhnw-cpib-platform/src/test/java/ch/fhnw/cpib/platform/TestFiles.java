@@ -7,7 +7,7 @@ public class TestFiles {
 
     // Overflow.iml and TypeConversions.iml were dropped due their use of pre- and post increment/decrement
     public static final List<String> filenames = Arrays.asList(
-        /*"/Team/Program1.iml",
+        "/Team/Program1.iml",
         "/Team/Program2.iml",
         "/Team/Program3.iml",
         "/Existing/Assoc.iml",
@@ -48,7 +48,7 @@ public class TestFiles {
         "/Existing/test08.iml",
         "/Existing/test10.iml",
         "/Existing/TestDivMod.iml",
-        "/Existing/TruthTable.iml",*/
+        "/Existing/TruthTable.iml",
         "/Generator/TestFile1.iml"
     );
 
