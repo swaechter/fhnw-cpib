@@ -1,6 +1,7 @@
 package ch.fhnw.cpib.platform.generator;
 
 import ch.fhnw.cpib.platform.TestFiles;
+import ch.fhnw.cpib.platform.checker.Checker;
 import ch.fhnw.cpib.platform.parser.Parser;
 import ch.fhnw.cpib.platform.parser.abstracttree.AbstractTree;
 import ch.fhnw.cpib.platform.parser.concretetree.ConcreteTree;
@@ -42,7 +43,7 @@ public class TestGenerator {
             //System.out.println(abstractprogram);
 
             // Check the abstract tree
-            //abstractprogram.check(new Checker());
+            abstractprogram.checkCode(new Checker());
 
             // Generate the Java code
             JavaFile javafile = generator.generateJavaFile(abstractprogram);
