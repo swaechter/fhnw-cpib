@@ -4,34 +4,41 @@ import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
 public class Parameter {
 
-    private Tokens.TypeToken type;
+    private String name;
 
-    private Tokens.FlowModeToken flowmode;
+    private Tokens.TypeToken.Type type;
 
-    private Tokens.MechModeToken mechmode;
+    private Tokens.FlowModeToken.FlowMode flowmode;
 
-    private Tokens.ChangeModeToken changemode;
+    private Tokens.MechModeToken.MechMode mechmode;
 
-    public Parameter(Tokens.TypeToken type, Tokens.FlowModeToken flowmode, Tokens.MechModeToken mechmode, Tokens.ChangeModeToken changemode) {
+    private Tokens.ChangeModeToken.ChangeMode changemode;
+
+    public Parameter(String name, Tokens.TypeToken.Type type, Tokens.FlowModeToken.FlowMode flowmode, Tokens.MechModeToken.MechMode mechmode, Tokens.ChangeModeToken.ChangeMode changemode) {
+        this.name = name;
         this.type = type;
         this.flowmode = flowmode;
         this.mechmode = mechmode;
         this.changemode = changemode;
     }
 
-    public Tokens.TypeToken getType() {
+    public String getName() {
+        return name;
+    }
+
+    public Tokens.TypeToken.Type getType() {
         return type;
     }
 
-    public Tokens.FlowModeToken getFlowMode() {
+    public Tokens.FlowModeToken.FlowMode getFlowMode() {
         return flowmode;
     }
 
-    public Tokens.MechModeToken getMechMode() {
+    public Tokens.MechModeToken.MechMode getMechMode() {
         return mechmode;
     }
 
-    public Tokens.ChangeModeToken getChangeMode() {
+    public Tokens.ChangeModeToken.ChangeMode getChangeMode() {
         return changemode;
     }
 }

@@ -9,10 +9,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class AbstractTree {
 
@@ -44,15 +41,15 @@ public class AbstractTree {
                 + ("</Program>");
         }
 
-        public void check(Checker checker) throws CheckerException {
+        public void checkCode(Checker checker) throws CheckerException {
             if (progparam != null) {
-                progparam.check(checker);
+                progparam.checkCode(checker);
             }
             if (declaration != null) {
-                declaration.check(checker);
+                declaration.checkCode(checker);
             }
             if (cmd != null) {
-                cmd.check(checker);
+                cmd.checkCode(checker);
             }
         }
 
@@ -118,7 +115,7 @@ public class AbstractTree {
                 + getHead("</ProgParam>");
         }
 
-        public void check(Checker checker) throws CheckerException {
+        public void checkCode(Checker checker) throws CheckerException {
             //check if identifier exist in global store table
             if (checker.getGlobalStoreTable().getStore(typedident.getIdentifier().getName()) != null) {
                 throw new CheckerException("Identifier " + typedident.getIdentifier().getName() + " is already declared");
@@ -126,7 +123,7 @@ public class AbstractTree {
             //store identifier in global store table
             checker.getGlobalStoreTable().addStore(new Store(typedident.getIdentifier().getName(), typedident.getType(), changemode.getChangeMode() == Tokens.ChangeModeToken.ChangeMode.CONST));
             if (nextprogparam != null) {
-                nextprogparam.check(checker);
+                nextprogparam.checkCode(checker);
             }
         }
 
@@ -184,36 +181,37 @@ public class AbstractTree {
                 + getHead("</Param>");
         }
 
-        public void check(Routine routine) throws CheckerException {
-            /*Store store = new Store(typedident.getIdentifier().getName(), typedident.getType(), true); //TODO
+        public void checkCode(Checker checker, Routine routine) throws CheckerException {
+            Store store = checker.getGlobalStoreTable().getStore(typedident.getIdentifier().getName());
             switch (flowmode.getFlowMode()) {
                 case IN:
                     //passing parameter must be constant
-                    if (mechmode.getMechMode() == Tokens.MechModeToken.MechMode.REF && !store.isConst()) {
+                    if (store != null && mechmode.getMechMode() == Tokens.MechModeToken.MechMode.REF && !store.isConst()) {
                         throw new CheckerException("IN reference parameter can not be var! Ident: " + store.getIdentifier());
                     }
-                    store.initialize();
+                    routine.addParameter(new Parameter(typedident.getIdentifier().getName(), typedident.getType(), flowmode.getFlowMode(), mechmode.getMechMode(), changemode.getChangeMode()));
                     break;
                 case INOUT:
                     if (routine.getRoutineType() != RoutineType.PROCEDURE) {
                         throw new CheckerException("INOUT parameter in function declaration! Ident: " + store.getIdentifier());
                     }
-                    if (store.isConst()) {
+                    if (store != null && store.isConst()) {
                         throw new CheckerException("INOUT parameter can not be constant! Ident: " + store.getIdentifier());
                     }
-                    store.initialize();
+                    routine.addParameter(new Parameter(typedident.getIdentifier().getName(), typedident.getType(), flowmode.getFlowMode(), mechmode.getMechMode(), changemode.getChangeMode()));
                     break;
                 case OUT:
                     if (routine.getRoutineType() != RoutineType.PROCEDURE) {
                         throw new CheckerException("OUT parameter in function declaration! Ident: " + store.getIdentifier());
                     }
+                    routine.addParameter(new Parameter(typedident.getIdentifier().getName(), typedident.getType(), flowmode.getFlowMode(), mechmode.getMechMode(), changemode.getChangeMode()));
                     break;
                 default:
                     break;
             }
             if (nextparam != null) {
-                nextparam.check(routine);
-            }*/
+                nextparam.checkCode(checker, routine);
+            }
         }
 
         public void generateCode(MethodSpec.Builder methodscpecbuilder) {
@@ -250,7 +248,7 @@ public class AbstractTree {
             return nextdeclaration;
         }
 
-        public abstract Tokens.TypeToken check(Checker checker) throws CheckerException;
+        public abstract Tokens.TypeToken.Type checkCode(Checker checker) throws CheckerException;
 
         public abstract void generateCode(MethodSpec.Builder methodscpecbuilder);
     }
@@ -277,7 +275,7 @@ public class AbstractTree {
         }
 
         @Override
-        public Tokens.TypeToken check(Checker checker) throws CheckerException {
+        public Tokens.TypeToken.Type checkCode(Checker checker) throws CheckerException {
             //check if global scope applies
             StoreTable storetable;
             if (checker.getScope() == null) {
@@ -299,9 +297,9 @@ public class AbstractTree {
             store.setReference(false);
 
             if (getNextDeclaration() != null) {
-                getNextDeclaration().check(checker);
+                getNextDeclaration().checkCode(checker);
             }
-            return typedident.getType();
+            return null;
         }
 
         @Override
@@ -393,7 +391,7 @@ public class AbstractTree {
         }
 
         @Override
-        public Tokens.TypeToken check(Checker checker) throws CheckerException {
+        public Tokens.TypeToken.Type checkCode(Checker checker) throws CheckerException {
             //check if function exist in global routine table
             Routine function = new Routine(identifier.getName(), RoutineType.FUNCTION);
             //store function in global routine table if not
@@ -402,22 +400,22 @@ public class AbstractTree {
             }
             checker.setScope(function.getScope());
             if (param != null) {
-                param.check(function);
+                param.checkCode(checker, function);
             }
             if (storedeclaration != null) {
-                storedeclaration.check(checker);
+                storedeclaration.checkCode(checker);
             }
             if (globalimport != null) {
-                globalimport.check(function);
+                globalimport.checkCode(function);
             }
             if (cmd != null) {
-                cmd.check(checker);
+                cmd.checkCode(checker);
             }
             checker.setScope(null);
             if (getNextDeclaration() != null) {
-                getNextDeclaration().check(checker);
+                getNextDeclaration().checkCode(checker);
             }
-            return null; //TODO
+            return null;
         }
 
         @Override
@@ -500,28 +498,28 @@ public class AbstractTree {
         }
 
         @Override
-        public Tokens.TypeToken check(Checker checker) throws CheckerException {
+        public Tokens.TypeToken.Type checkCode(Checker checker) throws CheckerException {
             //store function in global procedure table
             Routine procedure = new Routine(identifier.getName(), RoutineType.PROCEDURE);
             checker.getGlobalRoutineTable().insert(procedure);
             checker.setScope(procedure.getScope());
             if (param != null) {
-                param.check(procedure);
+                param.checkCode(checker, procedure);
             }
             if (globalimport != null) {
-                globalimport.check(procedure);
+                globalimport.checkCode(procedure);
             }
             if (cmd != null) {
-                cmd.check(checker);
+                cmd.checkCode(checker);
             }
             if (declaration != null) {
-                declaration.check(checker);
+                declaration.checkCode(checker);
             }
             checker.setScope(null);
             if (getNextDeclaration() != null) {
-                getNextDeclaration().check(checker);
+                getNextDeclaration().checkCode(checker);
             }
-            return null; //TODO
+            return null;
         }
 
         @Override
@@ -565,7 +563,7 @@ public class AbstractTree {
             return nextcmd;
         }
 
-        public abstract void check(Checker checker) throws CheckerException;
+        public abstract void checkCode(Checker checker) throws CheckerException;
     }
 
     public static class SkipCmd extends Cmd {
@@ -582,9 +580,9 @@ public class AbstractTree {
         }
 
         @Override
-        public void check(Checker checker) throws CheckerException {
+        public void checkCode(Checker checker) throws CheckerException {
             if (getNextCmd() != null) {
-                getNextCmd().check(checker);
+                getNextCmd().checkCode(checker);
             }
         }
 
@@ -626,27 +624,36 @@ public class AbstractTree {
         }
 
         @Override
-        public void check(Checker checker) throws CheckerException {
-            List<ExpressionInfo> targetexprinfos = new ArrayList<>();
-            List<ExpressionInfo> sourceexprinfos = new ArrayList<>();
-            ExpressionInfo targetexprinfo = expression1.check(checker);
-            ExpressionInfo sourceexprinfo = expression2.check(checker);
+        public void checkCode(Checker checker) throws CheckerException {
+            List<ExpressionInfo> targetExprInfos = new ArrayList<>();
+            List<ExpressionInfo> sourceExprInfos = new ArrayList<>();
+
+            ExpressionInfo sourceExprInfo = expression2.checkCode(checker);
+            ExpressionInfo targetExprInfo = expression1.checkCode(checker);
+
             if (expressionlist1 != null) {
-                expressionlist1.check(checker, targetexprinfos);
+                expressionlist1.checkCode(checker, targetExprInfos);
             }
             if (expressionlist2 != null) {
-                expressionlist2.check(checker, sourceexprinfos);
+                expressionlist2.checkCode(checker, sourceExprInfos);
             }
 
             //check if first type on each side has same type
-            boolean normalassignmentvalid = targetexprinfo.getType() == sourceexprinfo.getType();
+            boolean normalassignmentvalid = targetExprInfo.getType() == sourceExprInfo.getType();
 
             //normal assignment
             if (expressionlist1 == null && expressionlist2 == null) {
-                if (!normalassignmentvalid) {
-                    throw new CheckerException("Assignment not possible due different datatypes: " +
-                        targetexprinfo.getType() + " = " + sourceexprinfo.getType());
+                //check if null because variable can be used without initialisation
+                if (!normalassignmentvalid && targetExprInfo.getType() != null && sourceExprInfo.getType() != null) {
+                    //allow assignment INT to INT64
+                    if (targetExprInfo.getType() != Tokens.TypeToken.Type.INT64 && sourceExprInfo.getType() != Tokens.TypeToken.Type.INT) {
+                        throw new CheckerException("Assignment not possible due different datatypes: " +
+                            targetExprInfo.getType() + " = " + sourceExprInfo.getType());
+                    }
                 }
+            }
+            if (getNextCmd() != null) {
+                getNextCmd().checkCode(checker);
             }
         }
 
@@ -694,18 +701,17 @@ public class AbstractTree {
         }
 
         @Override
-        public void check(Checker checker) throws CheckerException {
-            ExpressionInfo exprinfo = expression.check(checker);
-            SwitchCase switchSave = new SwitchCase(exprinfo.getType(), repcasecmd.literal);
-            //store switch expr name as key (first argument)
-            //and switch object with switch expr type and case literal token with value and type (second argument)
-            checker.getGlobalSwitchTable().insert(exprinfo.getName(), switchSave);
-            //check if switch expr and case literal have the same data type
-            List<SwitchCase> switchCheck = checker.getGlobalSwitchTable().getEntry(exprinfo.getName());
-            if (exprinfo.getType().equals(switchCheck.get(0).getLiteraltoken().getType())) {
-                throw new CheckerException("SwitchCase expr and case literal are not from the same type. " +
-                    "Current switch expr type: " + exprinfo.getType() +
-                    "Current case literal type: " + switchCheck.get(0).getLiteraltoken().getType());
+        public void checkCode(Checker checker) throws CheckerException {
+            ExpressionInfo exprinfo = expression.checkCode(checker);
+            Switch s = new Switch(exprinfo.getName(), exprinfo.getType());
+            //store switch with name and type
+            checker.getGlobalSwitchTable().insert(s);
+            repcasecmd.checkCode(checker);
+            if (cmd != null) {
+                cmd.checkCode(checker);
+            }
+            if (getNextCmd() != null) {
+                getNextCmd().checkCode(checker);
             }
         }
 
@@ -754,14 +760,40 @@ public class AbstractTree {
         }
 
         @Override
-        public void check(Checker checker) throws CheckerException {
-            HashMap<String, List<SwitchCase>> map = checker.getGlobalSwitchTable().getTable();
-            //check if case literal vales are different
-            List<SwitchCase> cases = map.get(0); //TODO String exprName
-            for (SwitchCase c : cases) {
-                if (c.getLiteraltoken().getValue().equals(literal.getValue())) {
-                    throw new CheckerException("Case literal values have the same value.");
+        public void checkCode(Checker checker) throws CheckerException {
+            HashMap<String, Switch> map = checker.getGlobalSwitchTable().getTable();
+            Iterator it = map.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                Switch s = (Switch) pair.getValue();
+                //check if case literal vales are different
+                if (!s.getSwitchCaseList().isEmpty()) {
+                    for (SwitchCase c : s.getSwitchCaseList()) {
+                        if (c.getLiteraltoken().getValue().equals(literal.getValue())) {
+                            throw new CheckerException("Case literal values have the same value.");
+                        }
+                    }
                 }
+
+                //check if switch type and case literal type have the same type
+                if (!s.getSwitchCaseList().isEmpty()) {
+                    for (SwitchCase c : s.getSwitchCaseList()) {
+                        if (s.getType() != literal.getType()) {
+                            throw new CheckerException("SwitchCase expr and case literal are not from the same type. " +
+                                "Current switch expr type: " + s.getType() +
+                                "Current case literal type: " + literal.getType());
+                        }
+                    }
+                }
+
+                //add case literal with value and type
+                SwitchCase switchCase = new SwitchCase(literal);
+                //store case to switch
+                s.addSwitchCase(switchCase);
+                checker.getGlobalSwitchTable().insert(s);
+            }
+            if (getNextCmd() != null) {
+                getNextCmd().checkCode(checker);
             }
         }
 
@@ -807,20 +839,20 @@ public class AbstractTree {
         }
 
         @Override
-        public void check(Checker checker) throws CheckerException {
+        public void checkCode(Checker checker) throws CheckerException {
             //check expr return type is from type BOOL
-            ExpressionInfo exprinfo = expression.check(checker);
-            if (exprinfo.getType().equals(Tokens.TypeToken.Type.BOOL)) {
+            ExpressionInfo exprinfo = expression.checkCode(checker);
+            if (exprinfo.getType() != Tokens.TypeToken.Type.BOOL) {
                 throw new CheckerException("IF condition needs to be BOOL. Current type: " + exprinfo.getType());
             }
             if (repcondcmd != null) {
-                repcondcmd.check(checker);
+                repcondcmd.checkCode(checker);
             }
             if (othercmd != null) {
-                othercmd.check(checker);
+                othercmd.checkCode(checker);
             }
             if (getNextCmd() != null) {
-                getNextCmd().check(checker);
+                getNextCmd().checkCode(checker);
             }
         }
 
@@ -856,10 +888,13 @@ public class AbstractTree {
 
         public final Cmd cmd;
 
+        public final RepCondCmd repcondcmd;
+
         public RepCondCmd(Expression expression, Cmd cmd, RepCondCmd repCondCmd, int idendation) {
             super(repCondCmd, idendation);
             this.expression = expression;
             this.cmd = cmd;
+            this.repcondcmd = repCondCmd;
         }
 
         @Override
@@ -867,19 +902,23 @@ public class AbstractTree {
             return getHead("<RepCondCmd>")
                 + expression
                 + cmd
+                + (repcondcmd != null ? repcondcmd : getBody("<NoNextRepCondCmd/>"))
                 + (getNextCmd() != null ? getNextCmd() : getBody("<NoNextRepCondCmd/>"))
                 + getHead("</RepCondCmd>");
         }
 
         @Override
-        public void check(Checker checker) throws CheckerException {
+        public void checkCode(Checker checker) throws CheckerException {
             //check expr return type is from type BOOL
-            ExpressionInfo exprinfo = expression.check(checker);
-            if (exprinfo.getType().equals(Tokens.TypeToken.Type.BOOL)) {
+            ExpressionInfo exprinfo = expression.checkCode(checker);
+            if (exprinfo.getType() != Tokens.TypeToken.Type.BOOL) {
                 throw new CheckerException("ELSEIF condition needs to be BOOL. Current type: " + exprinfo.getType());
             }
+            if (repcondcmd != null) {
+                repcondcmd.checkCode(checker);
+            }
             if (getNextCmd() != null) {
-                getNextCmd().check(checker);
+                getNextCmd().checkCode(checker);
             }
         }
 
@@ -921,15 +960,14 @@ public class AbstractTree {
         }
 
         @Override
-        public void check(Checker checker) throws CheckerException {
+        public void checkCode(Checker checker) throws CheckerException {
             //check expr return type is from type BOOL
-            // TODO: Fix nullpointer
-            ExpressionInfo exprinfo = expression.check(checker);
-            if (exprinfo != null && exprinfo.getType().equals(Tokens.TypeToken.Type.BOOL)) {
+            ExpressionInfo exprinfo = expression.checkCode(checker);
+            if (exprinfo.getType() != Tokens.TypeToken.Type.BOOL && exprinfo.getType() != null) {
                 throw new CheckerException("WHILE condition needs to be BOOL. Current type: " + exprinfo.getType());
             }
             if (getNextCmd() != null) {
-                getNextCmd().check(checker);
+                getNextCmd().checkCode(checker);
             }
         }
 
@@ -962,12 +1000,12 @@ public class AbstractTree {
         }
 
         @Override
-        public void check(Checker checker) throws CheckerException {
+        public void checkCode(Checker checker) throws CheckerException {
             if (globalinit != null) {
-                globalinit.check();
+                globalinit.checkCode();
             }
             if (getNextCmd() != null) {
-                getNextCmd().check(checker);
+                getNextCmd().checkCode(checker);
             }
         }
 
@@ -998,9 +1036,9 @@ public class AbstractTree {
         }
 
         @Override
-        public void check(Checker checker) throws CheckerException {
+        public void checkCode(Checker checker) throws CheckerException {
             if (getNextCmd() != null) {
-                getNextCmd().check(checker);
+                getNextCmd().checkCode(checker);
             }
         }
 
@@ -1034,9 +1072,9 @@ public class AbstractTree {
         }
 
         @Override
-        public void check(Checker checker) throws CheckerException {
+        public void checkCode(Checker checker) throws CheckerException {
             if (getNextCmd() != null) {
-                getNextCmd().check(checker);
+                getNextCmd().checkCode(checker);
             }
         }
 
@@ -1061,16 +1099,16 @@ public class AbstractTree {
 
         public abstract Tokens.IdentifierToken getIdentifier();
 
-        public abstract Tokens.TypeToken getType();
+        public abstract Tokens.TypeToken.Type getType();
     }
 
     public static class TypedIdentType extends TypedIdent<Tokens.IdentifierToken> {
 
         public final Tokens.IdentifierToken identifier;
 
-        public final Tokens.TypeToken type;
+        public final Tokens.TypeToken.Type type;
 
-        public TypedIdentType(Tokens.IdentifierToken identifier, Tokens.TypeToken type, int idendation) {
+        public TypedIdentType(Tokens.IdentifierToken identifier, Tokens.TypeToken.Type type, int idendation) {
             super(idendation);
             this.identifier = identifier;
             this.type = type;
@@ -1086,7 +1124,7 @@ public class AbstractTree {
 
         @Override
         public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            switch (type.getType()) {
+            switch (type) {
                 case BOOL:
                     methodscpecbuilder.addCode("boolean");
                     break;
@@ -1106,7 +1144,7 @@ public class AbstractTree {
         }
 
         public Tokens.TypeToken.Type getParameterType() {
-            return type.getType();
+            return type;
         }
 
         @Override
@@ -1115,7 +1153,7 @@ public class AbstractTree {
         }
 
         @Override
-        public Tokens.TypeToken getType() {
+        public Tokens.TypeToken.Type getType() {
             return type;
         }
     }
@@ -1126,7 +1164,7 @@ public class AbstractTree {
             super(idendation);
         }
 
-        public abstract ExpressionInfo check(Checker checker) throws CheckerException;
+        public abstract ExpressionInfo checkCode(Checker checker) throws CheckerException;
     }
 
     public static class LiteralExpr extends Expression {
@@ -1145,10 +1183,21 @@ public class AbstractTree {
                 + getHead("</LiteralExpr>");
         }
 
-        @Override
-        public ExpressionInfo check(Checker checker) throws CheckerException {
+        public ExpressionInfo checkCode() throws CheckerException {
             //check Lvalue
             throw new CheckerException("Found literal " + literal.getValue() + "in the left part of an assignement");
+        }
+
+        @Override
+        public ExpressionInfo checkCode(Checker checker) throws CheckerException {
+            if (literal.getType() == Tokens.TypeToken.Type.BOOL) {
+                return new ExpressionInfo(String.valueOf(literal.getValue()), Tokens.TypeToken.Type.BOOL);
+            } else if (literal.getType() == Tokens.TypeToken.Type.INT) {
+                return new ExpressionInfo(String.valueOf(literal.getValue()), Tokens.TypeToken.Type.INT);
+            } else if (literal.getType() == Tokens.TypeToken.Type.INT64) {
+                return new ExpressionInfo(String.valueOf(literal.getValue()), Tokens.TypeToken.Type.INT64);
+            }
+            throw new CheckerException("Invalid literal type");
         }
 
         public void generateCode(MethodSpec.Builder methodscpecbuilder) {
@@ -1177,7 +1226,7 @@ public class AbstractTree {
         }
 
         @Override
-        public ExpressionInfo check(Checker checker) throws CheckerException {
+        public ExpressionInfo checkCode(Checker checker) throws CheckerException {
             //check if global scope applies
             StoreTable storetable;
             if (checker.getScope() == null) {
@@ -1190,10 +1239,29 @@ public class AbstractTree {
             if (store == null) {
                 //check if store is declared on global scope
                 store = checker.getGlobalStoreTable().getStore(identifier.getName());
-                if (store == null) {
-                    throw new CheckerException("Identifier " + identifier.getName() + " is not declared");
+                //check if identifier in routine defined
+                HashMap map = checker.getGlobalRoutineTable().getTable();
+                Routine routine = null;
+                Iterator it = map.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry) it.next();
+                    routine = (Routine) pair.getValue();
+                    List<Parameter> parameters = routine.getParameters();
+                    for (Parameter parameter : parameters) {
+                        if (parameter.getName().equals(identifier.getName())) {
+                            return new ExpressionInfo(parameter.getName(), parameter.getType());
+                        }
+                    }
                 }
-
+                //store not initialized variable because before a initialisation of a variable i can be used
+                if (checker.getGlobalStoreTable().getStore(identifier.getName()) == null) {
+                    checker.getGlobalStoreTable().addStore(new Store(identifier.getName(), null, false));
+                    return new ExpressionInfo(identifier.getName(), null);
+                }
+                //throw exception in the end
+                //if (store == null) {
+                //    throw new CheckerException("Identifier " + identifier.getName() + " is not declared");
+                //}
             }
             return new ExpressionInfo(store.getIdentifier(), store.getType());
         }
@@ -1219,8 +1287,8 @@ public class AbstractTree {
                 + getHead("</FunCallExpr>");
         }
 
-        public ExpressionInfo check(Checker checker) throws CheckerException {
-            return routinecall.check(checker);
+        public ExpressionInfo checkCode(Checker checker) throws CheckerException {
+            return routinecall.checkCode(checker);
         }
 
         public void generateCode(MethodSpec.Builder methodspecbuilder) {
@@ -1249,8 +1317,8 @@ public class AbstractTree {
         }
 
         @Override
-        public ExpressionInfo check(Checker checker) throws CheckerException {
-            return expression.check(checker);
+        public ExpressionInfo checkCode(Checker checker) throws CheckerException {
+            return expression.checkCode(checker);
         }
 
         public void generateCode(MethodSpec.Builder methodscpecbuilder) {
@@ -1289,18 +1357,68 @@ public class AbstractTree {
         }
 
         @Override
-        public ExpressionInfo check(Checker checker) throws CheckerException {
-            // TODO: Implement all expressions
-            ExpressionInfo exprinfo1 = expression1.check(checker);
-            ExpressionInfo exprinfo2 = expression2.check(checker);
+        public ExpressionInfo checkCode(Checker checker) throws CheckerException {
+            ExpressionInfo exprinfo1 = expression1.checkCode(checker);
+            ExpressionInfo exprinfo2 = expression2.checkCode(checker);
             Tokens.OperationToken.Operation opr = operation.getOperation();
 
-            return null;
-            // TODO
-            /*switch (opr) {
+            switch (opr) {
                 case PLUS:
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT64 && exprinfo2.getType() == Tokens.TypeToken.Type.INT64) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT64);
+                    }
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT && exprinfo2.getType() == Tokens.TypeToken.Type.INT) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT);
+                    }
                     break;
-                case MINUS:
+                case TIMES:
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT64 && exprinfo2.getType() == Tokens.TypeToken.Type.INT64) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT64);
+                    }
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT && exprinfo2.getType() == Tokens.TypeToken.Type.INT) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT);
+                    }
+                    break;
+                case DIVE:
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT64 && exprinfo2.getType() == Tokens.TypeToken.Type.INT64) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT64);
+                    }
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT && exprinfo2.getType() == Tokens.TypeToken.Type.INT) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT);
+                    }
+                    break;
+                case MODE:
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT64 && exprinfo2.getType() == Tokens.TypeToken.Type.INT64) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT64);
+                    }
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT && exprinfo2.getType() == Tokens.TypeToken.Type.INT) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT);
+                    }
+                    break;
+                case EQ:
+                    return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
+                case NE:
+                    // Also booleans possible, no Exception thrown
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.BOOL && exprinfo2.getType() == Tokens.TypeToken.Type.BOOL) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
+                    }
+                    break;
+                case GT:
+                    return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
+                case LT:
+                    return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
+                case GE:
+                    return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
+                case LE:
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT64 && exprinfo2.getType() == Tokens.TypeToken.Type.INT64) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT64);
+                    }
+                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT && exprinfo2.getType() == Tokens.TypeToken.Type.INT) {
+                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT);
+                    }
+                case CAND:
+                    break;
+                case COR:
                     break;
                 case AND:
                     break;
@@ -1308,41 +1426,9 @@ public class AbstractTree {
                     if (exprinfo1.getType() == Tokens.TypeToken.Type.BOOL && exprinfo2.getType() == Tokens.TypeToken.Type.BOOL) {
                         return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
                     }
-                    throw new ContextException("Type error in operator " + opr + ".");
-                case CAND:
                     break;
-                case COR:
-                    break;
-                case TIMES:
-                    break;
-                case DIVE:
-                    break;
-                case MODE:
-                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT64 && exprinfo2.getType() == Tokens.TypeToken.Type.INT64) {
-                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.INT64);
-                    }
-                    throw new ContextException("Type error in operator " + opr + ".");
-                case EQ:
-                    break;
-                case NE:
-                    if (exprinfo1.getType() == Tokens.TypeToken.Type.BOOL && exprinfo2.getType() == Tokens.TypeToken.Type.BOOL) {
-                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
-                    }
-                    break;
-                case LT:
-                    break;
-                case GT:
-                    break;
-                case LE:
-                    if (exprinfo1.getType() == Tokens.TypeToken.Type.INT64 && exprinfo2.getType() == Tokens.TypeToken.Type.INT64) {
-                        return new ExpressionInfo(exprinfo1.getName(), Tokens.TypeToken.Type.BOOL);
-                    }
-                    throw new ContextException("Type error in operator " + opr + ".");
-                case GE:
-                    break;
-                default:
-                    throw new ContextException("Unhandled operation");
-            }*/
+            }
+            return new ExpressionInfo(exprinfo1.getName(), exprinfo1.getType());
         }
 
         public void generateCode(MethodSpec.Builder methodspecbuilder) {
@@ -1423,7 +1509,7 @@ public class AbstractTree {
                 + getHead("</RoutineCall>");
         }
 
-        public ExpressionInfo check(Checker checker) throws CheckerException {
+        public ExpressionInfo checkCode(Checker checker) throws CheckerException {
             Routine calledroutine = checker.getGlobalRoutineTable().lookup(identifier.getName());
             if (calledroutine == null) {
                 throw new CheckerException("Routine " + identifier.getName() + " is not declared.");
@@ -1431,7 +1517,7 @@ public class AbstractTree {
 
             List<ExpressionInfo> exprinfos = new ArrayList<>();
             if (expressionlist != null) {
-                expressionlist.check(checker, exprinfos);
+                expressionlist.checkCode(checker, exprinfos);
             }
             List<Parameter> parameters = calledroutine.getParameters();
 
@@ -1443,12 +1529,11 @@ public class AbstractTree {
 
             //check for type
             for (int i = 0; i < parameters.size(); i++) {
-                if (parameters.get(i).getType() != exprinfos.get(i).getType()) {
+                if (parameters.get(i).getType() != exprinfos.get(i).getType() && exprinfos.get(i).getType() != null) {
                     throw new CheckerException("Routine call: Type of " + (i + 1) + ". Argument does not match. Expected: "
                         + parameters.get(i).getType() + ", call has: " + exprinfos.get(i).getType());
                 }
             }
-
             return new ExpressionInfo(calledroutine.getIdentifier(), calledroutine.getReturnType());
         }
 
@@ -1481,10 +1566,10 @@ public class AbstractTree {
                 + getHead("</ExpressionList>");
         }
 
-        public void check(Checker checker, List<ExpressionInfo> expressioninfos) throws CheckerException {
-            expressioninfos.add(expression.check(checker));
+        public void checkCode(Checker checker, List<ExpressionInfo> expressioninfos) throws CheckerException {
+            expressioninfos.add(expression.checkCode(checker));
             if (expressionlist != null) {
-                expressionlist.check(checker, expressioninfos);
+                expressionlist.checkCode(checker, expressioninfos);
             }
         }
 
@@ -1517,9 +1602,9 @@ public class AbstractTree {
                 + getHead("</GlobalInit>");
         }
 
-        public void check() {
+        public void checkCode() {
             if (nextglobalinit != null) {
-                nextglobalinit.check();
+                nextglobalinit.checkCode();
             }
         }
 
@@ -1557,7 +1642,7 @@ public class AbstractTree {
                 + getHead("</GlobalImport>");
         }
 
-        public void check(Routine routine) {
+        public void checkCode(Routine routine) {
             routine.addGlobalImport(this);
         }
 
