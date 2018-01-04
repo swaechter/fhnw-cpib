@@ -71,14 +71,14 @@ public class Compiler {
             System.out.println();
 
             // Execute the Java JAR file
-            //System.out.println("===== Execute Java JAR file =====");
-            //Pair<String, String> output = generator.executeJarFile(jarfile);
-            //System.out.println("Regular Output:");
-            //System.out.println(output.getValue0());
-            //System.out.println();
-            //System.out.println("Error Output:");
-            //System.out.println(output.getValue1());
-            //System.out.println();
+            /*System.out.println("===== Execute Java JAR file =====");
+            Pair<String, String> output = generator.executeJarFile(jarfile);
+            System.out.println("Regular Output:");
+            System.out.println(output.getValue0());
+            System.out.println();
+            System.out.println("Error Output:");
+            System.out.println(output.getValue1());
+            System.out.println();*/
         } catch (ScannerException exception) {
             System.out.println("During the scanning process, an error occurred: " + exception.getMessage());
             System.exit(1);

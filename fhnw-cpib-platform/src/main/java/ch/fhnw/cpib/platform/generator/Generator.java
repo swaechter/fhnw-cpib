@@ -65,7 +65,7 @@ public class Generator {
             ProcessBuilder processbuilder = new ProcessBuilder("java", "-jar", file.getAbsolutePath());
             processbuilder.directory(file.getParentFile());
             Process process = processbuilder.start();
-            //process.waitFor();
+            process.waitFor();
 
             Reader inputreader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             Reader errorreader = new BufferedReader(new InputStreamReader(process.getErrorStream()));

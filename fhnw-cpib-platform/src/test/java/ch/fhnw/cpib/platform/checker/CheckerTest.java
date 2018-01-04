@@ -1,6 +1,7 @@
-package ch.fhnw.cpib.platform.parser;
+package ch.fhnw.cpib.platform.checker;
 
 import ch.fhnw.cpib.platform.TestFiles;
+import ch.fhnw.cpib.platform.parser.Parser;
 import ch.fhnw.cpib.platform.parser.abstracttree.AbstractTree;
 import ch.fhnw.cpib.platform.parser.concretetree.ConcreteTree;
 import ch.fhnw.cpib.platform.scanner.Scanner;
@@ -11,7 +12,7 @@ import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
 
-public class ParserTest {
+public class CheckerTest {
 
     @Test
     public void testAbstractParser() throws Exception {
@@ -20,7 +21,7 @@ public class ParserTest {
         Parser parser = new Parser();
 
         // Parse the files
-        for (String filename : TestFiles.filenames) {
+        for (String filename : TestFiles.checkerfilenames) {
             // Load the program
             String content = ReaderUtils.getContentFromInputStream(getClass().getResourceAsStream(filename), StandardCharsets.UTF_8);
             Assert.assertFalse(content.isEmpty());
@@ -36,6 +37,9 @@ public class ParserTest {
             // Make the parse tree abstract
             AbstractTree.Program abstractprogram = concreteprogram.toAbstract();
             Assert.assertTrue(abstractprogram.toString().length() > 0);
+
+            // Check the tree
+            abstractprogram.check(new Checker());
         }
     }
 }
