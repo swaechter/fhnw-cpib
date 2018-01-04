@@ -39,6 +39,7 @@ public class TestGenerator {
 
             // Make the parse tree abstract
             AbstractTree.Program abstractprogram = concreteprogram.toAbstract();
+            //System.out.println(abstractprogram);
 
             // Check the abstract tree
             //abstractprogram.check(new Checker());
@@ -49,8 +50,18 @@ public class TestGenerator {
             //System.out.println(javafile);
 
             // Generate the Java JAR file
-            File javaclassfile = generator.generateJarFile(javafile, abstractprogram);
-            Assert.assertNotNull(javaclassfile);
+            File jarfile = generator.generateJarFile(javafile, abstractprogram);
+            Assert.assertNotNull(jarfile);
+
+            // Execute the Java JAR file
+            //System.out.println("===== Execute Java JAR file =====");
+            //Pair<String, String> output = generator.executeJarFile(jarfile);
+            //System.out.println("Regular Output:");
+            //System.out.println(output.getValue0());
+            //System.out.println();
+            //System.out.println("Error Output:");
+            //System.out.println(output.getValue1());
+            //System.out.println();
         }
     }
 }

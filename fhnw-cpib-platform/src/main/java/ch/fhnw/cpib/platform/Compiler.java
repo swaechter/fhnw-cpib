@@ -1,7 +1,5 @@
 package ch.fhnw.cpib.platform;
 
-import ch.fhnw.cpib.platform.checker.Checker;
-import ch.fhnw.cpib.platform.checker.CheckerException;
 import ch.fhnw.cpib.platform.generator.Generator;
 import ch.fhnw.cpib.platform.generator.GeneratorException;
 import ch.fhnw.cpib.platform.parser.Parser;
@@ -12,7 +10,6 @@ import ch.fhnw.cpib.platform.scanner.Scanner;
 import ch.fhnw.cpib.platform.scanner.exception.ScannerException;
 import ch.fhnw.cpib.platform.scanner.tokens.TokenList;
 import com.squareup.javapoet.JavaFile;
-import org.javatuples.Pair;
 
 import java.io.File;
 
@@ -52,12 +49,12 @@ public class Compiler {
             // Parse the abstract tree and show it
             System.out.println("===== Abstract parsing tree =====");
             AbstractTree.Program abstractprogram = concreteprogram.toAbstract();
-            System.out.println(concreteprogram);
+            System.out.println(abstractprogram);
             System.out.println();
 
             // Check the abstract tree
             System.out.println("===== Check abstract tree =====");
-            abstractprogram.check(new Checker());
+            //abstractprogram.check(new Checker());
             System.out.println("Done");
             System.out.println();
 
@@ -70,28 +67,28 @@ public class Compiler {
             // Generate the Java JAR file
             System.out.println("===== Generate Java JAR file =====");
             File jarfile = generator.generateJarFile(javafile, abstractprogram);
-            System.out.println("Done");
+            System.out.println("Done: " + jarfile.getAbsolutePath());
             System.out.println();
 
             // Execute the Java JAR file
-            System.out.println("===== Execute Java JAR file =====");
-            Pair<String, String> output = generator.executeJarFile(jarfile);
-            System.out.println("Regular Output:");
-            System.out.println(output.getValue0());
-            System.out.println();
-            System.out.println("Error Output:");
-            System.out.println(output.getValue1());
-            System.out.println();
+            //System.out.println("===== Execute Java JAR file =====");
+            //Pair<String, String> output = generator.executeJarFile(jarfile);
+            //System.out.println("Regular Output:");
+            //System.out.println(output.getValue0());
+            //System.out.println();
+            //System.out.println("Error Output:");
+            //System.out.println(output.getValue1());
+            //System.out.println();
         } catch (ScannerException exception) {
             System.out.println("During the scanning process, an error occurred: " + exception.getMessage());
             System.exit(1);
         } catch (ParserException exception) {
             System.out.println("During the parsing process, an error occurred: " + exception.getMessage());
             System.exit(1);
-        } catch (CheckerException exception) {
+        }/* catch (CheckerException exception) {
             System.out.println("During the checking process, an error occurred: " + exception.getMessage());
             System.exit(1);
-        } catch (GeneratorException exception) {
+        }*/ catch (GeneratorException exception) {
             System.out.println("During the generation process, an error occurred: " + exception.getMessage());
             System.exit(1);
         }

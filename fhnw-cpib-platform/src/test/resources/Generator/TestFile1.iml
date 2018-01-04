@@ -1,6 +1,30 @@
 program Factorial(inputvalue:int32, outputvalue:int32)
 global
 
+    fun fast_factorial_if(value:int32) returns result:int32
+    local
+        tempresult:int32
+    do
+        if value = 1 then
+            result := 1
+        else
+            if value = 2 then
+                result := 2
+            else
+                if value = 3 then
+                    result := 6
+                else
+                    if value = 3 then
+                        result := 24
+                    else
+                        tempresult := fast_factorial_elseif(value - 1);
+                        result := value * tempresult
+                    endif
+                endif
+            endif
+        endif
+    endfun;
+
     fun fast_factorial_elseif(value:int32) returns result:int32
     local
         tempresult:int32
@@ -40,6 +64,9 @@ global
 
 do
     debugin inputvalue;
+
+    outputvalue := fast_factorial_if(inputvalue);
+    debugout outputvalue;
 
     outputvalue := fast_factorial_elseif(inputvalue);
     debugout outputvalue;
