@@ -1,0 +1,16 @@
+program Factorial(inputvalue:int32)
+global
+
+    proc countdown(value:int32)
+    do
+        while value >= 0 do
+            debugout value;
+            value := value - 1
+        endwhile
+    endproc
+
+do
+    debugin inputvalue;
+    call countdown(inputvalue);
+    skip
+endprogram

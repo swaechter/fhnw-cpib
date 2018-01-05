@@ -973,8 +973,13 @@ public class AbstractTree {
 
         @Override
         public void generateCode(MethodSpec.Builder methodscpecbuilder) {
-            // FIXME: Implement code generation
-            throw new RuntimeException("Code generation not implemented yet!");
+            methodscpecbuilder.addCode("while(");
+            expression.generateCode(methodscpecbuilder);
+            methodscpecbuilder.addCode(") {" + System.lineSeparator());
+
+            cmd.generateCode(methodscpecbuilder);
+
+            methodscpecbuilder.addCode("}" + System.lineSeparator());
         }
     }
 
