@@ -54,7 +54,7 @@ public class Parser {
                 consumeTerminal(context, Terminal.ENDPROGRAM);
                 return new ConcreteTree.Program(identifier, progparamlist, optcpsdecl, cpscmd, 0);
             default:
-                throw new ParserException("Invalid terminal in program (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in program(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -71,7 +71,7 @@ public class Parser {
                 ConcreteTree.ProcDecl procdecl = parseProcDecl(context, idendation + 1);
                 return new ConcreteTree.DeclProc(procdecl, idendation);
             default:
-                throw new ParserException("Invalid terminal in decl (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in decl(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -85,7 +85,7 @@ public class Parser {
                 ConcreteTree.TypedIdent typedident2 = parseTypedIdent(context, idendation + 1);
                 return new ConcreteTree.StoDeclChangemode(changemode1, typedident2, idendation);
             default:
-                throw new ParserException("Invalid terminal in stoDecl (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in stoDecl(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -104,7 +104,7 @@ public class Parser {
                 consumeTerminal(context, Terminal.ENDFUN);
                 return new ConcreteTree.FunDecl(identifier, paramlist, stodecl, optglobimps, optcpsstodecl, cpscmd, idendation);
             default:
-                throw new ParserException("Invalid terminal in funDecl (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in funDecl(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -121,7 +121,7 @@ public class Parser {
                 consumeTerminal(context, Terminal.ENDPROC);
                 return new ConcreteTree.ProcDecl(identifier, paramlist, optglobimps, optcpsstodecl, cpscmd, idendation);
             default:
-                throw new ParserException("Invalid terminal in procDecl (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in procDecl(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
 
         }
     }
@@ -136,7 +136,7 @@ public class Parser {
             case LOCAL:
                 return new ConcreteTree.OptGlobImpsEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in optGlobImps (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in optGlobImps(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -149,7 +149,7 @@ public class Parser {
                 ConcreteTree.RepGlobImps repglobimps = parseRepGlobImps(context, idendation + 1);
                 return new ConcreteTree.GlobImps(globimp, repglobimps, idendation);
             default:
-                throw new ParserException("Invalid terminal in globImps (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in globImps(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -164,7 +164,7 @@ public class Parser {
             case LOCAL:
                 return new ConcreteTree.RepGlobImpsEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in repGlobImps (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in repGlobImps(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -176,7 +176,7 @@ public class Parser {
             case IDENT:
                 return new ConcreteTree.OptChangemodeEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in optChangemode (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in optChangemode(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -189,7 +189,7 @@ public class Parser {
             case CHANGEMODE:
                 return new ConcreteTree.OptMechmodeEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in optMechmode (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in optMechmode(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -206,7 +206,7 @@ public class Parser {
                 Tokens.IdentifierToken identifier2 = (Tokens.IdentifierToken) consumeTerminal(context, Terminal.IDENT);
                 return new ConcreteTree.GlobImpFlowmode(flowmode1, optchangemode2, identifier2, idendation);
             default:
-                throw new ParserException("Invalid terminal in globImp (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in globImp(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -219,7 +219,7 @@ public class Parser {
             case DO:
                 return new ConcreteTree.OptCpsDeclEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in optCpsDecl (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in optCpsDecl(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -233,7 +233,7 @@ public class Parser {
                 ConcreteTree.RepCpsDecl repcpsdecl = parseRepCpsDecl(context, idendation + 1);
                 return new ConcreteTree.CpsDecl(decl, repcpsdecl, idendation);
             default:
-                throw new ParserException("Invalid terminal in cpsDecl (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in cpsDecl(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -247,7 +247,7 @@ public class Parser {
             case DO:
                 return new ConcreteTree.RepCpsDeclEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in repCpsDecl (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in repCpsDecl(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -260,7 +260,7 @@ public class Parser {
             case DO:
                 return new ConcreteTree.OptCpsStoDeclEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in optCpsStoDecl (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in optCpsStoDecl(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -272,7 +272,7 @@ public class Parser {
                 ConcreteTree.RepCpsStoDecl repcpsstodecl = parseRepCpsStoDecl(context, idendation + 1);
                 return new ConcreteTree.CpsStoDecl(stodecl, repcpsstodecl, idendation);
             default:
-                throw new ParserException("Invalid terminal in cpsStoDecl (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in cpsStoDecl(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -286,7 +286,7 @@ public class Parser {
             case DO:
                 return new ConcreteTree.RepCpsStoDeclEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in repCpsStoDecl (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in repCpsStoDecl(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -298,7 +298,7 @@ public class Parser {
                 consumeTerminal(context, Terminal.RPAREN);
                 return new ConcreteTree.ProgParamList(optprogparamlist, idendation);
             default:
-                throw new ParserException("Invalid terminal in progParamList (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in progParamList(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -313,7 +313,7 @@ public class Parser {
             case RPAREN:
                 return new ConcreteTree.OptProgParamListEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in optProgParamList (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in optProgParamList(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -327,7 +327,7 @@ public class Parser {
             case RPAREN:
                 return new ConcreteTree.RepProgParamListEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in repProgParamList (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in repProgParamList(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -345,7 +345,7 @@ public class Parser {
                 return new ConcreteTree.ProgParamFlowmode(flowmode1, optchangemode1, typeident1, idendation);
 
             default:
-                throw new ParserException("Invalid terminal in progParam (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in progParam(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -357,7 +357,7 @@ public class Parser {
                 consumeTerminal(context, Terminal.RPAREN);
                 return new ConcreteTree.ParamList(optparamlist, idendation);
             default:
-                throw new ParserException("Invalid terminal in paramList (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in paramList(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -373,7 +373,7 @@ public class Parser {
             case RPAREN:
                 return new ConcreteTree.OptParamListEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in optParamList (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in optParamList(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -387,7 +387,7 @@ public class Parser {
             case RPAREN:
                 return new ConcreteTree.RepParamListEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in repParamList (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in repParamList(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -407,7 +407,7 @@ public class Parser {
                 ConcreteTree.TypedIdent typedindent2 = parseTypedIdent(context, idendation + 1);
                 return new ConcreteTree.ParamFlowmode(flowmode1, optmechmode2, optchangemode2, typedindent2, idendation);
             default:
-                throw new ParserException("Invalid terminal in param (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in param(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -419,7 +419,7 @@ public class Parser {
                 Tokens.TypeToken type = (Tokens.TypeToken) consumeTerminal(context, Terminal.TYPE);
                 return new ConcreteTree.TypedIdent(identifier, type.getType(), idendation);
             default:
-                throw new ParserException("Invalid terminal in typedIdent (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in typedIdent(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -481,7 +481,7 @@ public class Parser {
                 ConcreteTree.Expr expr7 = parseExpr(context, idendation + 1);
                 return new ConcreteTree.CmdDebugOut(expr7, idendation);
             default:
-                throw new ParserException("Invalid terminal in cmd (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in cmd(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -503,7 +503,7 @@ public class Parser {
                 ConcreteTree.RepCpsCmd repcpscmd = parseRepCpsCmd(context, idendation + 1);
                 return new ConcreteTree.CpsCmd(cmd, repcpscmd, idendation);
             default:
-                throw new ParserException("Invalid terminal in cpsCmd (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in cpsCmd(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -526,7 +526,7 @@ public class Parser {
             case ENDPROGRAM:
                 return new ConcreteTree.RepCpsCmdEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in repCpsCmd (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in repCpsCmd(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -550,7 +550,7 @@ public class Parser {
             case SEMICOLON:
                 return new ConcreteTree.OptGlobInitsEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in optGlobInits (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in optGlobInits(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -574,7 +574,7 @@ public class Parser {
             case SEMICOLON:
                 return new ConcreteTree.RepIdentsEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in repIdents (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in repIdents(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -589,7 +589,7 @@ public class Parser {
                 ConcreteTree.RepTerm1 repterm1 = parseRepTerm1(context, idendation + 1);
                 return new ConcreteTree.Expr(term1, repterm1, idendation);
             default:
-                throw new ParserException("Invalid terminal in expr (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in expr(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -618,7 +618,7 @@ public class Parser {
             case COMMA:
                 return new ConcreteTree.RepTerm1Epsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in repTerm2 (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in repTerm2(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -633,7 +633,7 @@ public class Parser {
                 ConcreteTree.RepTerm2 repterm2 = parseRepTerm2(context, idendation + 1);
                 return new ConcreteTree.Term1(term2, repterm2, idendation);
             default:
-                throw new ParserException("Invalid terminal in term1 (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in term1(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -663,7 +663,7 @@ public class Parser {
             case BOOLOPR:
                 return new ConcreteTree.RepTerm2Epsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in repTerm2 (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in repTerm2(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -678,7 +678,7 @@ public class Parser {
                 ConcreteTree.RepTerm3 repterm3 = parseRepTerm3(context, idendation + 1);
                 return new ConcreteTree.Term2(term3, repterm3, idendation);
             default:
-                throw new ParserException("Invalid terminal in term2 (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in term2(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -709,7 +709,7 @@ public class Parser {
             case RELOPR:
                 return new ConcreteTree.RepTerm3Epsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in repTerm3 (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in repTerm3(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -724,7 +724,7 @@ public class Parser {
                 ConcreteTree.RepFactor repfactor = parseRepFactor(context, idendation + 1);
                 return new ConcreteTree.Term3(factor, repfactor, idendation);
             default:
-                throw new ParserException("Invalid terminal in term3 (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in term3(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -756,7 +756,7 @@ public class Parser {
             case ADDOPR:
                 return new ConcreteTree.RepFactorEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in repFactor (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in repFactor(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -780,7 +780,7 @@ public class Parser {
                 consumeTerminal(context, Terminal.RPAREN);
                 return new ConcreteTree.FactorLparen(expr1, idendation);
             default:
-                throw new ParserException("Invalid terminal in factor (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in factor(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -814,7 +814,7 @@ public class Parser {
             case MULTOPR:
                 return new ConcreteTree.OptInitOrExprListEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in optInitOrExprList (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in optInitOrExprList(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -828,7 +828,7 @@ public class Parser {
                 Tokens.AddOprToken addopr = (Tokens.AddOprToken) consumeTerminal(context, Terminal.ADDOPR);
                 return new ConcreteTree.MonadicOprAddopr(addopr, idendation);
             default:
-                throw new ParserException("Invalid terminal in monadicOpr (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in monadicOpr(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -840,7 +840,7 @@ public class Parser {
                 consumeTerminal(context, Terminal.RPAREN);
                 return new ConcreteTree.ExprList(optexprlist, idendation);
             default:
-                throw new ParserException("Invalid terminal in exprList (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in exprList(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -857,7 +857,7 @@ public class Parser {
             case RPAREN:
                 return new ConcreteTree.OptExprListEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in optExprList (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in optExprList(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -883,7 +883,7 @@ public class Parser {
             case BECOMES:
                 return new ConcreteTree.RepExprListEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in repExprList (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in repExprList(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -900,7 +900,7 @@ public class Parser {
             case DEFAULT:
                 return new ConcreteTree.RepCaseEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in repCase (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in repCase(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -914,7 +914,7 @@ public class Parser {
             case ENDSWITCH:
                 return new ConcreteTree.OptDefaultEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in optDefault (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in optDefault(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -927,7 +927,7 @@ public class Parser {
             case ENDIF:
                 return new ConcreteTree.OptElseEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in optElse (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in optElse(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 
@@ -944,7 +944,7 @@ public class Parser {
             case ELSE:
                 return new ConcreteTree.RepElseifEpsilon(idendation);
             default:
-                throw new ParserException("Invalid terminal in repElseif (" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "):" + context.getTerminal());
+                throw new ParserException("Invalid terminal in repElseif(" + context.getToken().getRow() + ":" + context.getToken().getColumn() + "): " + context.getTerminal());
         }
     }
 }
