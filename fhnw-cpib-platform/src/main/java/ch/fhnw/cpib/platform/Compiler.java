@@ -1,5 +1,7 @@
 package ch.fhnw.cpib.platform;
 
+import ch.fhnw.cpib.platform.checker.Checker;
+import ch.fhnw.cpib.platform.checker.CheckerException;
 import ch.fhnw.cpib.platform.generator.Generator;
 import ch.fhnw.cpib.platform.generator.GeneratorException;
 import ch.fhnw.cpib.platform.parser.Parser;
@@ -54,7 +56,7 @@ public class Compiler {
 
             // Check the abstract tree
             System.out.println("===== Check abstract tree =====");
-            //abstractprogram.check(new Checker());
+            abstractprogram.checkCode(new Checker());
             System.out.println("Done");
             System.out.println();
 
@@ -85,10 +87,10 @@ public class Compiler {
         } catch (ParserException exception) {
             System.out.println("During the parsing process, an error occurred: " + exception.getMessage());
             System.exit(1);
-        }/* catch (CheckerException exception) {
+        } catch (CheckerException exception) {
             System.out.println("During the checking process, an error occurred: " + exception.getMessage());
             System.exit(1);
-        }*/ catch (GeneratorException exception) {
+        } catch (GeneratorException exception) {
             System.out.println("During the generation process, an error occurred: " + exception.getMessage());
             System.exit(1);
         }
