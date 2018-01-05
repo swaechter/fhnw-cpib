@@ -8,7 +8,6 @@ import ch.fhnw.cpib.platform.parser.concretetree.ConcreteTree;
 import ch.fhnw.cpib.platform.scanner.Scanner;
 import ch.fhnw.cpib.platform.scanner.tokens.TokenList;
 import ch.fhnw.cpib.platform.utils.ReaderUtils;
-import com.squareup.javapoet.JavaFile;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -46,12 +45,12 @@ public class TestGenerator {
             abstractprogram.checkCode(new Checker());
 
             // Generate the Java code
-            JavaFile javafile = generator.generateJavaFile(abstractprogram);
-            Assert.assertTrue(javafile.toString().length() > 0);
-            //System.out.println(javafile);
+            String javacode = generator.generateJavaCode(abstractprogram);
+            Assert.assertTrue(javacode.length() > 0);
+            //System.out.println(javacode);
 
             // Generate the Java JAR file
-            File jarfile = generator.generateJarFile(javafile, abstractprogram);
+            File jarfile = generator.generateJarFile(javacode, abstractprogram);
             Assert.assertNotNull(jarfile);
 
             // Execute the Java JAR file

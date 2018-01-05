@@ -18,16 +18,18 @@ import java.util.jar.Manifest;
 
 public class Generator {
 
-    public JavaFile generateJavaFile(AbstractTree.Program program) throws GeneratorException {
-        return program.generateCode();
+    public String generateJavaCode(AbstractTree.Program program) throws GeneratorException {
+        // Build the Java file
+        JavaFile javafile = program.generateCode();
+
+        // Replace the package namespace
+        String javacode = javafile.toString();
+        javacode = javacode.replace("package fhnw;", "");
+        return javacode;
     }
 
-    public File generateJarFile(JavaFile javaobject, AbstractTree.Program program) throws GeneratorException {
+    public File generateJarFile(String javacode, AbstractTree.Program program) throws GeneratorException {
         try {
-            // Replace the package namespace
-            String javacode = javaobject.toString();
-            javacode = javacode.replace("package fhnw;", "");
-
             // Create the Java source file
             File javafile = new File(program.getProgramName() + ".java");
             Files.write(javafile.toPath(), javacode.getBytes(StandardCharsets.UTF_8));

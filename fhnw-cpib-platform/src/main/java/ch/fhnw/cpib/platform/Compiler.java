@@ -11,7 +11,6 @@ import ch.fhnw.cpib.platform.parser.exception.ParserException;
 import ch.fhnw.cpib.platform.scanner.Scanner;
 import ch.fhnw.cpib.platform.scanner.exception.ScannerException;
 import ch.fhnw.cpib.platform.scanner.tokens.TokenList;
-import com.squareup.javapoet.JavaFile;
 
 import java.io.File;
 
@@ -62,13 +61,13 @@ public class Compiler {
 
             // Generate the Java code
             System.out.println("===== Generate Java code =====");
-            JavaFile javafile = generator.generateJavaFile(abstractprogram);
-            System.out.println(javafile);
+            String javacode = generator.generateJavaCode(abstractprogram);
+            System.out.println(javacode);
             System.out.println();
 
             // Generate the Java JAR file
             System.out.println("===== Generate Java JAR file =====");
-            File jarfile = generator.generateJarFile(javafile, abstractprogram);
+            File jarfile = generator.generateJarFile(javacode, abstractprogram);
             System.out.println("Done: " + jarfile.getAbsolutePath());
             System.out.println();
 
