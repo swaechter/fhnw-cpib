@@ -13,7 +13,7 @@ public class OperatorState extends State {
 
     @Override
     public State handleNewline() throws ScannerException {
-        Optional<Tokens.Token> token = getDictionary().lookupToken(getToken());
+        Optional<Tokens.Token> token = getDictionary().lookupToken(this, getToken());
         if (token.isPresent()) {
             getTokenList().addToken(token.get());
             return new InitialState(this);
@@ -24,7 +24,7 @@ public class OperatorState extends State {
 
     @Override
     public State handleLetter(Character character) throws ScannerException {
-        Optional<Tokens.Token> token = getDictionary().lookupToken(getToken());
+        Optional<Tokens.Token> token = getDictionary().lookupToken(this, getToken());
         if (token.isPresent()) {
             getTokenList().addToken(token.get());
             return new IdentityState(this, character);
@@ -35,7 +35,7 @@ public class OperatorState extends State {
 
     @Override
     public State handleDigit(Character character) throws ScannerException {
-        Optional<Tokens.Token> token = getDictionary().lookupToken(getToken());
+        Optional<Tokens.Token> token = getDictionary().lookupToken(this, getToken());
         if (token.isPresent()) {
             getTokenList().addToken(token.get());
             return new LiteralState(this, character);
@@ -46,7 +46,7 @@ public class OperatorState extends State {
 
     @Override
     public State handleSpace(Character character) throws ScannerException {
-        Optional<Tokens.Token> token = getDictionary().lookupToken(getToken());
+        Optional<Tokens.Token> token = getDictionary().lookupToken(this, getToken());
         if (token.isPresent()) {
             getTokenList().addToken(token.get());
             return new InitialState(this);
@@ -57,7 +57,7 @@ public class OperatorState extends State {
 
     @Override
     public State handleUnderScore(Character character) throws ScannerException {
-        Optional<Tokens.Token> token = getDictionary().lookupToken(getToken());
+        Optional<Tokens.Token> token = getDictionary().lookupToken(this, getToken());
         if (token.isPresent()) {
             getTokenList().addToken(token.get());
             return new IdentityState(this, character);
@@ -73,7 +73,7 @@ public class OperatorState extends State {
 
     @Override
     public State handleSlash(Character character) throws ScannerException {
-        Optional<Tokens.Token> token = getDictionary().lookupToken(getToken());
+        Optional<Tokens.Token> token = getDictionary().lookupToken(this, getToken());
         if (token.isPresent()) {
             getTokenList().addToken(token.get());
             return new CommentState(this, character);
@@ -84,13 +84,13 @@ public class OperatorState extends State {
 
     @Override
     public State handleOperator(Character character) throws ScannerException {
-        Optional<Tokens.Token> token = getDictionary().lookupToken(getToken() + character);
+        Optional<Tokens.Token> token = getDictionary().lookupToken(this, getToken() + character);
         if (token.isPresent()) {
             getTokenList().addToken(token.get());
             return new InitialState(this);
         } else {
-            Optional<Tokens.Token> operator1 = getDictionary().lookupToken(getToken());
-            Optional<Tokens.Token> operator2 = getDictionary().lookupToken(String.valueOf(character));
+            Optional<Tokens.Token> operator1 = getDictionary().lookupToken(this, getToken());
+            Optional<Tokens.Token> operator2 = getDictionary().lookupToken(this, String.valueOf(character));
             if (operator1.isPresent() && operator2.isPresent()) {
                 getTokenList().addToken(operator1.get());
                 getTokenList().addToken(operator2.get());

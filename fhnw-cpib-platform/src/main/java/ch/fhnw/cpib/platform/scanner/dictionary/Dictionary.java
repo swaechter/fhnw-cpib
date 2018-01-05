@@ -1,5 +1,6 @@
 package ch.fhnw.cpib.platform.scanner.dictionary;
 
+import ch.fhnw.cpib.platform.scanner.states.State;
 import ch.fhnw.cpib.platform.scanner.tokens.Terminal;
 import ch.fhnw.cpib.platform.scanner.tokens.Tokens;
 
@@ -98,19 +99,39 @@ public class Dictionary {
         tokens.put("modT", new Tokens.MultOprToken(Terminal.MULTOPR, Tokens.MultOprToken.MultOpr.MODE));
     }
 
-    public Optional<Tokens.Token> lookupToken(String symbol) {
-        return tokens.entrySet().stream().filter(e -> e.getKey().equalsIgnoreCase(symbol)).map(Map.Entry::getValue).findFirst();
+    public Optional<Tokens.Token> lookupToken(State state, String symbol) {
+        Optional<Tokens.Token> optionaltoken = tokens.entrySet().stream().filter(e -> e.getKey().equalsIgnoreCase(symbol)).map(Map.Entry::getValue).findFirst();
+        if (optionaltoken.isPresent()) {
+            try {
+                Tokens.Token token = (Tokens.Token) optionaltoken.get().clone();
+                token.setRow(state.getRow());
+                token.setColumn(state.getColumn());
+                return Optional.of(token);
+            } catch (CloneNotSupportedException exception) {
+                return Optional.empty();
+            }
+        }
+        return Optional.empty();
     }
 
-    public Tokens.Token lookupLiteral(String name) {
-        return new Tokens.LiteralToken(name, Terminal.LITERAL);
+    public Tokens.Token lookupLiteral(State state, String name) {
+        Tokens.Token token = new Tokens.LiteralToken(name, Terminal.LITERAL);
+        token.setRow(state.getRow());
+        token.setColumn(state.getColumn());
+        return token;
     }
 
-    public Tokens.Token lookupIdentifier(String value) {
-        return new Tokens.IdentifierToken(value, Terminal.IDENT);
+    public Tokens.Token lookupIdentifier(State state, String value) {
+        Tokens.Token token = new Tokens.IdentifierToken(value, Terminal.IDENT);
+        token.setRow(state.getRow());
+        token.setColumn(state.getColumn());
+        return token;
     }
 
-    public Tokens.Token lookupSentinel() {
-        return new Tokens.SentinelToken(Terminal.SENTINEL);
+    public Tokens.Token lookupSentinel(State state) {
+        Tokens.Token token = new Tokens.SentinelToken(Terminal.SENTINEL);
+        token.setRow(state.getRow());
+        token.setColumn(state.getColumn());
+        return token;
     }
 }

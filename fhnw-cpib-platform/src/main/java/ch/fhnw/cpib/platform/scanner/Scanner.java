@@ -32,6 +32,8 @@ public class Scanner {
             //System.out.println("[" + i + "]: " + element);
             if (element == '\n') {
                 state = state.handleNewline();
+                state.setRow(state.getRow() + 1);
+                state.setColumn(0);
             } else if (Character.isLetter(element)) {
                 state = state.handleLetter(element);
             } else if (Character.isDigit(element)) {
@@ -51,10 +53,11 @@ public class Scanner {
             } else {
                 state = state.handleUnknown(element);
             }
+            state.setColumn(state.getColumn() + 1);
         }
 
         // Add final sentinel token
-        tokenlist.addToken(dictionary.lookupSentinel());
+        tokenlist.addToken(dictionary.lookupSentinel(state));
 
         return tokenlist;
     }

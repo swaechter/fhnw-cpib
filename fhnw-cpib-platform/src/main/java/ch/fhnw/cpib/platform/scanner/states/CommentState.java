@@ -21,7 +21,7 @@ public class CommentState extends State {
         if (getToken().length() == 2) {
             return this;
         } else {
-            Optional<Tokens.Token> token = getDictionary().lookupToken(getToken());
+            Optional<Tokens.Token> token = getDictionary().lookupToken(this, getToken());
             if (token.isPresent()) {
                 getTokenList().addToken(token.get());
                 return new ch.fhnw.cpib.platform.scanner.states.IdentityState(this, character);
@@ -36,7 +36,7 @@ public class CommentState extends State {
         if (getToken().length() == 2) {
             return this;
         } else {
-            Optional<Tokens.Token> token = getDictionary().lookupToken(getToken());
+            Optional<Tokens.Token> token = getDictionary().lookupToken(this, getToken());
             if (token.isPresent()) {
                 getTokenList().addToken(token.get());
                 return new ch.fhnw.cpib.platform.scanner.states.LiteralState(this, character);
@@ -51,7 +51,7 @@ public class CommentState extends State {
         if (getToken().length() == 2) {
             return this;
         } else {
-            Optional<Tokens.Token> token = getDictionary().lookupToken(getToken());
+            Optional<Tokens.Token> token = getDictionary().lookupToken(this, getToken());
             if (token.isPresent()) {
                 getTokenList().addToken(token.get());
                 return new ch.fhnw.cpib.platform.scanner.states.InitialState(this);

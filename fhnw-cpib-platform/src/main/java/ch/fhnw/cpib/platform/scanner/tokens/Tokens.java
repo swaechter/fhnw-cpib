@@ -2,9 +2,13 @@ package ch.fhnw.cpib.platform.scanner.tokens;
 
 public class Tokens {
 
-    public static class Token {
+    public static class Token implements Cloneable {
 
         private final Terminal terminal;
+
+        private int row;
+
+        private int column;
 
         public Token(Terminal terminal) {
             this.terminal = terminal;
@@ -16,6 +20,27 @@ public class Tokens {
 
         public String toString() {
             return terminal.toString();
+        }
+
+        public int getRow() {
+            return row;
+        }
+
+        public void setRow(int row) {
+            this.row = row;
+        }
+
+        public int getColumn() {
+            return column;
+        }
+
+        public void setColumn(int column) {
+            this.column = column;
+        }
+
+        @Override
+        public Object clone() throws CloneNotSupportedException {
+            return super.clone();
         }
     }
 

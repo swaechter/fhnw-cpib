@@ -10,7 +10,7 @@ public class LiteralState extends State {
 
     @Override
     public State handleNewline() throws ScannerException {
-        getTokenList().addToken(getDictionary().lookupLiteral(getToken()));
+        getTokenList().addToken(getDictionary().lookupLiteral(this, getToken()));
         return new InitialState(this);
     }
 
@@ -27,7 +27,7 @@ public class LiteralState extends State {
 
     @Override
     public State handleSpace(Character character) throws ScannerException {
-        getTokenList().addToken(getDictionary().lookupLiteral(getToken()));
+        getTokenList().addToken(getDictionary().lookupLiteral(this, getToken()));
         return new InitialState(this);
     }
 
@@ -43,13 +43,13 @@ public class LiteralState extends State {
 
     @Override
     public State handleSlash(Character character) throws ScannerException {
-        getTokenList().addToken(getDictionary().lookupLiteral(getToken()));
+        getTokenList().addToken(getDictionary().lookupLiteral(this, getToken()));
         return new CommentState(this, character);
     }
 
     @Override
     public State handleOperator(Character character) throws ScannerException {
-        getTokenList().addToken(getDictionary().lookupLiteral(getToken()));
+        getTokenList().addToken(getDictionary().lookupLiteral(this, getToken()));
         return new OperatorState(this, character);
     }
 
