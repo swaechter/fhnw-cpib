@@ -103,6 +103,7 @@ public class TestFiles {
         "/Generator/TestFile1.iml",
         "/Generator/TestFile2.iml",
         "/Generator/TestFile3.iml",
-        "/Generator/TestFile4.iml"
+        "/Generator/TestFile4.iml",
+        "/Generator/TestFile5.iml"
     );
 }
