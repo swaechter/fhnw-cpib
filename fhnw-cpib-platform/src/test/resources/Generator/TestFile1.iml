@@ -14,7 +14,7 @@ global
                 if value = 3 then
                     result := 6
                 else
-                    if value = 3 then
+                    if value = 4 then
                         result := 24
                     else
                         tempresult := fast_factorial_if(value - 1);
